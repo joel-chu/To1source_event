@@ -14,7 +14,8 @@
   "scripts": {
     "test": "DEBUG=nb-event-service* ava",
     "build": "rollup -c",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test:browser": "node ./tests/fixtures/browser.js"
   },
   "repository": {
     "type": "git",
@@ -54,6 +55,7 @@
     "node": ">=8"
   },
   "devDependencies": {
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "server-io-core": "^1.0.9"
   }
 }
