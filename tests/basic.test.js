@@ -89,3 +89,18 @@ test('It should only call once if we use the $once option', t => {
   t.is(ctn, 2)
 
 })
+
+test('Using the $call alias to $trigger should do the same thing', t => {
+  let evtName = 'alias'
+  let ctn = 0;
+
+  const callback = () => {
+    ++ctn;
+    debug(ctn)
+  }
+  t.context.evtSrv.$once(evtName, callback)
+  t.context.evtSrv.$trigger(evtName)
+  t.context.evtSrv.$call(evtName)
+
+  t.is(ctn, 2)
+})

@@ -117,6 +117,11 @@ export default class NBEventService {
     })
   }
 
+  // this is an alias to the $trigger
+  $call(...args) {
+    return Reflect.apply(this.$trigger, this, args)
+  }
+
   /**
    * remove the evt from normal store
    * @param {string} evt name
