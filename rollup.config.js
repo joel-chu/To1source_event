@@ -1,6 +1,8 @@
 /**
  * rollup config for build browser version
  */
+import { join } from 'path'
+
 import buble from 'rollup-plugin-buble'
 import { terser } from 'rollup-plugin-terser'
 
@@ -12,7 +14,7 @@ export default {
     name: 'NBEventService',
     file: join(__dirname, 'dist', 'nb-event-service.js'),
     format: 'umd',
-    sourceMap: true,
+    sourcemap: true
   },
   plugins: [
     buble(),

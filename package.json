@@ -5,8 +5,16 @@
   "module": "index.js",
   "browser": "dist/nb-event-service.js",
   "main": "main.js",
+  "files": [
+    "index.js",
+    "main.js",
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "test": "ava"
+    "test": "ava",
+    "build": "rollup -c",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -21,10 +29,31 @@
   "license": "ISC",
   "dependencies": {
     "ava": "^2.1.0",
-    "debug": "^4.1.1",
     "esm": "^3.2.25",
     "rollup": "^1.15.4",
     "rollup-plugin-buble": "^0.19.6",
     "rollup-plugin-terser": "^5.0.0"
+  },
+  "ava": {
+    "files": [
+      "tests/*.test.js",
+      "!tests/helpers/*.*",
+      "!tests/fixtures/*.*"
+    ],
+    "require": [
+      "esm"
+    ],
+    "cache": true,
+    "concurrency": 5,
+    "failFast": true,
+    "failWithoutAssertions": false,
+    "tap": false,
+    "compileEnhancements": false
+  },
+  "engine": {
+    "node": ">=8"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1"
   }
 }
