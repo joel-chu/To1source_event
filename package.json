@@ -1,0 +1,30 @@
+{
+  "name": "nb-event-service",
+  "version": "1.0.0",
+  "description": "An universal event service or Browser / Node",
+  "module": "index.js",
+  "browser": "dist/nb-event-service.js",
+  "main": "main.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "TBC"
+  },
+  "keywords": [
+    "event",
+    "javascript",
+    "node"
+  ],
+  "author": "Joel Chu <joelckchu@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "ava": "^2.1.0",
+    "debug": "^4.1.1",
+    "esm": "^3.2.25",
+    "rollup": "^1.15.4",
+    "rollup-plugin-buble": "^0.19.6",
+    "rollup-plugin-terser": "^5.0.0"
+  }
+}
