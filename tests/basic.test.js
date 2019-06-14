@@ -104,3 +104,23 @@ test('Using the $call alias to $trigger should do the same thing', t => {
 
   t.is(ctn, 2)
 })
+
+/*
+test.only('It should able to register multiple events for one callback', t => {
+  let ctn = 0;
+  const callback = () => {
+    ++ctn;
+    debug(ctn)
+  }
+  let events = ['a', 'b', 'c']
+  t.context.evtSrv.$on(events, callback)
+
+  t.context.evtSrv.$call('a')
+  t.context.evtSrv.$call('b')
+  t.context.evtSrv.$call('c')
+
+  t.is(ctn, 3)
+
+
+})
+*/

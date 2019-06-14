@@ -36,11 +36,11 @@ It will return
 * true - event been clear
 * false - such even doesn't exist
 
-#### $trigger(eventName , params , from)
+#### $trigger(eventName , params , context)
 
 * eventName (string || array) you can trigger one or multiple events (array)
 * params (mixed) data you want to pass to your callback method
-* from (string) this is for debugging purposes, this will pass back to your callback as second parameter, if you don't then you get the stack index.
+* When we execute the callback, we will add this context to the `Reflect.apply` or default to null
 
 This method will return
 
@@ -49,51 +49,33 @@ This method will return
 
 #### $get(evt)
 
-* return all the data from the internal store. Handy for debug.
-* pass the optional event name will only return that stack.
+* return all the listerners for that particular event name from the internal store. Handy for debug.
 
-## EXAMPLES (BREAKING CHANGE @ > V0.7.X)
+#### $call
 
-When you use with your browser:
+This is an alias to `$trigger`
 
-```javascript
-     ~~var EventSrvInstance = new NB.EventService();~~
-     // now you need to do this in browser
-     var EventSrvInstance = new window.NBEventService['default']({
-         logger: console.log
-     }); // if you want to debug it then pass a logger method
-```
-
-The reason is , there are several other package within the NB (comming to Github soon).
+## Examples
 
 Then register your event with a handler:
 
+```js
     EventSrvInstance.$on('someEventName' , function(data)
     {
         // do what you want
-    });
+    })
+```
 
 Now fire at will:
 
+```js
     EventSrvInstance.$trigger('someEventName', {data: 'some data'});
-
-
-V.2 allow you to listen to multiple events
-
-    EventSrvInstance.$on(['event1' , 'event2'] , function(data , from)
-    {
-        do_the_same_thing();
-    });
-
-Also allow you to trigger multiple events:
-
-    EventSrvInstance.$trigger(['click1' , 'click2' , 'click3'] , {data: 'hello'} , 'same-btn');
-
+```
 
 Now use this with AngularJS, create a service / provider (but not a factory!)
 
 ```javascript
-    angular.module('yourAppModule').service('MyEventService' , window.NBEventService['default']);
+    angular.module('yourAppModule').service('MyEventService' , NBEventService);
 ```
 
 Or if you want to pass an option:
@@ -116,6 +98,7 @@ And that's it. Let say you register the event in your controller as well as a di
 
 Controller:
 
+```js
     angular.module('yourAppModule').controller('mainCtrl' , ['$scope' , 'MyEventService', function($scope , MyEventService)
     {
         MyEventService.$on('someClickEvent' , function(data , from)
@@ -133,9 +116,11 @@ Controller:
             }
         });
     }]);
+```
 
 In a directive some where else
 
+```js
     angular.module('yourAppModule').directive('showHideMe' , ['MyEventService' , function(MyEventService)
     {
         var tpl = [
@@ -157,9 +142,12 @@ In a directive some where else
             }
         }
     }]);
+```
+
 
 Then somewhere else in another directive
 
+```js
     angular.module('yourAppModule').directive('clickMe' , ['MyEventService' , function(MyEventService)
     {
         return {
@@ -177,31 +165,32 @@ Then somewhere else in another directive
             }
         }
     }]);
+```
 
 If you want to wrap this around your own service
 
+```js
+
     angular.module('yourAppModule').service('yourService' , [function()
     {
-        var self = angular.merge(this , new NB.EventService());
+        var self = angular.merge(this , new NBEventService());
         // the rest of the stuff you want to do
 
         return self;
     }]);
+```
 
 And you can use this with React.js / Riot.js (or any other JS library) pretty easily.
 
 ### ~~Loading sequence and timing might cause problem~~
 
-~~Please note, you need to register your listener before you can fire. In an proper async / promise environment is fine.
-Everything will wait until its ready. But sometime you might calling $trigger as soon as page load. Then you will be
-running into the race condition, that the listener is not yet ready to received your call. So please be aware of
-how you design your trigger/listener.~~
+**This is not a problem anymore.**
 
 V0.3.0 - add `lazyStore` internally, so you could `$trigger` before you register the listener.
 
 V0.5.3 - change the way how the object init. We now allow you to pass an config object during init
 
-    new NB.EventService({logger: console.log});
+    new NBEventService({logger: console.log});
 
 Then you can see all the internal what is happening. Also fix a bug which about the context, now by default will be a `null` value
 instead of `this`

@@ -1,6 +1,6 @@
 {
   "name": "nb-event-service",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An universal event service or Browser / Node",
   "module": "index.js",
   "browser": "dist/nb-event-service.js",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "TBC"
+    "url": "git+ssh://git@gitlab.com:newbranltd/nb-event-service"
   },
   "keywords": [
     "event",
