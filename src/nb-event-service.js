@@ -11,7 +11,7 @@ import {
 } from './store'
 
 // Default
-export default class NBEventServiceCls {
+export default class NBEventService {
   /**
    * class constructor
    */
@@ -42,7 +42,7 @@ export default class NBEventServiceCls {
     // should look at the lazyStore first !!!!
     if (this.executeFnInLazyStore(evt , callback , context , hashKey) === false) {
       // start with normal empty
-      if (!store[evt]) {
+      if (!store || !store[evt]) {
         const payload = [this.saveToNormalStore(hashKey , callback , context)]
         this.normalStore = this.mergeToStore(store , evt , payload)
         this.logger('init store' , evt , payload)
@@ -222,9 +222,9 @@ export default class NBEventServiceCls {
     }
     const fn = key === 'store' ? 'normalStore' : 'lazyStore';
     // create a hash code and check if this already been stored
-    const store = this['__' + fn + '__'];
+    const store = this[fn]
     const hashKey = this.hashFnToKey(callback)
-    return [hashKey , store];
+    return [hashKey , store]
   }
 
   /**

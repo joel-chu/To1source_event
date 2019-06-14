@@ -12,7 +12,7 @@
     "src"
   ],
   "scripts": {
-    "test": "ava",
+    "test": "DEBUG=nb-event-service* ava",
     "build": "rollup -c",
     "prepare": "npm run build"
   },
