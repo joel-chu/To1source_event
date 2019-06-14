@@ -16,18 +16,17 @@ export default class NBEventServiceCls {
     /**
      * class constructor
      */
-    constructor(config = {})
-    {
-        this.logger = (config.logger || function() {});
+    constructor(config = {}) {
+      if (config.logger && typeof config.logger === 'function') {
+        this.logger = config.logger;
+      }
     }
+
     /**
      * logger for overwrite
      */
-    logger()
-    {
-        const args = [...arguments];
-        this.config.logger(args);
-    }
+    logger() {}
+
     //////////////////////////
     //    PUBLIC METHODS    //
     //////////////////////////
@@ -268,7 +267,7 @@ export default class NBEventServiceCls {
      */
     __hashCode__(fn)
     {
-        return genHaskKey(fn.toString()) + ""; // make sure its a string
+        return genHaskKey(fn.toString())
     }
 }
 
