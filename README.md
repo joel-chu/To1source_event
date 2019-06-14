@@ -1,6 +1,6 @@
 # nb-event-service
 
-> An universal Event Service for Javascript.
+> A universal Event Service for Javascript.
 
 ## Installation
 
@@ -13,14 +13,14 @@ This module works in browser as well as node.js
 #### $on(eventName, callback)
 
 * eventName (string || array) now you can pass one, or many (array) to listen to multiple events.
-* callback (function) it will receive the `params` that call a second `from` see below for more info.
+* callback (function) it will receive the `params` that call.
 
 It will return the total number of events that get registered.
 
 #### $once(eventName , callback)
 
 * eventName (string || array) now you can pass one, or many (array) to listen to multiple events.
-* callback (function) it will receive the `params` that call a second `from` see below for more info.
+* callback (function) it will receive the `params` that call.
 
 There was a problem when I use it in Angular whenever a page
 get reloaded - the same event listener get register then accumulated
@@ -38,9 +38,9 @@ It will return
 
 #### $trigger(eventName , params , context)
 
-* eventName (string || array) you can trigger one or multiple events (array)
-* params (mixed) data you want to pass to your callback method
-* When we execute the callback, we will add this context to the `Reflect.apply` or default to null
+* eventName (string || array) - you can trigger one or multiple events (array)
+* params (mixed) - data you want to pass to your callback method
+* context (object || null) - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
 
 This method will return
 
@@ -49,7 +49,7 @@ This method will return
 
 #### $get(evt)
 
-* return all the listerners for that particular event name from the internal store. Handy for debug.
+* return all the listeners for that particular event name from the internal store. Handy for debug.
 
 #### $call
 
@@ -57,7 +57,9 @@ This is an alias to `$trigger`
 
 ## Examples
 
-Then register your event with a handler:
+First register your event with a handler,
+but you don't have to, you can fire event first before you register it.
+This is where the magic comes from
 
 ```js
     EventSrvInstance.$on('someEventName' , function(data)
@@ -190,7 +192,9 @@ V0.3.0 - add `lazyStore` internally, so you could `$trigger` before you register
 
 V0.5.3 - change the way how the object init. We now allow you to pass an config object during init
 
-    new NBEventService({logger: console.log});
+```js
+    new NBEventService({logger: console.log})
+```
 
 Then you can see all the internal what is happening. Also fix a bug which about the context, now by default will be a `null` value
 instead of `this`
