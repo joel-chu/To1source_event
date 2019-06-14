@@ -52,12 +52,13 @@ export default class NBEventService {
         // if this hashKey is not registered
         store[evt].push(this.saveToNormalStore(hashKey , callback , context))
         this.normalStore = store;
-        this.logger('append to store' , payload)
+        this.logger('append another to store')
         return true;
       }
     }
     return false;
   }
+
   /**
    * once only registered it once, there is no overwrite option here
    * @param {string} evt name
@@ -137,6 +138,17 @@ export default class NBEventService {
    */
   get $store() {
     return this.normalStore;
+  }
+
+  /**
+   * return all the listener from the event
+   * @param {string} evtName event name
+   * @return {array} listerner(s)
+   */
+  $get(evtName) {
+    let base = this.normalStore[evtName] || []
+    let lazy = this.lazyStore[evtName] || []
+    return base.concat(lazy)
   }
 
   /**
