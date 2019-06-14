@@ -7,7 +7,7 @@ const debug = require('debug')('nb-event-service')
 let value = 1000;
 
 test.before( t => {
-  t.context.evtSrv = new NBEventService.default({
+  t.context.evtSrv = new NBEventService({
     logger: debug
   })
 })
@@ -25,7 +25,7 @@ test.cb('It should able to bind a simple test and callback', t => {
 test.cb('It should able to emit the event before register the listener', t => {
   t.plan(1)
   let evtName = 'simple-reverse'
-  
+
   t.context.evtSrv.$trigger(evtName, value)
 
   t.context.evtSrv.$on(evtName, function(num) {
