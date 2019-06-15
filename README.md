@@ -96,7 +96,7 @@ It will return
 
 #### $trigger(eventName, params , context)
 
-* eventName (string || array) - you can trigger one or multiple events (array)
+* eventName (string) this will trigger the callback that register with this `eventName` whether that actually exist or not
 * params (mixed) optional - data you want to pass to your callback method
 * context (object || null) optional - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
 
