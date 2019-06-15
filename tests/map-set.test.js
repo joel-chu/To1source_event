@@ -8,6 +8,7 @@ test('A Set should not allow the same thing add twice', t => {
   const testFn = () => {
     console.log(`call me ${++ctn}`)
   }
+  // problem - can only store primitive type that id is the same
   testSet.add(testFn)
   testSet.add(testFn)
   t.is(testSet.size, 1)

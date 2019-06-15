@@ -4,9 +4,9 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
-
+import genHaskKey from './hash-code.js'
+// export
 export default class EventService {
-
   /**
    * class constructor
    */
@@ -98,17 +98,17 @@ export default class EventService {
     // first check the normal store
     let nStore = this.normalStore;
     if (nStore.has(evt)) {
-      let nSet = nStore.get(evt)
-      // now loop it over
-      nSet.forEach( s => {
-        ++found;
-        const [ callback, ctx, type ] = s;
+      let nSet = Array.from(nStore.get(evt))
+      let ctn = nSet.length;
+      for (let i=0; i<ctn; ++i) {
+        found = i;
+        let [ _, callback, ctx, type ] = nSet[i]
         this.run(callback, payload, context || ctx)
         if (type === 'once') {
           nStore.delete(evt)
-          return found;
+          return i;
         }
-      })
+      }
       return found;
     }
     // now this is not register yet
@@ -149,15 +149,14 @@ export default class EventService {
    */
   $get(evt) {
     this.validateEvt(evt)
-    let fns = [];
     let store = this.normalStore;
     if (store.has(evt)) {
-      let list = store.get(evt)
-      list.forEach( l => {
-        let [callback] = l;
-        fns.push(callback)
-      })
-      return fns;
+      return Array
+        .from(store.get(evt))
+        .map( l => {
+          let [key, callback, ] = l;
+          return callback;
+        })
     }
     return false;
   }
@@ -217,7 +216,10 @@ export default class EventService {
    * @return {void} the result store in $done
    */
   run(callback, payload, ctx) {
-    this.$done = Reflect.apply(callback, ctx, payload)
+    this.logger(callback)
+    this.logger(payload)
+    this.logger(ctx)
+    Reflect.apply(callback, ctx, this.toArray(payload))
   }
 
   /**
@@ -228,7 +230,8 @@ export default class EventService {
    */
   takeFromStore(evt, storeName = 'lazyStore') {
     let store = this[storeName]; // it could be empty at this point
-    if (store && store.has(evt)) {
+    this.logger(storeName, store)
+    if (store.has(evt)) {
       let content = store.get(evt)
       store.delete(evt)
       return content;
@@ -246,14 +249,41 @@ export default class EventService {
   addToStore(store, evt, ...args) {
     let fnSet;
     if (store.has(evt)) {
+      this.logger(`${evt} existed`)
       fnSet = store.get(evt)
     } else {
+      this.logger(`create new Set for ${evt}`)
       // this is new
-      let fnSet = new Set()
+      fnSet = new Set()
     }
-    fnSet.add(args)
+    let ctn = args.length;
+    // lazy only store 2 items!
+    if (ctn > 2) {
+      if (!this.checkContentExist(args, fnSet)) {
+        this.logger(`insert new`, args)
+        fnSet.add(args)
+      }
+    } else { // just add if this is a lazy store
+      fnSet.add(args)
+    }
     store.set(evt, fnSet)
     return [store, fnSet.size]
+  }
+
+  /**
+   * @param {array} args for compare
+   * @param {object} fnSet A Set to search from
+   * @return {boolean} true on exist
+   */
+  checkContentExist(args, fnSet) {
+    let list = Array.from(fnSet)
+    return !!list.filter(l => {
+      let [hash,] = l;
+      if (hash === args[0]) {
+        return true;
+      }
+      return false;
+    }).length;
   }
 
   /**
@@ -265,7 +295,9 @@ export default class EventService {
    * @return {number} size of the store
    */
   addToNormalStore(evt, type, callback, context) {
-    let [_store, size] = this.addToStore(this.normalStore, evt, callback, context, type)
+    this.logger(evt, type, 'add to normal store')
+    let key = this.hashFnToKey(callback)
+    let [_store, size] = this.addToStore(this.normalStore, evt, key, callback, context, type)
     this.normalStore = _store;
     return size;
   }
@@ -323,4 +355,23 @@ export default class EventService {
     return NB_EVENT_SERVICE_PRIVATE_LAZY.get(this)
   }
 
+  /**
+   * generate a hashKey to identify the function call
+   * The build-in store some how could store the same values!
+   * @param {function} fn the converted to string function
+   * @return {string} hashKey
+   */
+  hashFnToKey(fn) {
+    return genHaskKey(fn.toString()) + '';
+  }
+
+  /**
+   * @param {array} args from function call
+   * @return {object} key value of the function call
+   */
+  packArgs(fn, context) {
+    let key = hashFnToKey(fn)
+    this.logger(key)
+    return [key, fn, context]
+  }
 }

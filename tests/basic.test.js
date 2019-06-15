@@ -11,7 +11,7 @@ test.before( t => {
   })
 })
 
-test.cb.only('It should able to bind a simple test and callback', t => {
+test.cb('It should able to bind a simple test and callback', t => {
   t.plan(1)
   let evtName = 'simple'
   t.context.evtSrv.$on(evtName, function(num) {
@@ -49,9 +49,10 @@ test.cb('It should able to add more than one listerner to the same event', t => 
   })
 
   t.context.evtSrv.$trigger(evtName, letter)
+
 })
 
-test('It should not allow to add the same function again', t => {
+test.only('It should not allow to add the same function again', t => {
   let evtName = 'add-once'
   const callback = (x) => {
     debug(x)
