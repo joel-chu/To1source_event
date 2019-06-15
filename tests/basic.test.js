@@ -3,7 +3,6 @@ const test = require('ava')
 const NBEventService = require('../main')
 const debug = require('debug')('nb-event-service')
 
-
 let value = 1000;
 
 test.before( t => {
@@ -12,7 +11,7 @@ test.before( t => {
   })
 })
 
-test.cb('It should able to bind a simple test and callback', t => {
+test.cb.only('It should able to bind a simple test and callback', t => {
   t.plan(1)
   let evtName = 'simple'
   t.context.evtSrv.$on(evtName, function(num) {
@@ -86,7 +85,7 @@ test('It should only call once if we use the $once option', t => {
   t.context.evtSrv.$trigger(evtName)
   t.context.evtSrv.$trigger(evtName)
 
-  t.is(ctn, 2)
+  t.is(ctn, 1)
 
 })
 
@@ -104,23 +103,3 @@ test('Using the $call alias to $trigger should do the same thing', t => {
 
   t.is(ctn, 2)
 })
-
-/*
-test.only('It should able to register multiple events for one callback', t => {
-  let ctn = 0;
-  const callback = () => {
-    ++ctn;
-    debug(ctn)
-  }
-  let events = ['a', 'b', 'c']
-  t.context.evtSrv.$on(events, callback)
-
-  t.context.evtSrv.$call('a')
-  t.context.evtSrv.$call('b')
-  t.context.evtSrv.$call('c')
-
-  t.is(ctn, 3)
-
-
-})
-*/

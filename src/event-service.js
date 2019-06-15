@@ -16,6 +16,9 @@ export default class EventService {
     }
     // for the $done setter
     this.result = null;
+    // we need to init the store first otherwise it could be a lot of checking later
+    this.normalStore = new Map()
+    this.lazyStore = new Map()
   }
 
   /**
@@ -37,22 +40,21 @@ export default class EventService {
    */
   $on(evt , callback , context = null) {
     const type = 'on';
-    const { validate, takeFromStore, addToNormalStore, logger } = this;
-    validate(evt, callback)
+    this.validate(evt, callback)
     // first need to check if this evt is in lazy store
-    let lazyStoreContent = takeFromStore(evt)
+    let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register first then call later
     if (lazyStoreContent === false) {
-      logger('$on', `${evt} callback is not in lazy store`)
-      return addToNormalStore(evt, type, callback, context)
+      this.logger('$on', `${evt} callback is not in lazy store`)
+      return this.addToNormalStore(evt, type, callback, context)
     }
-    logger('$on', `${evt} found in lazy store`)
+    this.logger('$on', `${evt} found in lazy store`)
     // this is when they call $trigger before register this callback
     let size = 0;
     lazyStoreContent.forEach(content => {
       let [ payload, ctx ] = content;
       this.run(callback, payload, context || ctx)
-      size += addToNormalStore(evt, type, callback, context || ctx)
+      size += this.addToNormalStore(evt, type, callback, context || ctx)
     })
     return size;
   }
@@ -64,7 +66,7 @@ export default class EventService {
    * @return {boolean} result
    */
   $once(evt , callback , context) {
-    validate(evt, callback)
+    this.validate(evt, callback)
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     if (lazyStoreContent === false) {
@@ -114,19 +116,22 @@ export default class EventService {
     return found;
   }
 
-  // this is an alias to the $trigger
+  /**
+   * this is an alias to the $trigger
+   * @param {array} args spread
+   */
   $call(...args) {
     return Reflect.apply(this.$trigger, this, args)
   }
 
   /**
-   * remove the evt from normal store
+   * remove the evt from all the stores
    * @param {string} evt name
    * @return {boolean} true actually delete something
    */
   $off(evt) {
     this.validateEvt(evt)
-    let stores = [ this.lazyStore, this.normalStore ];
+    let stores = [ this.lazyStore, this.normalStore ]
     let found = false;
     stores.forEach(store => {
       if (store.has(evt)) {
@@ -222,10 +227,10 @@ export default class EventService {
    * @return {object|boolean} content or false on not found
    */
   takeFromStore(evt, storeName = 'lazyStore') {
-    let lazyStore = this[storeName]
-    if (lazyStore.has(evt)) {
-      let content = lazyStore.get(evt)
-      lazyStore.delete(evt)
+    let store = this[storeName]; // it could be empty at this point
+    if (store && store.has(evt)) {
+      let content = store.get(evt)
+      store.delete(evt)
       return content;
     }
     return false;
@@ -260,8 +265,7 @@ export default class EventService {
    * @return {number} size of the store
    */
   addToNormalStore(evt, type, callback, context) {
-    let store = this.normalStore;
-    let [_store, size] = this.addToStore(store, evt, callback, context, type)
+    let [_store, size] = this.addToStore(this.normalStore, evt, callback, context, type)
     this.normalStore = _store;
     return size;
   }
@@ -275,28 +279,46 @@ export default class EventService {
    * @return {number} size of the store
    */
   addToLazyStore(evt, payload = [], context = null) {
-    let lstore = this.lazyStore;
-    let [_store, size] = this.addToStore(lstore, evt, this.toArray(payload), context)
+    let [_store, size] = this.addToStore(this.lazyStore, evt, this.toArray(payload), context)
     this.lazyStore = _store;
     return size;
   }
 
+  /**
+   * make sure we store the argument correctly
+   * @param {*} arg could be array
+   * @return {array} make sured
+   */
   toArray(arg) {
     return Array.isArray(arg) ? arg : [arg];
   }
 
+  /**
+   * setter to store the Set in private
+   * @param {object} obj a Set
+   */
   set normalStore(obj) {
     NB_EVENT_SERVICE_PRIVATE_STORE.set(this, obj)
   }
 
+  /**
+   * @return {object} Set object
+   */
   get normalStore() {
     return NB_EVENT_SERVICE_PRIVATE_STORE.get(this)
   }
 
+  /**
+   * setter to store the Set in lazy store
+   * @param {object} obj a Set
+   */
   set lazyStore(obj) {
     NB_EVENT_SERVICE_PRIVATE_LAZY.set(this , obj)
   }
 
+  /**
+   * @return {object} the lazy store Set
+   */
   get lazyStore() {
     return NB_EVENT_SERVICE_PRIVATE_LAZY.get(this)
   }
