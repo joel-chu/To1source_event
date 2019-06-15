@@ -1,13 +1,13 @@
 const test = require('ava')
 // import the cjs version for testing
 const NBEventService = require('../main')
-const debug = require('debug')('nb-event-service')
-
+const logger = require('debug')('nb-event-service')
+const debug  = require('debug')('nb-event-service:test:basic')
 let value = 1000;
 
 test.before( t => {
   t.context.evtSrv = new NBEventService({
-    logger: debug
+    logger
   })
 })
 
@@ -66,7 +66,7 @@ test('It should not allow to add the same function again', t => {
   t.is(ctn.length, 1)
 })
 
-test.only('It should only call once if we use the $once option', t => {
+test('It should only call once if we use the $once option', t => {
   let evtName = 'once-call'
   let ctn = 0;
 
@@ -102,5 +102,24 @@ test('Using the $call alias to $trigger should do the same thing', t => {
   t.context.evtSrv.$trigger(evtName)
   t.context.evtSrv.$call(evtName)
 
+  t.is(ctn, 1)
+})
+
+test('Using $trigger and $call should make the callback run again', t => {
+  let evtName = 'alias-two'
+  let ctn = 0;
+
+  const callback = () => {
+    ++ctn;
+    debug(ctn)
+  }
+
+  t.context.evtSrv.$trigger(evtName)
+  t.context.evtSrv.$call(evtName)
+
+  t.context.evtSrv.$on(evtName, callback)
+
   t.is(ctn, 2)
+
+  t.pass()
 })

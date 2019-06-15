@@ -102,7 +102,9 @@ export default class EventService {
     let found = 0;
     // first check the normal store
     let nStore = this.normalStore;
+    this.logger('$trigger', nStore)
     if (nStore.has(evt)) {
+      this.logger('$trigger', evt, 'found')
       let nSet = Array.from(nStore.get(evt))
       let ctn = nSet.length;
       for (let i=0; i<ctn; ++i) {
@@ -126,6 +128,7 @@ export default class EventService {
    * @param {array} args spread
    */
   $call(...args) {
+    this.logger('$call')
     return Reflect.apply(this.$trigger, this, args)
   }
 
