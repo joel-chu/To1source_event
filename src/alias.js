@@ -3,28 +3,25 @@
 
 import EventService from './event-service'
 
-export default AliasEventService extends EventService {
+export default class AliasEventService extends EventService {
 
-  contructor(options = {}) {
+  constructor(options = {}) {
     super(options)
   }
 
   on(...args) {
-
+    return Reflect.apply(this.$on, this, args)
   }
 
   off(...args) {
-
+    return Reflect.apply(this.$off, this, args)
   }
 
   emit(...args) {
-
+    return Reflect.apply(this.$trigger, this, args)
   }
 
-  remove(...args) {
-
+  once(...args) {
+    return Reflect.apply(this.$once, this, args)
   }
-
-  
-
 }

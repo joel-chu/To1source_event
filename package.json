@@ -13,7 +13,9 @@
   ],
   "scripts": {
     "test": "DEBUG=nb-event-service* ava",
-    "build": "rollup -c",
+    "build": "npm run build:umd && npm run build:alias",
+    "build:umd": "rollup -c",
+    "build:alias": "NODE_ENV=alias rollup -c",
     "prepare": "npm run build",
     "test:browser": "node ./tests/fixtures/browser.js",
     "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js"
