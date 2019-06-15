@@ -115,6 +115,45 @@ Or it will return `false` if there is nothing
 
 This is an alias to `$trigger`
 
+## Alias version
+
+For browser you can include the `nb-event-service/dist/alias.js` for node you can `require('nb-event-service/alias')`
+
+And that will gives you the following alias version:
+
+- on --> $on
+- once --> $once
+- off --> $off
+- emit --> $trigger
+- get --> $get
+
+If you don't like the `$`
+
+## $done getter
+
+This is a feature that you don't see in other Event Emitter library.
+
+Whenever you execute the callback, the result will store in the internal `$done` setter.
+
+So you can call the `$done` getter to get back the last result.
+
+Example:
+
+```js
+es.$on('add', function add(val) {
+  return val + 1;
+})
+
+es.$trigger('add', 1000)
+
+console.log(es.$done)
+
+```
+
+You will get a 1001. This might be useful in some situation. Please note, it will get call
+whenever a event got trigger, so if at the same time some other event trigger then your value
+might be different from what you expected. So use this with caution.
+
 ## Examples
 
 Coming soon with more update to date example.
