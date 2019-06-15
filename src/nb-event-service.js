@@ -147,12 +147,12 @@ export default class NBEventService {
 
   /**
    * return all the listener from the event
-   * @param {string} evtName event name
+   * @param {string} [evtName = false] event name
    * @return {array} listerner(s)
    */
   $get(evtName) {
-    let base = this.normalStore[evtName] || []
-    let lazy = this.lazyStore[evtName] || []
+    let base = this.normalStore.get(evtName) || []
+    let lazy = this.lazyStore.get(evtName) || []
     return base.concat(lazy)
   }
 
