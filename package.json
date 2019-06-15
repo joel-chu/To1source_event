@@ -15,7 +15,8 @@
     "test": "DEBUG=nb-event-service* ava",
     "build": "rollup -c",
     "prepare": "npm run build",
-    "test:browser": "node ./tests/fixtures/browser.js"
+    "test:browser": "node ./tests/fixtures/browser.js",
+    "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js"
   },
   "repository": {
     "type": "git",
