@@ -24,4 +24,8 @@ export default class AliasEventService extends EventService {
   once(...args) {
     return Reflect.apply(this.$once, this, args)
   }
+
+  get(...args) {
+    return Reflect.apply(this.$get, this, args)
+  }
 }

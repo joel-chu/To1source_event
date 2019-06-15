@@ -1,11 +1,12 @@
 {
   "name": "nb-event-service",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An universal event service or Browser / Node",
   "module": "index.js",
   "browser": "dist/nb-event-service.js",
   "main": "main.js",
   "files": [
+    "alias.js",
     "index.js",
     "main.js",
     "dist",
@@ -20,7 +21,8 @@
     "test:browser": "node ./tests/fixtures/browser.js",
     "test:basic": "DEBUG=nb-event-service* ava ./tests/basic.test.js",
     "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js",
-    "test:once": "DEBUG=nb-event-service* ava ./tests/once-problem.test.js"
+    "test:once": "DEBUG=nb-event-service* ava ./tests/once-problem.test.js",
+    "test:alias": "DEBUG=nb-event-service* ava ./tests/alias.test.js"
   },
   "repository": {
     "type": "git",
