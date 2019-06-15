@@ -82,10 +82,12 @@ export default class EventService {
       // now this is the tricky bit
       // there is a potential bug here that cause by the developer
       // if they call $trigger first, the lazy won't know it's a once call
-      // so if in the middle they regiseter any call with the same evt name
+      // so if in the middle they register any call with the same evt name
       // then this $once call will be fucked - add this to the documentation
       this.logger('$once', lazyStoreContent)
-      const [ payload, ctx ] = lazyStoreContent;
+      const list = Array.from(lazyStoreContent)
+      // should never have more than 1
+      const [ payload, ctx ] = list[0];
       this.run(callback, payload, context || ctx)
     }
   }
@@ -241,6 +243,7 @@ export default class EventService {
     this.logger('takeFromStore', storeName, store)
     if (store.has(evt)) {
       let content = store.get(evt)
+      this.logger('takeFromStore', content)
       store.delete(evt)
       return content;
     }

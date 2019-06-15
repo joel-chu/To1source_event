@@ -123,3 +123,21 @@ test('Using $trigger and $call should make the callback run again', t => {
 
   t.pass()
 })
+
+test('Should not able to call the method once the $off is called', t => {
+
+  let evtName = 'off-event'
+
+  const callback = (l) => {
+    debug(`${l}`)
+  }
+
+  t.context.evtSrv.$on(evtName, callback)
+
+  t.context.evtSrv.$off(evtName)
+
+  t.context.evtSrv.$trigger(evtName)
+
+  t.false(t.context.evtSrv.$get(evtName))
+
+})

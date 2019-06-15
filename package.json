@@ -19,7 +19,8 @@
     "prepare": "npm run build",
     "test:browser": "node ./tests/fixtures/browser.js",
     "test:basic": "DEBUG=nb-event-service* ava ./tests/basic.test.js",
-    "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js"
+    "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js",
+    "test:once": "DEBUG=nb-event-service* ava ./tests/once-problem.test.js"
   },
   "repository": {
     "type": "git",
