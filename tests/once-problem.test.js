@@ -27,8 +27,24 @@ test('This is how $once normally works', t => {
 
 })
 
-test('Demonstrate the potential bug with $once', t => {
+test.only('Demonstrate the potential bug with $once', t => {
 
-  let evtName = ''
+  let evtName = 'once-problem';
+  let evtSrv = t.context.evtSrv;
+
+  evtSrv.$trigger(evtName, 1000)
+
+  evtSrv.$on(evtName, function(val) {
+    return (val*0.2) + val;
+  })
+
+  evtSrv.$once(evtName, function(val) {
+    return (val*0.1) + val;
+  })
+
+  // now the first $on call hijacked the evt
+
+  t.is(evtSrv.$done, 1200)
+
 
 })

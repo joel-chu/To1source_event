@@ -7,25 +7,80 @@
     $ npm install nb-event-service --save
 
 This module works in browser as well as node.js
+The main different between this module and the other event emitter out there is this:
+
+**We don't care about the order of event registration and handling**
+
+Basically you can trigger an event that doesn't exist (well, sort of)
 
 ## API
 
-#### $on(eventName, callback)
+#### $on(eventName, callback, context)
 
 * eventName (string || array) now you can pass one, or many (array) to listen to multiple events.
 * callback (function) it will receive the `params` that call.
+* context (object|null) optional, we will pass it like this `Reflect.apply(callback, context, args)`
 
 It will return the total number of events that get registered.
 
-#### $once(eventName , callback)
+#### $once(eventName , callback, context)
 
 * eventName (string || array) now you can pass one, or many (array) to listen to multiple events.
 * callback (function) it will receive the `params` that call.
+* context (object|null) optional same as above
 
-There was a problem when I use it in Angular whenever a page
-get reloaded - the same event listener get register then accumulated
-and fire all at once, I ended up have to do a $off before calling $on
-now this will solve the problem, that make sure it only bind the event once
+Binded it and will get call only $once. But there is a potential problem.
+This library does not care about the order of the event emitter and binding.
+
+What that mean is - you can emit an event before it even exist.
+For example:
+
+```js
+//  other library like EventEmitter
+
+ee.emitEvent('someEvent')
+
+ee.addListener('someEvent', function() {
+  console.log('I am called')
+})
+
+```
+
+The above example, the callback never works and you will never see the message. But our can do it:
+
+```js
+
+es.$trigger('someEvent') // <-- not yet exist
+
+ee.$on('someEvent', function() {
+  console.log('Hello world!')
+})
+
+```
+
+The message will show. Now back to our problem.
+
+```js
+ee.$trigger('someEvent')
+
+ee.$on('someEvent', function() {
+  console.log('call me second')
+})
+
+ee.$once('someEvent', function() {
+  console.log('call me first')
+})
+
+```
+
+The message print out will be `call me second` because event name is first come first serve.
+And `$once` will only register a callback once - and remove it after you call.
+
+But `$on` is different. You can keep adding listener to the same event, as long as the callback is not the same.
+Internally we hash the function to compare if you add the same function or not. That greatly reduce browser reload
+bug. At the same time, we allow you to work in a real reactive way.
+
+You can clone this git, and run the `npm run test:once` to see the problem.
 
 #### $off(eventName)
 
@@ -36,11 +91,11 @@ It will return
 * true - event been clear
 * false - such even doesn't exist
 
-#### $trigger(eventName , params , context)
+#### $trigger(eventName, params , context)
 
 * eventName (string || array) - you can trigger one or multiple events (array)
-* params (mixed) - data you want to pass to your callback method
-* context (object || null) - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
+* params (mixed) optional - data you want to pass to your callback method
+* context (object || null) optional - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
 
 This method will return
 
@@ -51,153 +106,15 @@ This method will return
 
 * return all the listeners for that particular event name from the internal store. Handy for debug.
 
+Or it will return `false` if there is nothing
+
 #### $call
 
 This is an alias to `$trigger`
 
 ## Examples
 
-First register your event with a handler,
-but you don't have to, you can fire event first before you register it.
-This is where the magic comes from
-
-```js
-    EventSrvInstance.$on('someEventName' , function(data)
-    {
-        // do what you want
-    })
-```
-
-Now fire at will:
-
-```js
-    EventSrvInstance.$trigger('someEventName', {data: 'some data'});
-```
-
-Now use this with AngularJS, create a service / provider (but not a factory!)
-
-```javascript
-    angular.module('yourAppModule').service('MyEventService' , NBEventService);
-```
-
-Or if you want to pass an option:
-
-```javascript
-
-    angular.module('yourAppModule').service('MyEventService' , function()
-    {
-        var srv = this;
-        srv = angular.extend(srv , new window.NBEventService['default']({
-            logger: console.log
-        }));
-        return srv;
-    })
-
-```
-
-
-And that's it. Let say you register the event in your controller as well as a directive
-
-Controller:
-
-```js
-    angular.module('yourAppModule').controller('mainCtrl' , ['$scope' , 'MyEventService', function($scope , MyEventService)
-    {
-        MyEventService.$on('someClickEvent' , function(data , from)
-        {
-            // then do some data processing with the data
-            // a handy thing is if you have pass the `from` param when you call the `$trigger`
-            // you can use it to control the flow whether you want to do anything with it.
-            switch(from) {
-                case FIRE_FORM_LEFT:
-                    do_left();
-                break;
-                case FIRE_FROM_RIGHT:
-                    do_right();
-                break;
-            }
-        });
-    }]);
-```
-
-In a directive some where else
-
-```js
-    angular.module('yourAppModule').directive('showHideMe' , ['MyEventService' , function(MyEventService)
-    {
-        var tpl = [
-            '<div ng-show="showMe">',
-            '{{showMeData}}',
-            '</div>'
-        ].join('');
-
-        return {
-            restrict: 'E',
-            template: tpl,
-            link: function(scope , el , attr)
-            {
-                MyEventService.$on('someClickEvent' , function(data)
-                {
-                    scope.showMe = true;
-                    scope.showMeData = data;
-                }, 'clicked');
-            }
-        }
-    }]);
-```
-
-
-Then somewhere else in another directive
-
-```js
-    angular.module('yourAppModule').directive('clickMe' , ['MyEventService' , function(MyEventService)
-    {
-        return {
-            restrict: 'A',
-            link: function(scope , el , attr)
-            {
-
-                el.on('click' , function(evt)
-                {
-                    evt.preventDefault();
-
-                    MyEventService.$trigger('someClickEvent' , {clicker: 'clickMe Directive'} , 'another-click');
-
-                });
-            }
-        }
-    }]);
-```
-
-If you want to wrap this around your own service
-
-```js
-
-    angular.module('yourAppModule').service('yourService' , [function()
-    {
-        var self = angular.merge(this , new NBEventService());
-        // the rest of the stuff you want to do
-
-        return self;
-    }]);
-```
-
-And you can use this with React.js / Riot.js (or any other JS library) pretty easily.
-
-### ~~Loading sequence and timing might cause problem~~
-
-**This is not a problem anymore.**
-
-V0.3.0 - add `lazyStore` internally, so you could `$trigger` before you register the listener.
-
-V0.5.3 - change the way how the object init. We now allow you to pass an config object during init
-
-```js
-    new NBEventService({logger: console.log})
-```
-
-Then you can see all the internal what is happening. Also fix a bug which about the context, now by default will be a `null` value
-instead of `this`
+Coming soon with more update to date example.
 
 ## Test
 
@@ -217,4 +134,4 @@ It will kick start the rollup building process
 
 ---
 
-(Joel Chu)[https://newbran.ch] (c) 2019
+[Joel Chu](https://joelchu.com) [NEWBRAN LTD](https://newbran.ch) (c) 2019
