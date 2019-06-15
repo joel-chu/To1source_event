@@ -1,2 +1,2 @@
 require = require('esm')(module)
-module.exports = require('./nb-event-service.js')
+module.exports = require('./event-service.js')
