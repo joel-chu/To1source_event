@@ -39,7 +39,7 @@ test('It should able to store a Set inside a Map', t => {
   t.pass()
 })
 
-test.only('It should able to store multiple level within a class structure and act like a private property', t => {
+test('It should able to store multiple level within a class structure and act like a private property', t => {
   const testFnB = () => {
     console.log(`call B ${++ctn}`)
   }
@@ -71,4 +71,37 @@ test.only('It should able to store multiple level within a class structure and a
   t.is( dummyValue1.get('a').size, 1 )
 
   t.pass()
+})
+
+test('It should store one item if its adding different thing to the same key', t => {
+  let ctn = 0;
+  const testFnA = () => {
+    console.log(`call A ${++ctn}`)
+  }
+  const testFnB = () => {
+    console.log(`call B ${++ctn}`)
+  }
+  let PRIVATE_STORE = new Map()
+  class Dummy {
+    add(item) {
+      PRIVATE_STORE.set(this, item)
+    }
+    get() {
+      return PRIVATE_STORE.get(this)
+    }
+  }
+
+  let dummyInstance = new Dummy()
+
+  let mapA = new Map();
+  mapA.set('key-1', testFnA)
+  let mapB = new Map();
+  mapB.set('key-2', testFnB)
+
+  dummyInstance.add(mapA)
+  dummyInstance.add(mapB)
+
+  t.truthy( dummyInstance.get().has('key-2') )
+
+
 })

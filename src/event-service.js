@@ -29,12 +29,12 @@ export default class EventService {
    * Register your evt handler, note we don't check the type here,
    * we expect you to be sensible and know what you are doing.
    * @param {string} evt name of event
-   * @param {function} callback bind method
+   * @param {function} callback bind method --> if it's array or not
    * @param {object} context to execute this call in
    * @return {boolean} result add or not
    */
   $on(evt , callback , context) {
-
+    
   }
 
   /**
@@ -76,6 +76,6 @@ export default class EventService {
   //    PRIVATE METHODS      //
   /////////////////////////////
 
-  
+
 
 }
