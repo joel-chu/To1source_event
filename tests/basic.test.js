@@ -52,7 +52,7 @@ test.cb('It should able to add more than one listerner to the same event', t => 
 
 })
 
-test.only('It should not allow to add the same function again', t => {
+test('It should not allow to add the same function again', t => {
   let evtName = 'add-once'
   const callback = (x) => {
     debug(x)
@@ -66,7 +66,7 @@ test.only('It should not allow to add the same function again', t => {
   t.is(ctn.length, 1)
 })
 
-test('It should only call once if we use the $once option', t => {
+test.only('It should only call once if we use the $once option', t => {
   let evtName = 'once-call'
   let ctn = 0;
 

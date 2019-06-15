@@ -70,19 +70,24 @@ export default class EventService {
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     if (lazyStoreContent === false) {
+      this.logger('$once', `${evt} not in the lazy store`)
       // check to see if this already exist in the normal store
       let nStore = this.normalStore;
       if (!nStore.has(evt)) {
+        this.logger('$once', `${evt} add to normal store`)
         return this.addToNormalStore(evt, 'once', callback, context)
       }
+      this.logger('$once', `${evt} already existed`)
+    } else {
+      // now this is the tricky bit
+      // there is a potential bug here that cause by the developer
+      // if they call $trigger first, the lazy won't know it's a once call
+      // so if in the middle they regiseter any call with the same evt name
+      // then this $once call will be fucked - add this to the documentation
+      this.logger('$once', lazyStoreContent)
+      const [ payload, ctx ] = lazyStoreContent;
+      this.run(callback, payload, context || ctx)
     }
-    // now this is the tricky bit
-    // there is a potential bug here that cause by the developer
-    // if they call $trigger first, the lazy won't know it's a once call
-    // so if in the middle they regiseter any call with the same evt name
-    // then this $once call will be fucked - add this to the documentation
-    const [ payload, ctx ] = lazyStoreContent;
-    this.run(callback, payload, context || ctx)
   }
 
   /**
@@ -216,10 +221,10 @@ export default class EventService {
    * @return {void} the result store in $done
    */
   run(callback, payload, ctx) {
-    this.logger(callback)
-    this.logger(payload)
-    this.logger(ctx)
-    Reflect.apply(callback, ctx, this.toArray(payload))
+    this.logger('run', callback)
+    this.logger('run', payload)
+    this.logger('run', ctx)
+    this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
   }
 
   /**
@@ -230,7 +235,7 @@ export default class EventService {
    */
   takeFromStore(evt, storeName = 'lazyStore') {
     let store = this[storeName]; // it could be empty at this point
-    this.logger(storeName, store)
+    this.logger('takeFromStore', storeName, store)
     if (store.has(evt)) {
       let content = store.get(evt)
       store.delete(evt)
@@ -249,10 +254,10 @@ export default class EventService {
   addToStore(store, evt, ...args) {
     let fnSet;
     if (store.has(evt)) {
-      this.logger(`${evt} existed`)
+      this.logger('addToStore', `${evt} existed`)
       fnSet = store.get(evt)
     } else {
-      this.logger(`create new Set for ${evt}`)
+      this.logger('addToStore', `create new Set for ${evt}`)
       // this is new
       fnSet = new Set()
     }
@@ -260,7 +265,7 @@ export default class EventService {
     // lazy only store 2 items!
     if (ctn > 2) {
       if (!this.checkContentExist(args, fnSet)) {
-        this.logger(`insert new`, args)
+        this.logger('addToStore', `insert new`, args)
         fnSet.add(args)
       }
     } else { // just add if this is a lazy store
@@ -294,8 +299,8 @@ export default class EventService {
    * @param {object} context the context the function execute in or null
    * @return {number} size of the store
    */
-  addToNormalStore(evt, type, callback, context) {
-    this.logger(evt, type, 'add to normal store')
+  addToNormalStore(evt, type, callback, context = null) {
+    this.logger('addToNormalStore', evt, type, 'add to normal store')
     let key = this.hashFnToKey(callback)
     let [_store, size] = this.addToStore(this.normalStore, evt, key, callback, context, type)
     this.normalStore = _store;
@@ -365,13 +370,4 @@ export default class EventService {
     return genHaskKey(fn.toString()) + '';
   }
 
-  /**
-   * @param {array} args from function call
-   * @return {object} key value of the function call
-   */
-  packArgs(fn, context) {
-    let key = hashFnToKey(fn)
-    this.logger(key)
-    return [key, fn, context]
-  }
 }
