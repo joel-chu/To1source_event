@@ -11,7 +11,10 @@ The main different between this module and the other event emitter out there is 
 
 **We don't care about the order of event registration and handling**
 
-Basically you can trigger an event that doesn't exist (well, sort of)
+Basically you can trigger an event that doesn't exist (well, sort of, its magic)
+
+*Please note the new version is using ES6 features heavily (WeakMap, Set, Map, Array.from etc) if you need to
+use this module on older platform, please provide polyfill accordingly*
 
 ## API
 
