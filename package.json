@@ -12,7 +12,7 @@
     "src"
   ],
   "scripts": {
-    "test": "DEBUG=nb-event-service* ava",
+    "test": "ava",
     "build": "npm run build:umd && npm run build:alias",
     "build:umd": "rollup -c",
     "build:alias": "NODE_ENV=alias rollup -c",
