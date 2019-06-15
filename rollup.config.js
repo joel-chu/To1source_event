@@ -11,7 +11,7 @@ const base = join(__dirname)
 const outDir = join(base, 'dist')
 
 const inputFile = env === 'alias' ? join('src', 'alias.js') : 'index.js'
-const outputFile = env === 'alias' ? 'nb-event-service.alias.js' : 'nb-event-service.js'
+const outputFile = env === 'alias' ? 'alias.js' : 'nb-event-service.js'
 
 export default {
   input: join(base, inputFile),
