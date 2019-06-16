@@ -20,22 +20,24 @@ use this module on older platform, please provide polyfill accordingly*
 
 #### $on(eventName, callback, context)
 
-* eventName (string || array) now you can pass one, or many (array) to listen to multiple events.
-* callback (function) it will receive the `params` that call.
+* eventName (string) The event name you want to handle. You can call this multiple times to add different listeners
+* callback (function) it will receive the `params` that call
 * context (object|null) optional, we will pass it like this `Reflect.apply(callback, context, args)`
 
 It will return the total number of events that get registered.
 
 #### $once(eventName , callback, context)
 
-* eventName (string || array) now you can pass one, or many (array) to listen to multiple events.
-* callback (function) it will receive the `params` that call.
+* eventName (string) the event you want to listen to once, you can call this more than once to add more listener
+* callback (function) it will receive the `params` that call
 * context (object|null) optional same as above
 
-Binded it and will get call only $once. But there is a potential problem.
-This library does not care about the order of the event emitter and binding.
+$once allow you to bind one or more listener to the same event. But once this event fired (triggered)
+it will remove itself from the event store, and no longer available. This behavior is changed in V1.3.0.
 
-What that mean is - you can emit an event before it even exist.
+There is a potential problem with $once you can see below. It's no really a bug per se, but due to our
+own unique feature that can call event before even it existed (yeah, it's magic)
+
 For example:
 
 ```js
@@ -49,41 +51,65 @@ ee.addListener('someEvent', function() {
 
 ```
 
-The above example, the callback never works and you will never see the message. But our can do it:
+The callback in the above example never works and you will never see the message. But our can do it:
 
 ```js
-
 es.$trigger('someEvent') // <-- not yet exist
 
 ee.$on('someEvent', function() {
   console.log('Hello world!')
 })
-
 ```
 
 The message will show. Now back to our problem.
 
 ```js
+// trigger event before it register with a handler
 ee.$trigger('someEvent')
-
+// now it register with a regular $on
 ee.$on('someEvent', function() {
   console.log('call me second')
 })
-
+// but some where else you try to register it with $once
 ee.$once('someEvent', function() {
   console.log('call me first')
 })
+```
+
+In v1.3.0 we change the behavior of $once, now you can register more than one handler.
+But if you look at the above example, you register it with `$on` then `$once`.
+
+What happen is, the `$once` call execute the `$trigger` from the earlier call, then it will
+remove this event from the event handler store. Therefore, you `$on` will never fire again.
+
+So you have to make sure which event you **REALLY** want to register with what.
+
+#### $only(eventName , callback, context)
+
+This is a new method in v1.3.0
+
+* eventName (string) the event you want to listen to once, this is first come first serve, and only **ONE** listener
+* callback (function) it will receive the `params` that call
+* context (object|null) optional same as above
+
+Example:
+
+```js
+$only('only-event', function(message) {
+  console.log('ONLY', message)
+})
+// now if you try to add another
+$only('only-event', function(message) {
+  console.log('AGAIN', message)
+})
+
+// execute it
+$call('only-event', 'A little cat jumping through the window')
 
 ```
 
-The message print out will be `call me second` because event name is first come first serve.
-And `$once` will only register a callback once - and remove it after you call.
-
-But `$on` is different. You can keep adding listener to the same event, as long as the callback is not the same.
-Internally we hash the function to compare if you add the same function or not. That greatly reduce browser reload
-bug. At the same time, we allow you to work in a real reactive way.
-
-You can clone this git, and run the `npm run test:once` to see the problem.
+You will only get `ONLY A little cat jumping through the window` but the second callback never add to the event store.
+Although we develop this feature purposely for our other library to use, but it has a lot real world usage.
 
 #### $off(eventName)
 
@@ -105,17 +131,19 @@ This method will return
 * false - if there is nothing to call
 * i - the total events been called
 
+#### $call
+
+This is an alias to `$trigger`
+
 #### $get(evt)
 
 * return all the listeners for that particular event name from the internal store. Handy for debug.
 
 Or it will return `false` if there is nothing
 
-#### $call
-
-This is an alias to `$trigger`
-
 ## Alias version
+
+If you don't like the `$`, you can use the alias version.
 
 For browser you can include the `nb-event-service/dist/alias.js` for node you can `require('nb-event-service/alias')`
 
@@ -126,8 +154,7 @@ And that will gives you the following alias version:
 - off --> $off
 - emit --> $trigger
 - get --> $get
-
-If you don't like the `$`
+- only --> $only
 
 ## $done getter
 
@@ -151,7 +178,7 @@ console.log(es.$done)
 ```
 
 You will get a 1001. This might be useful in some situation. Please note, it will get call
-whenever a event got trigger, so if at the same time some other event trigger then your value
+whenever a event got trigger, if at the same time some other event trigger then your value
 might be different from what you expected. So use this with caution.
 
 ## Examples

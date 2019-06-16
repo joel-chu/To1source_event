@@ -22,7 +22,7 @@ export default class EventService {
   }
 
   /**
-   * logger for overwrite
+   * logger function for overwrite
    */
   logger() {}
 
@@ -102,6 +102,27 @@ export default class EventService {
    */
   $only(evt, callback, context = null) {
     this.validate(evt, callback)
+    let lazyStoreContent = this.takeFromStore(evt)
+    // this is normal register before call $trigger
+    let nStore = this.normalStore;
+    if (lazyStoreContent === false) {
+      this.logger('$only', `${evt} not in the lazy store`)
+      // can only have one listener
+      if (!nStore.has(evt)) {
+        this.logger(`$only`, `${evt} add to store`)
+        return this.addToNormalStore(evt, 'only', callback, context)
+      }
+      this.logger('$only', `${evt} already existed no longer allow to add new listener`)
+    } else {
+      // there are data store in lazy store
+      this.logger('$only', `${evt} found data in lazy store to execute`)
+      const list = Array.from(lazyStoreContent)
+      // $only allow to trigger this multiple time on the single handler
+      list.forEach( l => {
+        const [ payload, ctx ] = l;
+        this.run(callback, payload, context || ctx)
+      })
+    }
   }
 
   /**
