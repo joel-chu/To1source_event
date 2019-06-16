@@ -44,7 +44,7 @@ test('only should only allow to add one listner', t => {
   t.is(evtSrv.$done, 110)
 })
 
-test.only('Test the trigger before call $only and see if that works the same', t => {
+test('Test the trigger before call $only and see if that works the same', t => {
   let ctn = 0;
   let evt = 'test-only-reverse'
   let evtSrv = t.context.evtSrv;
