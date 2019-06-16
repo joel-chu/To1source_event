@@ -46,6 +46,10 @@ export default class EventService {
     // this is normal register first then call later
     if (lazyStoreContent === false) {
       this.logger('$on', `${evt} callback is not in lazy store`)
+      // @TODO we need to check if there was other listener to this
+      // event and are they the same type then we could solve that
+      // register the different type to the same event name
+
       return this.addToNormalStore(evt, type, callback, context)
     }
     this.logger('$on', `${evt} found in lazy store`)
@@ -142,14 +146,18 @@ export default class EventService {
       this.logger('$trigger', evt, 'found')
       let nSet = Array.from(nStore.get(evt))
       let ctn = nSet.length;
-      for (let i=0; i<ctn; ++i) {
+      let hasOnce = false;
+      let hasOnly = false;
+      for (let i=0; i < ctn; ++i) {
         found = i;
         let [ _, callback, ctx, type ] = nSet[i]
         this.run(callback, payload, context || ctx)
         if (type === 'once') {
-          nStore.delete(evt)
-          return i;
+          hasOnce = true;
         }
+      }
+      if (hasOnce) {
+        nStore.delete(evt)
       }
       return found;
     }
@@ -188,15 +196,19 @@ export default class EventService {
   /**
    * return all the listener from the event
    * @param {string} evtName event name
+   * @param {boolean} [full=false] if true then return the entire content
    * @return {array|boolean} listerner(s) or false when not found
    */
-  $get(evt) {
+  $get(evt, full = false) {
     this.validateEvt(evt)
     let store = this.normalStore;
     if (store.has(evt)) {
       return Array
         .from(store.get(evt))
         .map( l => {
+          if (full) {
+            return l;
+          }
           let [key, callback, ] = l;
           return callback;
         })
@@ -331,6 +343,28 @@ export default class EventService {
   }
 
   /**
+   * get the existing type to make sure no mix type add to the same store
+   * @param {string} evtName event name
+   * @param {string} type the type to check
+   * @return {boolean} true it existed, false it doens't
+   */
+  checkTypeInStore(evtName, type) {
+    this.validateEvt(evtName)
+    this.validateEvt(type)
+    let all = this.$get(evtName, true)
+    if (all === false) {
+      this.logger('all false')
+      return false; // pristine
+    }
+    this.logger('checking', type)
+    // it should only have ONE type in ONE event store
+    return !all.filter(list => {
+      let [ ,,,t ] =list;
+      return type !== t;
+    }).length;
+  }
+
+  /**
    * wrapper to re-use the addToStore
    * @param {string} evt event name
    * @param {string} type on or once
@@ -340,6 +374,9 @@ export default class EventService {
    */
   addToNormalStore(evt, type, callback, context = null) {
     this.logger('addToNormalStore', evt, type, 'add to normal store')
+    // @TODO we need to check the existing store for the type first!
+
+
     let key = this.hashFnToKey(callback)
     let [_store, size] = this.addToStore(this.normalStore, evt, key, callback, context, type)
     this.normalStore = _store;

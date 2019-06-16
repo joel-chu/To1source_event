@@ -22,7 +22,8 @@
     "test:basic": "DEBUG=nb-event-service* ava ./tests/basic.test.js",
     "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js",
     "test:once": "DEBUG=nb-event-service* ava ./tests/once-problem.test.js",
-    "test:alias": "DEBUG=nb-event-service* ava ./tests/alias.test.js"
+    "test:alias": "DEBUG=nb-event-service* ava ./tests/alias.test.js",
+    "test:only": "DEBUG=nb-event-service* ava ./tests/only.test.js"
   },
   "repository": {
     "type": "git",
