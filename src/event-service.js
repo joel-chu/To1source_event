@@ -61,23 +61,22 @@ export default class EventService {
 
   /**
    * once only registered it once, there is no overwrite option here
+   * @NOTE change in v1.3.0 $once can add multiple listeners
+   *       but once the event fired, it will remove this event (see $only)
    * @param {string} evt name
    * @param {function} callback to execute
+   * @param {object} [context=null] the handler execute in
    * @return {boolean} result
    */
-  $once(evt , callback , context) {
+  $once(evt , callback , context = null) {
     this.validate(evt, callback)
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
+    let nStore = this.normalStore;
     if (lazyStoreContent === false) {
       this.logger('$once', `${evt} not in the lazy store`)
-      // check to see if this already exist in the normal store
-      let nStore = this.normalStore;
-      if (!nStore.has(evt)) {
-        this.logger('$once', `${evt} add to normal store`)
-        return this.addToNormalStore(evt, 'once', callback, context)
-      }
-      this.logger('$once', `${evt} already existed`)
+      // v1.3.0 $once now allow to add multiple listeners
+      return this.addToNormalStore(evt, 'once', callback, context)
     } else {
       // now this is the tricky bit
       // there is a potential bug here that cause by the developer
@@ -87,9 +86,22 @@ export default class EventService {
       this.logger('$once', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
-      const [ payload, ctx ] = list[0];
+      const [ payload, ctx ] = list[0]
       this.run(callback, payload, context || ctx)
+      // remove this evt from store
+      this.$off(evt)
     }
+  }
+
+  /**
+   * This one event can only bind one callbackback
+   * @param {string} evt event name
+   * @param {function} callback event handler
+   * @param {object} [context=null] the context the event handler execute in
+   * @return {boolean} true bind for first time, false already existed
+   */
+  $only(evt, callback, context = null) {
+    this.validate(evt, callback)
   }
 
   /**
