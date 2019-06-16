@@ -221,6 +221,7 @@ export default class EventService {
    * @param {*} value whatever return from callback
    */
   set $done(value) {
+    this.logger('set $done', value)
     this.result = value;
   }
 
@@ -364,7 +365,8 @@ export default class EventService {
   }
 
   /**
-   * wrapper to re-use the addToStore
+   * wrapper to re-use the addToStore,
+   * V1.3.0 add extra check to see if this type can add to this evt
    * @param {string} evt event name
    * @param {string} type on or once
    * @param {function} callback function
@@ -376,12 +378,12 @@ export default class EventService {
     // @TODO we need to check the existing store for the type first!
     if (this.checkTypeInStore(evt, type)) {
       this.logger(`${type} can add to ${evt} store`)
+      let key = this.hashFnToKey(callback)
+      let [_store, size] = this.addToStore(this.normalStore, evt, key, callback, context, type)
+      this.normalStore = _store;
+      return size;
     }
-    
-    let key = this.hashFnToKey(callback)
-    let [_store, size] = this.addToStore(this.normalStore, evt, key, callback, context, type)
-    this.normalStore = _store;
-    return size;
+    return false;
   }
 
   /**

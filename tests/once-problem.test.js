@@ -31,7 +31,7 @@ test('This is how $once normally works', t => {
 
 })
 
-test.cb.only('$once should allow to add more than one listner', t => {
+test.cb('$once should allow to add more than one listner', t => {
   t.plan(3)
   let evtName = 'more-once';
   let evtSrv = t.context.evtSrv;
@@ -51,11 +51,11 @@ test.cb.only('$once should allow to add more than one listner', t => {
 
   evtSrv.$call(evtName)
 
-  t.is(evtSrv.$done, 1)
+  t.is(evtSrv.$done, 2)
 
 })
 
-test('Demonstrate the potential bug with $once', t => {
+test.only('It should be fixed with the check type before adding to the store, but the $done value can be unpredictable', t => {
 
   let evtName = 'once-problem';
   let evtSrv = t.context.evtSrv;
@@ -65,11 +65,22 @@ test('Demonstrate the potential bug with $once', t => {
   evtSrv.$on(evtName, function(val) {
     return (val*0.2) + val;
   })
-
+  // this should not add
   evtSrv.$once(evtName, function(val) {
     return (val*0.1) + val;
   })
+
+  evtSrv.$on(evtName, function(val) {
+    return (val*0.3) + val;
+  })
+
   // now the first $on call hijacked the evt
+  // I thought it will be 1300 but its 1200
   t.is(evtSrv.$done, 1200)
+
+  evtSrv.$trigger(evtName, 2000)
+  // but this work as expecte because the order of adding to it
+  // where the last one was taken out from the lazyStore
+  t.is(evtSrv.$done, 2600)
 
 })

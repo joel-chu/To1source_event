@@ -27,8 +27,24 @@ test('Test the check type method', t => {
   evtSrv.$on(evt, function() {
     debug('call me again')
   })
-  
-  t.is(evtSrv.checkTypeInStore(evt, 'only'), false)
 
+  t.is(evtSrv.checkTypeInStore(evt, 'only'), false)
+})
+
+test.only('only should only allow to add one listner', t => {
+  let evt = 'test-only-evt'
+  let evtSrv = t.context.evtSrv;
+
+  evtSrv.$only(evt, function(num) {
+    return num + 10;
+  })
+
+  evtSrv.$only(evt, function(num) {
+    return num * 10;
+  })
+
+  evtSrv.$call(evt, 100)
+
+  t.is(evtSrv.$done, 110)
 
 })
