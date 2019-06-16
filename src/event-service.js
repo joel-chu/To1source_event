@@ -106,18 +106,15 @@ export default class EventService {
    */
   $only(evt, callback, context = null) {
     this.validate(evt, callback)
+    let added = false;
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     let nStore = this.normalStore;
-    if (lazyStoreContent === false) {
-      this.logger('$only', `${evt} not in the lazy store`)
-      // can only have one listener
-      if (!nStore.has(evt)) {
-        this.logger(`$only`, `${evt} add to store`)
-        return this.addToNormalStore(evt, 'only', callback, context)
-      }
-      this.logger('$only', `${evt} already existed no longer allow to add new listener`)
-    } else {
+    if (!nStore.has(evt)) {
+      this.logger(`$only`, `${evt} add to store`)
+      added = this.addToNormalStore(evt, 'only', callback, context)
+    }
+    if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger('$only', `${evt} found data in lazy store to execute`)
       const list = Array.from(lazyStoreContent)
@@ -127,6 +124,7 @@ export default class EventService {
         this.run(callback, payload, context || ctx)
       })
     }
+    return added;
   }
 
   /**
@@ -171,7 +169,7 @@ export default class EventService {
    * @param {array} args spread
    */
   $call(...args) {
-    this.logger('$call')
+    this.logger('$call', args)
     return Reflect.apply(this.$trigger, this, args)
   }
 
@@ -272,9 +270,7 @@ export default class EventService {
    * @return {void} the result store in $done
    */
   run(callback, payload, ctx) {
-    this.logger('run', callback)
-    this.logger('run', payload)
-    this.logger('run', ctx)
+    this.logger('run', callback, payload, ctx)
     this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
   }
 

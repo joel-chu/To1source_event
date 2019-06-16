@@ -31,20 +31,38 @@ test('Test the check type method', t => {
   t.is(evtSrv.checkTypeInStore(evt, 'only'), false)
 })
 
-test.only('only should only allow to add one listner', t => {
+test('only should only allow to add one listner', t => {
   let evt = 'test-only-evt'
   let evtSrv = t.context.evtSrv;
-
   evtSrv.$only(evt, function(num) {
     return num + 10;
   })
-
   evtSrv.$only(evt, function(num) {
     return num * 10;
   })
-
   evtSrv.$call(evt, 100)
-
   t.is(evtSrv.$done, 110)
+})
+
+test.only('Test the trigger before call $only and see if that works the same', t => {
+  let ctn = 0;
+  let evt = 'test-only-reverse'
+  let evtSrv = t.context.evtSrv;
+
+  evtSrv.$call(evt, 'x')
+
+  evtSrv.$only(evt, function(A) {
+    debug(A, ctn)
+    return ++ctn;
+  })
+
+  evtSrv.$call(evt, 'y')
+
+  evtSrv.$only(evt, function(B) {
+    debug(B, ctn)
+    return --ctn;
+  })
+
+  t.is(evtSrv.$done , 2)
 
 })
