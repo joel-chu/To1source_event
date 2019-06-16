@@ -346,17 +346,16 @@ export default class EventService {
    * get the existing type to make sure no mix type add to the same store
    * @param {string} evtName event name
    * @param {string} type the type to check
-   * @return {boolean} true it existed, false it doens't
+   * @return {boolean} true you can add, false then you can't add this type
    */
   checkTypeInStore(evtName, type) {
     this.validateEvt(evtName)
     this.validateEvt(type)
     let all = this.$get(evtName, true)
     if (all === false) {
-      this.logger('all false')
-      return false; // pristine
+       // pristine it means you can add
+      return true;
     }
-    this.logger('checking', type)
     // it should only have ONE type in ONE event store
     return !all.filter(list => {
       let [ ,,,t ] =list;
@@ -375,8 +374,10 @@ export default class EventService {
   addToNormalStore(evt, type, callback, context = null) {
     this.logger('addToNormalStore', evt, type, 'add to normal store')
     // @TODO we need to check the existing store for the type first!
-
-
+    if (this.checkTypeInStore(evt, type)) {
+      this.logger(`${type} can add to ${evt} store`)
+    }
+    
     let key = this.hashFnToKey(callback)
     let [_store, size] = this.addToStore(this.normalStore, evt, key, callback, context, type)
     this.normalStore = _store;

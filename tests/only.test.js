@@ -16,13 +16,18 @@ test('Test the check type method', t => {
   let evt = 'test-evt'
   let evtSrv = t.context.evtSrv;
 
-  t.is(evtSrv.checkTypeInStore(evt, 'on'), false)
+  t.is(evtSrv.checkTypeInStore(evt, 'on'), true)
 
   evtSrv.$on(evt, function() {
     debug('call me')
   })
 
   t.is(evtSrv.checkTypeInStore(evt, 'on'), true)
+
+  evtSrv.$on(evt, function() {
+    debug('call me again')
+  })
+  
   t.is(evtSrv.checkTypeInStore(evt, 'only'), false)
 
 
