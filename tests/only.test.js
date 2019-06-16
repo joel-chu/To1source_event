@@ -51,17 +51,21 @@ test.only('Test the trigger before call $only and see if that works the same', t
 
   evtSrv.$call(evt, 'x')
 
-  evtSrv.$only(evt, function(A) {
+  let result1 = evtSrv.$only(evt, function(A) {
     debug(A, ctn)
     return ++ctn;
   })
 
+  t.truthy(result1)
+
   evtSrv.$call(evt, 'y')
 
-  evtSrv.$only(evt, function(B) {
+  let result2 = evtSrv.$only(evt, function(B) {
     debug(B, ctn)
     return --ctn;
   })
+
+  t.false(result2)
 
   t.is(evtSrv.$done , 2)
 
