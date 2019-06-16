@@ -13,6 +13,31 @@ The main different between this module and the other event emitter out there is 
 
 Basically you can trigger an event that doesn't exist (well, sort of, its magic)
 
+For example:
+
+```js
+//  other library like EventEmitter
+
+ee.emitEvent('someEvent')
+
+ee.addListener('someEvent', function() {
+  console.log('I am called')
+})
+
+```
+
+The callback in the above example never works and you will never see the message. But our can do it:
+
+```js
+es.$trigger('someEvent') // <-- not yet exist
+
+ee.$on('someEvent', function() {
+  console.log('Hello world!')
+})
+```
+
+The message will show. 
+
 *Please note the new version is using ES6 features heavily (WeakMap, Set, Map, Array.from etc) if you need to
 use this module on older platform, please provide polyfill accordingly*
 
@@ -38,30 +63,6 @@ it will remove itself from the event store, and no longer available. This behavi
 There is a potential problem with $once you can see below. It's no really a bug per se, but due to our
 own unique feature that can call event before even it existed (yeah, it's magic)
 
-For example:
-
-```js
-//  other library like EventEmitter
-
-ee.emitEvent('someEvent')
-
-ee.addListener('someEvent', function() {
-  console.log('I am called')
-})
-
-```
-
-The callback in the above example never works and you will never see the message. But our can do it:
-
-```js
-es.$trigger('someEvent') // <-- not yet exist
-
-ee.$on('someEvent', function() {
-  console.log('Hello world!')
-})
-```
-
-The message will show. Now back to our problem.
 
 ```js
 // trigger event before it register with a handler
