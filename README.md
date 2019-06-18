@@ -36,7 +36,7 @@ ee.$on('someEvent', function() {
 })
 ```
 
-The message will show. 
+The message will show.
 
 *Please note the new version is using ES6 features heavily (WeakMap, Set, Map, Array.from etc) if you need to
 use this module on older platform, please provide polyfill accordingly*
@@ -111,6 +111,12 @@ $call('only-event', 'A little cat jumping through the window')
 
 You will only get `ONLY A little cat jumping through the window` but the second callback never add to the event store.
 Although we develop this feature purposely for our other library to use, but it has a lot real world usage.
+
+### $onlyOnce(eventName , callback, context)
+
+Just like what it said on the tin, its `$once` + `$only`. You should able to figure out what it does.
+There is no alias for this one.
+
 
 #### $off(eventName)
 
@@ -203,5 +209,7 @@ $ npm run build
 It will kick start the rollup building process
 
 ---
+
+ISC
 
 [Joel Chu](https://joelchu.com) [NEWBRAN LTD](https://newbran.ch) (c) 2019
