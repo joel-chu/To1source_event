@@ -128,6 +128,37 @@ export default class EventService {
   }
 
   /**
+   * $only + $once this is because I found a very subtile bug when we pass a
+   * resolver, rejecter - and it never fire because that's OLD
+   * @param {string} evt event name
+   * @param {function} callback to call later
+   * @param {object} [context=null] exeucte context
+   * @return {void}
+   */
+  $onlyOnce(evt, callback, context = null) {
+    this.validate(evt, callback)
+    let added = false;
+    let lazyStoreContent = this.takeFromStore(evt)
+    // this is normal register before call $trigger
+    let nStore = this.normalStore;
+    if (!nStore.has(evt)) {
+      this.logger(`$only`, `${evt} add to store`)
+      added = this.addToNormalStore(evt, 'onlyOnce', callback, context)
+    }
+    if (lazyStoreContent !== false) {
+      // there are data store in lazy store
+      this.logger('$onlyOnce', lazyStoreContent)
+      const list = Array.from(lazyStoreContent)
+      // should never have more than 1
+      const [ payload, ctx ] = list[0]
+      this.run(callback, payload, context || ctx)
+      // remove this evt from store
+      this.$off(evt)
+    }
+    return added;
+  }
+
+  /**
    * trigger the event
    * @param {string} evt name NOT allow array anymore!
    * @param {mixed} [payload = []] pass to fn
@@ -147,10 +178,11 @@ export default class EventService {
       let hasOnce = false;
       let hasOnly = false;
       for (let i=0; i < ctn; ++i) {
-        found = i;
+        ++found;
+        this.logger('found', found)
         let [ _, callback, ctx, type ] = nSet[i]
         this.run(callback, payload, context || ctx)
-        if (type === 'once') {
+        if (type === 'once' || type === 'onlyOnce') {
           hasOnce = true;
         }
       }
