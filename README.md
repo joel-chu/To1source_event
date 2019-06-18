@@ -114,9 +114,7 @@ Although we develop this feature purposely for our other library to use, but it 
 
 ### $onlyOnce(eventName , callback, context)
 
-Just like what it said on the tin, its `$once` + `$only`. You should able to figure out what it does.
-There is no alias for this one.
-
+Just like what it said on the tin; its `$only` + `$once`. You should able to figure out what it does.
 
 #### $off(eventName)
 
@@ -162,6 +160,7 @@ And that will gives you the following alias version:
 - emit --> $trigger
 - get --> $get
 - only --> $only
+- onlyOnce --> $onlyOnce
 
 ## $done getter
 
