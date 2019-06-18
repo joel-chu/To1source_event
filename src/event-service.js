@@ -14,8 +14,9 @@ export default class EventService {
     if (config.logger && typeof config.logger === 'function') {
       this.logger = config.logger;
     }
+    this.keep = config.keep;
     // for the $done setter
-    this.result = null;
+    this.result = config.keep ? [] : null;
     // we need to init the store first otherwise it could be a lot of checking later
     this.normalStore = new Map()
     this.lazyStore = new Map()
@@ -142,7 +143,7 @@ export default class EventService {
     // this is normal register before call $trigger
     let nStore = this.normalStore;
     if (!nStore.has(evt)) {
-      this.logger(`$only`, `${evt} add to store`)
+      this.logger(`$onlyOnce`, `${evt} add to store`)
       added = this.addToNormalStore(evt, 'onlyOnce', callback, context)
     }
     if (lazyStoreContent !== false) {
@@ -179,7 +180,7 @@ export default class EventService {
       let hasOnly = false;
       for (let i=0; i < ctn; ++i) {
         ++found;
-        this.logger('found', found)
+        // this.logger('found', found)
         let [ _, callback, ctx, type ] = nSet[i]
         this.run(callback, payload, context || ctx)
         if (type === 'once' || type === 'onlyOnce') {
@@ -252,7 +253,11 @@ export default class EventService {
    */
   set $done(value) {
     this.logger('set $done', value)
-    this.result = value;
+    if (this.keep) {
+      this.result.push(value)
+    } else {
+      this.result = value;
+    }
   }
 
   /**
@@ -260,8 +265,18 @@ export default class EventService {
    * @return {*} whatever last store result
    */
   get $done() {
+    if (this.keep) {
+      this.logger(this.result)
+      return this.result[this.result.length - 1]
+    }
     return this.result;
   }
+
+  /**
+   * @TODO is there any real use with the keep prop?
+   *
+   */
+
 
   /////////////////////////////
   //    PRIVATE METHODS      //
@@ -387,7 +402,7 @@ export default class EventService {
     }
     // it should only have ONE type in ONE event store
     return !all.filter(list => {
-      let [ ,,,t ] =list;
+      let [ ,,,t ] = list;
       return type !== t;
     }).length;
   }
