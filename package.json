@@ -17,7 +17,7 @@
     "build": "npm run build:umd && npm run build:alias",
     "build:umd": "rollup -c",
     "build:alias": "NODE_ENV=alias rollup -c",
-    "prepare": "npm run build",
+    "prepare": "npm run build && npm run test",
     "test:browser": "node ./tests/fixtures/browser.js",
     "test:basic": "DEBUG=nb-event-service* ava ./tests/basic.test.js",
     "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js",
