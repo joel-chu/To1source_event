@@ -155,6 +155,21 @@ This method will return
 This basically it's a shorthand of `$trigger` if you know that your callback only execute in `null` and purposely register a type to prevent
 other to register it later
 
+This is useful shorthand, also trigger event before its register
+
+Example:
+
+```js
+// call before event register
+es.$call('some-event', 1001, 'only')
+// now try to register it with a different event handler
+es.$on('some-event', function(num) {
+  return ++num;
+})
+// it will throw Error that tells you it has been register with `only` type already
+
+```
+
 #### $get(evt)
 
 * return all the listeners for that particular event name from the internal store. Handy for debug.
