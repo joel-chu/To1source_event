@@ -1,6 +1,6 @@
 {
   "name": "nb-event-service",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "An universal event service or Browser / Node",
   "module": "index.js",
   "browser": "dist/nb-event-service.js",
@@ -24,7 +24,8 @@
     "test:once": "DEBUG=nb-event-service* ava ./tests/once-problem.test.js",
     "test:alias": "DEBUG=nb-event-service* ava ./tests/alias.test.js",
     "test:only": "DEBUG=nb-event-service* ava ./tests/only.test.js",
-    "test:oo": "DEBUG=nb-event-service* ava ./tests/only-once.test.js"
+    "test:oo": "DEBUG=nb-event-service* ava ./tests/only-once.test.js",
+    "test:replace": "DEBUG=nb-event-service* ava ./tests/replace.test.js"
   },
   "repository": {
     "type": "git",

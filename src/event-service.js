@@ -130,7 +130,7 @@ export default class EventService {
 
   /**
    * $only + $once this is because I found a very subtile bug when we pass a
-   * resolver, rejecter - and it never fire because that's OLD
+   * resolver, rejecter - and it never fire because that's OLD adeed in v1.4.0
    * @param {string} evt event name
    * @param {function} callback to call later
    * @param {object} [context=null] exeucte context
@@ -160,10 +160,27 @@ export default class EventService {
   }
 
   /**
+   * This is a shorthand of $off + $on added in V1.5.0
+   * @param {string} evt event name
+   * @param {function} callback to exeucte
+   * @param {object} [context = null] or pass a string as type
+   * @param {string} [type=on] what type of method to replace
+   * @return {}
+   */
+  $replace(evt, callback, context = null, type = 'on') {
+    if (this.validateType(type)) {
+      this.$off(evt)
+      let method = this['$' + type]
+      return Reflect.apply(method, this, [evt, callback, context])
+    }
+    throw new Error(`${type} is not supported!`)
+  }
+
+  /**
    * trigger the event
    * @param {string} evt name NOT allow array anymore!
    * @param {mixed} [payload = []] pass to fn
-   * @param {object} [context = null] overwrite what stored
+   * @param {object|string} [context = null] overwrite what stored
    * @return {number} if it has been execute how many times
    */
   $trigger(evt , payload = [] , context = null) {
@@ -307,6 +324,16 @@ export default class EventService {
       }
     }
     throw new Error(`callback required to be function type!`)
+  }
+
+  /**
+   * Check if this type is correct or not added in V1.5.0
+   * @param {string} type for checking
+   * @return {boolean} true on OK
+   */
+  validateType(type) {
+    const types = ['on', 'only', 'once', 'onlyOnce']
+    return !!types.filter(t => type === t).length;
   }
 
   /**
