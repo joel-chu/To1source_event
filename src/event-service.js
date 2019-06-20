@@ -181,9 +181,10 @@ export default class EventService {
    * @param {string} evt name NOT allow array anymore!
    * @param {mixed} [payload = []] pass to fn
    * @param {object|string} [context = null] overwrite what stored
+   * @param {string} [type=false] if pass this then we need to add type to store too
    * @return {number} if it has been execute how many times
    */
-  $trigger(evt , payload = [] , context = null) {
+  $trigger(evt , payload = [] , context = null, type = false) {
     this.validateEvt(evt)
     let found = 0;
     // first check the normal store
@@ -210,7 +211,7 @@ export default class EventService {
       return found;
     }
     // now this is not register yet
-    this.addToLazyStore(evt, payload, context)
+    this.addToLazyStore(evt, payload, context, type)
     return found;
   }
 
@@ -278,6 +279,7 @@ export default class EventService {
   }
 
   /**
+   * @TODO is there any real use with the keep prop?
    * getter for $done
    * @return {*} whatever last store result
    */
@@ -288,12 +290,6 @@ export default class EventService {
     }
     return this.result;
   }
-
-  /**
-   * @TODO is there any real use with the keep prop?
-   *
-   */
-
 
   /////////////////////////////
   //    PRIVATE METHODS      //
@@ -383,14 +379,22 @@ export default class EventService {
       // this is new
       fnSet = new Set()
     }
-    let ctn = args.length;
-    // lazy only store 2 items!
-    if (ctn > 2) {
-      if (!this.checkContentExist(args, fnSet)) {
-        this.logger('addToStore', `insert new`, args)
-        fnSet.add(args)
+    // lazy only store 2 items - this is not the case in V1.6.0 anymore
+    // we need to check the first parameter is string or not
+    if (args.length > 2) {
+      if (Array.isArray(args[0])) { // lazy store
+        // check if this type of this event already register in the lazy store
+        let [,,t] = args;
+        if (!this.checkTypeInLazyStore(evt, t)) {
+          fnSet.add(args)
+        }
+      } else {
+        if (!this.checkContentExist(args, fnSet)) {
+          this.logger('addToStore', `insert new`, args)
+          fnSet.add(args)
+        }
       }
-    } else { // just add if this is a lazy store
+    } else {
       fnSet.add(args)
     }
     store.set(evt, fnSet)
@@ -435,6 +439,22 @@ export default class EventService {
   }
 
   /**
+   * This is checking just the lazy store because the structure is different
+   * therefore we need to use a new method to check it
+   */
+  checkTypeInLazyStore(evtName, type) {
+    this.validateEvt(evtName)
+    this.validateEvt(type)
+    let store = this.lazyStore;
+    return !!Array
+      .from(store.get(evtName))
+      .filter(l => {
+        let [,,t] = l;
+        return t === type;
+      }).length
+  }
+  
+  /**
    * wrapper to re-use the addToStore,
    * V1.3.0 add extra check to see if this type can add to this evt
    * @param {string} evt event name
@@ -449,7 +469,8 @@ export default class EventService {
     if (this.checkTypeInStore(evt, type)) {
       this.logger(`${type} can add to ${evt} store`)
       let key = this.hashFnToKey(callback)
-      let [_store, size] = this.addToStore(this.normalStore, evt, key, callback, context, type)
+      let args = [this.normalStore, evt, key, callback, context, type]
+      let [_store, size] = Reflect.apply(this.addToStore, this, args)
       this.normalStore = _store;
       return size;
     }
@@ -461,11 +482,19 @@ export default class EventService {
    * so we only get a payload object or even nothing
    * @param {string} evt event name
    * @param {array} payload of arguments or empty if there is none
-   * @param {object} context the context the callback execute in
+   * @param {object} [context=null] the context the callback execute in
+   * @param {string} [type=false] register a type so no other type can add to this evt
    * @return {number} size of the store
    */
-  addToLazyStore(evt, payload = [], context = null) {
-    let [_store, size] = this.addToStore(this.lazyStore, evt, this.toArray(payload), context)
+  addToLazyStore(evt, payload = [], context = null, type = false) {
+    // this is add in V1.6.0
+    // when there is type then we will need to check if this already added in lazy store
+    // and no other type can add to this lazy store
+    let args = [this.lazyStore, evt, this.toArray(payload), context]
+    if (type) {
+      args.push(type)
+    }
+    let [_store, size] = Reflect.apply(this.addToStore, this, args)
     this.lazyStore = _store;
     return size;
   }
