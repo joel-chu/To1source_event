@@ -68,6 +68,17 @@ export default class EventService {
   }
 
   /**
+   * There is a problem with the dynamic generated function for here they all look the same
+   * therefore they were not added, we need to have a function that allow adding dynamic
+   * methods that don't check, which might cause bugs later on, therefore it has to be control
+   * really carefully how you use this one
+   */
+  $stack() {
+    // TBC what to do because this is really a bad idea
+
+  }
+
+  /**
    * once only registered it once, there is no overwrite option here
    * @NOTE change in v1.3.0 $once can add multiple listeners
    *       but once the event fired, it will remove this event (see $only)
