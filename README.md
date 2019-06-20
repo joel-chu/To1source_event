@@ -96,16 +96,16 @@ This is a new method in v1.3.0
 Example:
 
 ```js
-$only('only-event', function(message) {
+es.$only('only-event', function(message) {
   console.log('ONLY', message)
 })
 // now if you try to add another
-$only('only-event', function(message) {
+es.$only('only-event', function(message) {
   console.log('AGAIN', message)
 })
 
 // execute it
-$call('only-event', 'A little cat jumping through the window')
+es.$trigger('only-event', 'A little cat jumping through the window')
 
 ```
 
@@ -131,20 +131,29 @@ This is `$off` + event register function
 
 Type can be `on`, `only`, `once`, `onlyOnce` default value is `on`
 
-#### $trigger(eventName, params , context)
+#### $trigger(eventName, params , context, type)
 
 * eventName (string) this will trigger the callback that register with this `eventName` whether that actually exist or not
 * params (mixed) optional - data you want to pass to your callback method
 * context (object || null) optional - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
+* type (string) available types are `on`, `only`, `once`, `onlyOnce` this is for trigger event before it get register and prevent other type to register it
 
 This method will return
 
 * false - if there is nothing to call
 * i - the total events been called
 
-#### $call
+#### $call(eventName, params, type, context)
 
-This is an alias to `$trigger`
+**This is breaking change in V1.6.0**
+
+* eventName (string) this will trigger the callback that register with this `eventName` whether that actually exist or not
+* params (mixed) optional - data you want to pass to your callback method
+* type (string) available types are `on`, `only`, `once`, `onlyOnce` this is for trigger event before it get register and prevent other type to register it
+* context (object || null) optional - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
+
+This basically it's a shorthand of `$trigger` if you know that your callback only execute in `null` and purposely register a type to prevent
+other to register it later
 
 #### $get(evt)
 

@@ -232,10 +232,16 @@ export default class EventService {
 
   /**
    * this is an alias to the $trigger
-   * @param {array} args spread
+   * @NOTE breaking change in V1.6.0 we swap the parameter around
+   * @param {string} evt event name
+   * @param {*} params pass to the callback
+   * @param {string} type of call
+   * @param {object} context what context callback execute in
+   * @return {*} from $trigger
    */
-  $call(...args) {
-    this.logger('$call', args)
+  $call(evt, params, type = false, context = null) {
+    let args = [evt, params]
+    args.push(context, type)
     return Reflect.apply(this.$trigger, this, args)
   }
 

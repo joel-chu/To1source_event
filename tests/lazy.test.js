@@ -27,4 +27,29 @@ test('when using the context as type in lazy store, other type should not able t
   t.is(content.size, 1)
 })
 
-test.todo()
+test('It should throw an error if the event been trigger with one type but try to register with another', t => {
+  let es = t.context.evtSrv;
+  let evt = 'some-event'
+
+  es.$trigger(evt, 1, null, 'on')
+
+  const fn = (num) => es.$only(evt, num => {
+    debug(num)
+  })
+
+  t.throws(() => fn(), Error, 'It should throw error because its different type')
+})
+
+test('using $call should able to pass the type without passing the context', t => {
+  let es = t.context.evtSrv;
+  let evt = 'just-calling'
+
+  es.$call(evt, 100, 'only')
+
+  const fn = (num) => es.$on(evt, num => {
+    debug(num)
+  })
+
+  t.throws(() => fn(), Error, 'It should throw error because already register with $only')
+
+})
