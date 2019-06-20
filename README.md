@@ -112,7 +112,7 @@ $call('only-event', 'A little cat jumping through the window')
 You will only get `ONLY A little cat jumping through the window` but the second callback never add to the event store.
 Although we develop this feature purposely for our other library to use, but it has a lot real world usage.
 
-### $onlyOnce(eventName , callback, context)
+#### $onlyOnce(eventName , callback, context)
 
 Just like what it said on the tin; its `$only` + `$once`. You should able to figure out what it does.
 
@@ -124,6 +124,12 @@ It will return
 
 * true - event been clear
 * false - such even doesn't exist
+
+#### $replace(eventName, callback, context = null, type = 'on')
+
+This is `$off` + event register function
+
+Type can be `on`, `only`, `once`, `onlyOnce` default value is `on`
 
 #### $trigger(eventName, params , context)
 
@@ -161,6 +167,7 @@ And that will gives you the following alias version:
 - get --> $get
 - only --> $only
 - onlyOnce --> $onlyOnce
+- replace --> $replace
 
 ## $done getter
 
