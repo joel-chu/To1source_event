@@ -352,14 +352,17 @@ export default class EventService {
    */
   takeFromStore(evt, storeName = 'lazyStore') {
     let store = this[storeName]; // it could be empty at this point
-    this.logger('takeFromStore', storeName, store)
-    if (store.has(evt)) {
-      let content = store.get(evt)
-      this.logger('takeFromStore', content)
-      store.delete(evt)
-      return content;
+    if (store) {
+      this.logger('takeFromStore', storeName, store)
+      if (store.has(evt)) {
+        let content = store.get(evt)
+        this.logger('takeFromStore', content)
+        store.delete(evt)
+        return content;
+      }
+      return false;
     }
-    return false;
+    throw new Error(`${storeName} is not supported!`)
   }
 
   /**
@@ -394,7 +397,7 @@ export default class EventService {
           fnSet.add(args)
         }
       }
-    } else {
+    } else { // add straight to lazy store
       fnSet.add(args)
     }
     store.set(evt, fnSet)
@@ -445,15 +448,19 @@ export default class EventService {
   checkTypeInLazyStore(evtName, type) {
     this.validateEvt(evtName)
     this.validateEvt(type)
-    let store = this.lazyStore;
-    return !!Array
-      .from(store.get(evtName))
-      .filter(l => {
-        let [,,t] = l;
-        return t === type;
-      }).length
+    let store = this.lazyStore.get(evtName)
+    this.logger('checkTypeInLazyStore', store)
+    if (store) {
+      return !!Array
+        .from(store)
+        .filter(l => {
+          let [,,t] = l;
+          return t !== type;
+        }).length
+    }
+    return false;
   }
-  
+
   /**
    * wrapper to re-use the addToStore,
    * V1.3.0 add extra check to see if this type can add to this evt
