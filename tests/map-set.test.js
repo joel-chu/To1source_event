@@ -6,7 +6,7 @@ test('A Set should not allow the same thing add twice', t => {
   let ctn = 0;
   let testSet = new Set()
   const testFn = () => {
-    console.log(`call me ${++ctn}`)
+    debug(`call me ${++ctn}`)
   }
   // problem - can only store primitive type that id is the same
   testSet.add(testFn)
@@ -17,11 +17,11 @@ test('A Set should not allow the same thing add twice', t => {
 test('It should able to store a Set inside a Map', t => {
   let ctn = 0;
   const testFnA = () => {
-    console.log(`call A ${++ctn}`)
+    debug(`call A ${++ctn}`)
   }
 
   const testFnB = () => {
-    console.log(`call B ${++ctn}`)
+    debug(`call B ${++ctn}`)
   }
 
   let testMap = new Map()
@@ -42,7 +42,7 @@ test('It should able to store a Set inside a Map', t => {
 
 test('It should able to store multiple level within a class structure and act like a private property', t => {
   const testFnB = () => {
-    console.log(`call B ${++ctn}`)
+    debug(`call B ${++ctn}`)
   }
 
   let PRIVATE_STORE = new Map()
@@ -77,10 +77,10 @@ test('It should able to store multiple level within a class structure and act li
 test('It should store one item if its adding different thing to the same key', t => {
   let ctn = 0;
   const testFnA = () => {
-    console.log(`call A ${++ctn}`)
+    debug(`call A ${++ctn}`)
   }
   const testFnB = () => {
-    console.log(`call B ${++ctn}`)
+    debug(`call B ${++ctn}`)
   }
   let PRIVATE_STORE = new Map()
   class Dummy {

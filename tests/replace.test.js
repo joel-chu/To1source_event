@@ -3,7 +3,7 @@ const test = require('ava')
 const NBEventService = require('../main')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:replace')
-let value = 2000;
+
 
 test.before(t => {
   t.context.evtSrv = new NBEventService({
