@@ -57,7 +57,10 @@ export default class EventService {
     // this is when they call $trigger before register this callback
     let size = 0;
     lazyStoreContent.forEach(content => {
-      let [ payload, ctx ] = content;
+      let [ payload, ctx, t ] = content;
+      if (t && t !== type) {
+        throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
+      }
       this.run(callback, payload, context || ctx)
       size += this.addToNormalStore(evt, type, callback, context || ctx)
     })
@@ -75,13 +78,14 @@ export default class EventService {
    */
   $once(evt , callback , context = null) {
     this.validate(evt, callback)
+    const type = 'once';
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     let nStore = this.normalStore;
     if (lazyStoreContent === false) {
       this.logger('$once', `${evt} not in the lazy store`)
       // v1.3.0 $once now allow to add multiple listeners
-      return this.addToNormalStore(evt, 'once', callback, context)
+      return this.addToNormalStore(evt, type, callback, context)
     } else {
       // now this is the tricky bit
       // there is a potential bug here that cause by the developer
@@ -91,7 +95,10 @@ export default class EventService {
       this.logger('$once', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
-      const [ payload, ctx ] = list[0]
+      const [ payload, ctx, t ] = list[0]
+      if (t && t !== type) {
+        throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
+      }
       this.run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
@@ -107,13 +114,14 @@ export default class EventService {
    */
   $only(evt, callback, context = null) {
     this.validate(evt, callback)
+    const type = 'only';
     let added = false;
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     let nStore = this.normalStore;
     if (!nStore.has(evt)) {
       this.logger(`$only`, `${evt} add to store`)
-      added = this.addToNormalStore(evt, 'only', callback, context)
+      added = this.addToNormalStore(evt, type, callback, context)
     }
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
@@ -121,7 +129,10 @@ export default class EventService {
       const list = Array.from(lazyStoreContent)
       // $only allow to trigger this multiple time on the single handler
       list.forEach( l => {
-        const [ payload, ctx ] = l;
+        const [ payload, ctx, t ] = l;
+        if (t && t !== type) {
+          throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
+        }
         this.run(callback, payload, context || ctx)
       })
     }
@@ -138,20 +149,24 @@ export default class EventService {
    */
   $onlyOnce(evt, callback, context = null) {
     this.validate(evt, callback)
+    const type = 'onlyOnce';
     let added = false;
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     let nStore = this.normalStore;
     if (!nStore.has(evt)) {
       this.logger(`$onlyOnce`, `${evt} add to store`)
-      added = this.addToNormalStore(evt, 'onlyOnce', callback, context)
+      added = this.addToNormalStore(evt, type, callback, context)
     }
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger('$onlyOnce', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
-      const [ payload, ctx ] = list[0]
+      const [ payload, ctx, t ] = list[0]
+      if (t && t !== 'onlyOnce') {
+        throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
+      }
       this.run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)

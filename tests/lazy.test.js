@@ -11,7 +11,7 @@ test.before(t => {
   })
 })
 
-test('It should able to save to lazy store with a type using the context parameter', t => {
+test('when using the context as type in lazy store, other type should not able to add to lazystore', t => {
   let es = t.context.evtSrv;
   let evt = 'not-here-yet'
   // first we trigger an non-exist event
@@ -25,7 +25,6 @@ test('It should able to save to lazy store with a type using the context paramet
   debug(content)
 
   t.is(content.size, 1)
-
 })
 
-test.todo('when using the context as type in lazy store, other type should not able to add to lazystore')
+test.todo()
