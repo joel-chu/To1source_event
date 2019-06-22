@@ -15,6 +15,7 @@ export default class EventService {
       this.logger = config.logger;
     }
     this.keep = config.keep;
+    this.suspend = false;
     // for the $done setter
     this.result = config.keep ? [] : null;
     // we need to init the store first otherwise it could be a lot of checking later
@@ -65,17 +66,6 @@ export default class EventService {
       size += this.addToNormalStore(evt, type, callback, context || ctx)
     })
     return size;
-  }
-
-  /**
-   * There is a problem with the dynamic generated function for here they all look the same
-   * therefore they were not added, we need to have a function that allow adding dynamic
-   * methods that don't check, which might cause bugs later on, therefore it has to be control
-   * really carefully how you use this one
-   */
-  $stack() {
-    // TBC what to do because this is really a bad idea
-
   }
 
   /**
@@ -295,6 +285,24 @@ export default class EventService {
         })
     }
     return false;
+  }
+
+  /**
+   * Holding off all the event firing and put them back into the lazy store
+   * until the suspend been lifted
+   * @param {string} [type=all] what type of event should be suspended
+   * @return {void}
+   */
+  $suspend(type = 'all') {
+    this.suspend = type === 'all' ? true : this.validateType(type);
+  }
+
+  /**
+   * Lifted the suspend
+   * @return {void}
+   */
+  $resume() {
+    this.suspend = false;
   }
 
   /**
