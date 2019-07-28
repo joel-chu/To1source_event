@@ -5,7 +5,9 @@ require('../src/watch')
 
 test('We should have a watch method in the Object', t => {
 
-  t.truthy(Object.watch)
+  let obj = {}
+
+  t.truthy(obj.watch)
 
 })
 
