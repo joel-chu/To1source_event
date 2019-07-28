@@ -14,7 +14,8 @@ if (!Object.prototype.watch) {
        }
        var setter = function (val) {
         old = cur;
-        cur = handler.call(this,prop,old,val)
+        // We change the order of the params
+        cur = handler.call(this, val, prop, old)
 
         return cur;
        }
