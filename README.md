@@ -176,6 +176,29 @@ es.$on('some-event', function(num) {
 
 Or it will return `false` if there is nothing
 
+#### $suspend setter
+
+This is new in V1.8.0. We watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
+Then when you set this to false, all the previous suspended call will get release.
+
+```js
+const evtSrv = new NBEventService()
+evtSrv.$on('some-event', value => {
+  return value + 1;
+})
+
+evtSrv.$suspend = true;
+
+evtSrv.$trigger('some-event', 100)
+
+evtSrv.$done === null
+
+evtSrv.$suspend = false;
+
+evtSrv.$done === 101
+
+```
+
 ## Alias version
 
 If you don't like the `$`, you can use the alias version.
