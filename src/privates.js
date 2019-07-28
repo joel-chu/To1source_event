@@ -24,10 +24,12 @@ export default class NbEventServiceBase extends WatchClass {
     this.suspend = null;
     this.queue = new Set()
     this.watch('suspend', function(value, prop, oldValue) {
+      this.logger(`${prop} set from ${oldValue} to ${value}`)
       // it means it set the suspend = true then release it
       if (oldValue === true && value === false) {
         this.release()
       }
+      return value; // we need to return the value to store it
     })
   }
 
@@ -37,6 +39,8 @@ export default class NbEventServiceBase extends WatchClass {
    */
   release() {
     this.logger('release was called')
+
+    this.$done = 'release called'
   }
 
 

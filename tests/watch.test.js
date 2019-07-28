@@ -6,6 +6,9 @@ const NBEventService = require('../main')
 
 test.before(t => {
   t.context.watchObj = new WatchClass()
+  t.context.evtSrv = new NBEventService({
+    logger: debug
+  })
 })
 
 test('We should have a watch method in the Object', t => {
@@ -31,6 +34,20 @@ test.cb('should able to watch a property change', t => {
   }, 500)
 
   obj.newProp = 'something';
+})
 
+test.cb.only('Setting the suspend should able to trigger the release call', t => {
+
+  t.plan(1)
+
+  const evtSrv = t.context.evtSrv;
+
+  evtSrv.suspend = true;
+
+  setTimeout(() => {
+    evtSrv.suspend = false;
+    t.pass()
+    t.end()
+  }, 300)
 
 })
