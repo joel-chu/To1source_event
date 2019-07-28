@@ -7,7 +7,7 @@ const NBEventService = require('../main')
 test.before(t => {
   t.context.watchObj = new WatchClass()
   t.context.evtSrv = new NBEventService({
-    logger: debug
+    logger: debug.extend('test')
   })
 })
 
@@ -38,16 +38,26 @@ test.cb('should able to watch a property change', t => {
 
 test.cb.only('Setting the suspend should able to trigger the release call', t => {
 
-  t.plan(1)
+  t.plan(2)
 
+  const evtName = 'unknown-operation'
   const evtSrv = t.context.evtSrv;
+
+  evtSrv.$on(evtName, function(value) {
+    return value + ' ha ha'
+  })
 
   evtSrv.suspend = true;
 
+  evtSrv.$trigger(evtName, 'you loser')
+
+  t.falsy(evtSrv.$done)
+
+  evtSrv.suspend = false;
+
   setTimeout(() => {
-    evtSrv.suspend = false;
-    t.pass()
+    t.is(evtSrv.$done, 'you loser ha ha')
     t.end()
-  }, 300)
+  }, 1)
 
 })

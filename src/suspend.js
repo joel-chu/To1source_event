@@ -12,7 +12,10 @@ export default class SuspendClass extends WatchClass {
       this.logger(`${prop} set from ${oldValue} to ${value}`)
       // it means it set the suspend = true then release it
       if (oldValue === true && value === false) {
-        this.release()
+        // we want this happen after the return happens
+        setTimeout(() => {
+          this.release()
+        }, 1)
       }
       return value; // we need to return the value to store it
     })
@@ -38,9 +41,8 @@ export default class SuspendClass extends WatchClass {
   $queue(...args) {
     if (this.suspend === true) {
       this.queueStore.add(args)
-      return true;
     }
-    return false;
+    return this.suspend;
   }
 
   /**
@@ -51,12 +53,14 @@ export default class SuspendClass extends WatchClass {
     let size = this.queueStore.size
     this.logger(`Release was called ${size}`)
     if (size > 0) {
-      this.queueStore.forEach(args => {
+      const queue = Array.from(this.queueStore)
+      this.queueStore.clear()
+      this.logger('queue', queue)
+      queue.forEach(args => {
+        this.logger(args)
         Reflect.apply(this.$trigger, this, args)
-        this.queueStore.delete(args)
       })
       this.logger(`Release size ${this.queueStore.size}`)
     }
-    return size
   }
 }
