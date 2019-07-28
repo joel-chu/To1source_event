@@ -193,23 +193,28 @@ export default class EventService extends NbEventServiceBase {
     this.logger('$trigger', nStore)
     if (nStore.has(evt)) {
       this.logger('$trigger', evt, 'found')
-      let nSet = Array.from(nStore.get(evt))
-      let ctn = nSet.length;
-      let hasOnce = false;
-      let hasOnly = false;
-      for (let i=0; i < ctn; ++i) {
-        ++found;
-        // this.logger('found', found)
-        let [ _, callback, ctx, type ] = nSet[i]
-        this.run(callback, payload, context || ctx)
-        if (type === 'once' || type === 'onlyOnce') {
-          hasOnce = true;
+      // @1.8.0 to add the suspend queue
+      let added = this.$queue(evt, payload, context, type)
+      if (added === false) {
+        let nSet = Array.from(nStore.get(evt))
+        let ctn = nSet.length;
+        let hasOnce = false;
+        let hasOnly = false;
+        for (let i=0; i < ctn; ++i) {
+          ++found;
+          // this.logger('found', found)
+          let [ _, callback, ctx, type ] = nSet[i]
+          this.run(callback, payload, context || ctx)
+          if (type === 'once' || type === 'onlyOnce') {
+            hasOnce = true;
+          }
         }
+        if (hasOnce) {
+          nStore.delete(evt)
+        }
+        return found;
       }
-      if (hasOnce) {
-        nStore.delete(evt)
-      }
-      return found;
+      return false; // not executed
     }
     // now this is not register yet
     this.addToLazyStore(evt, payload, context, type)

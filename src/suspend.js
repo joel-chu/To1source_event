@@ -33,19 +33,30 @@ export default class SuspendClass extends WatchClass {
   /**
    * queuing call up when it's in suspend mode
    * @param {any} value
-   * 
+   * @return {Boolean} true when added or false when it's not
    */
-  set $queue(value) {
-
+  $queue(...args) {
+    if (this.suspend === true) {
+      this.queueStore.add(args)
+      return true;
+    }
+    return false;
   }
 
   /**
-   *
-   *
+   * Release the queue
+   * @return {int} size if any
    */
   release() {
-    this.logger('release was called')
-
-    this.$done = 'release called'
+    let size = this.queueStore.size
+    this.logger(`Release was called ${size}`)
+    if (size > 0) {
+      this.queueStore.forEach(args => {
+        Reflect.apply(this.$trigger, this, args)
+        this.queueStore.delete(args)
+      })
+      this.logger(`Release size ${this.queueStore.size}`)
+    }
+    return size
   }
 }
