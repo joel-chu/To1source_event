@@ -273,24 +273,6 @@ export default class EventService extends NbEventServiceBase {
   }
 
   /**
-   * Holding off all the event firing and put them back into the lazy store
-   * until the suspend been lifted
-   * @param {string} [type=all] what type of event should be suspended
-   * @return {void}
-   */
-  $suspend(type = 'all') {
-    this.suspend = type === 'all' ? true : this.validateType(type);
-  }
-
-  /**
-   * Lifted the suspend
-   * @return {void}
-   */
-  $resume() {
-    this.suspend = false;
-  }
-
-  /**
    * store the return result from the run
    * @param {*} value whatever return from callback
    */
@@ -315,11 +297,6 @@ export default class EventService extends NbEventServiceBase {
     }
     return this.result;
   }
-
-  /////////////////////////////
-  //    PRIVATE METHODS      //
-  /////////////////////////////
-
 
 
 }

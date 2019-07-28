@@ -4,9 +4,9 @@ import {
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
 import genHaskKey from './hash-code'
-import { WatchClass } from './watch'
+import SuspendClass from './suspend'
 
-export default class NbEventServiceBase extends WatchClass {
+export default class NbEventServiceBase extends SuspendClass {
 
   constructor(config) {
     super()
@@ -14,35 +14,13 @@ export default class NbEventServiceBase extends WatchClass {
       this.logger = config.logger;
     }
     this.keep = config.keep;
-
     // for the $done setter
     this.result = config.keep ? [] : null;
     // we need to init the store first otherwise it could be a lot of checking later
     this.normalStore = new Map()
     this.lazyStore = new Map()
-    // suspend, release and queue
-    this.suspend = null;
-    this.queue = new Set()
-    this.watch('suspend', function(value, prop, oldValue) {
-      this.logger(`${prop} set from ${oldValue} to ${value}`)
-      // it means it set the suspend = true then release it
-      if (oldValue === true && value === false) {
-        this.release()
-      }
-      return value; // we need to return the value to store it
-    })
+
   }
-
-  /**
-   *
-   *
-   */
-  release() {
-    this.logger('release was called')
-
-    this.$done = 'release called'
-  }
-
 
   /**
    * validate the event name

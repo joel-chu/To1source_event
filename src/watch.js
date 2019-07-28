@@ -1,6 +1,6 @@
 // a polyfill to create global watch method
 // from https://abdulapopoola.com/2015/04/17/how-to-watch-variables-in-javascript/
-
+// without own modification to make it NOT polluting the global prototype chain
 class WatchClass {}
 
 if (!WatchClass.prototype.watch) {
