@@ -1,8 +1,10 @@
 // a polyfill to create global watch method
 // from https://abdulapopoola.com/2015/04/17/how-to-watch-variables-in-javascript/
 
-if (!Object.prototype.watch) {
- Object.defineProperty(Object.prototype, "watch", {
+class WatchClass {}
+
+if (!WatchClass.prototype.watch) {
+ Object.defineProperty(WatchClass.prototype, "watch", {
      enumerable: false,
      configurable: true,
      writable: false,
@@ -32,3 +34,6 @@ if (!Object.prototype.watch) {
     }
  })
 }
+
+// instead of polluting the global prototype we create this as an class method instead
+export { WatchClass }

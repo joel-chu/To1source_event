@@ -1,21 +1,22 @@
 // testing the watch method
 const test = require('ava')
-require('../src/watch')
-
+const { WatchClass } = require('../src/watch')
+const debug = require('debug')('nb-event-service:watch')
 
 test('We should have a watch method in the Object', t => {
 
-  let obj = {}
+  let int = new WatchClass()
 
-  t.truthy(obj.watch)
-
+  t.truthy(int.watch)
 })
 
 
 test.cb('should able to watch a property change', t => {
   t.plan(3)
 
-  let obj = {prop: false}
+  let obj = new WatchClass()
+
+  obj.prop = false
 
   obj.watch('prop', function(value, prop, oldValue) {
     t.is(value, true)
