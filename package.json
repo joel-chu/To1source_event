@@ -26,7 +26,8 @@
     "test:only": "DEBUG=nb-event-service* ava ./tests/only.test.js",
     "test:oo": "DEBUG=nb-event-service* ava ./tests/only-once.test.js",
     "test:replace": "DEBUG=nb-event-service* ava ./tests/replace.test.js",
-    "test:lazy": "DEBUG=nb-event-service* ava ./tests/lazy.test.js"
+    "test:lazy": "DEBUG=nb-event-service* ava ./tests/lazy.test.js",
+    "test:watch": "DEBUG=nb-event-service* ava ./tests/watch.test.js",
   },
   "repository": {
     "type": "git",
