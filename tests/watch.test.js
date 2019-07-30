@@ -36,7 +36,7 @@ test.cb('should able to watch a property change', t => {
   obj.newProp = 'something';
 })
 
-test.cb.only('Setting the suspend should able to trigger the release call', t => {
+test.cb('Setting the suspend should able to trigger the release call', t => {
 
   t.plan(2)
 
@@ -55,7 +55,7 @@ test.cb.only('Setting the suspend should able to trigger the release call', t =>
 
   let q = evtSrv.$queues;
 
-  debug('$queue', q)
+  debug('$queues', q)
 
   evtSrv.suspend = false;
 
