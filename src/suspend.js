@@ -40,9 +40,22 @@ export default class SuspendClass extends WatchClass {
    */
   $queue(...args) {
     if (this.suspend === true) {
+      // there shouldn't be any duplicate ...
       this.queueStore.add(args)
     }
     return this.suspend;
+  }
+
+  /**
+   * a getter to get all the store queue
+   * @return {array} Set turn into Array before return
+   */
+  get $queues() {
+    let size = this.queueStore.size
+    if (size > 0) {
+      return Array.from(this.queueStore)
+    }
+    return []
   }
 
   /**

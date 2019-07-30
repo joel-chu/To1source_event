@@ -53,6 +53,10 @@ test.cb.only('Setting the suspend should able to trigger the release call', t =>
 
   t.falsy(evtSrv.$done)
 
+  let q = evtSrv.$queues;
+
+  debug('$queue', q)
+
   evtSrv.suspend = false;
 
   setTimeout(() => {
