@@ -40,6 +40,7 @@ export default class SuspendClass extends WatchClass {
    */
   $queue(...args) {
     if (this.suspend === true) {
+      this.logger('added to $queue', args)
       // there shouldn't be any duplicate ...
       this.queueStore.add(args)
     }
@@ -51,7 +52,8 @@ export default class SuspendClass extends WatchClass {
    * @return {array} Set turn into Array before return
    */
   get $queues() {
-    let size = this.queueStore.size
+    let size = this.queueStore.size;
+    this.logger(`$queues size: ${size}`)
     if (size > 0) {
       return Array.from(this.queueStore)
     }
