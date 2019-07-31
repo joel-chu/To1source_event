@@ -1,5 +1,5 @@
 // making all the functionality on it's own
-import { WatchClass } from './watch'
+// import { WatchClass } from './watch'
 
 export default class SuspendClass extends WatchClass {
 
@@ -8,6 +8,7 @@ export default class SuspendClass extends WatchClass {
     // suspend, release and queue
     this.suspend = null;
     this.queueStore = new Set()
+    /*
     this.watch('suspend', function(value, prop, oldValue) {
       this.logger(`${prop} set from ${oldValue} to ${value}`)
       // it means it set the suspend = true then release it
@@ -19,6 +20,7 @@ export default class SuspendClass extends WatchClass {
       }
       return value; // we need to return the value to store it
     })
+    */
   }
 
   /**
@@ -27,7 +29,12 @@ export default class SuspendClass extends WatchClass {
    */
   set $suspend(value) {
     if (typeof value === 'boolean') {
+      const lastValue = this.suspend;
       this.suspend = value;
+      this.logger('($suspend)', `${lastValue} chnage to ${value}`)
+      if (lastValue === true && value === false) {
+        this.release()
+      }
     } else {
       throw new Error(`$suspend only accept Boolean value!`)
     }
@@ -40,7 +47,7 @@ export default class SuspendClass extends WatchClass {
    */
   $queue(...args) {
     if (this.suspend === true) {
-      this.logger('added to $queue', args)
+      this.logger('($queue)', 'added to $queue', args)
       // there shouldn't be any duplicate ...
       this.queueStore.add(args)
     }
@@ -53,7 +60,7 @@ export default class SuspendClass extends WatchClass {
    */
   get $queues() {
     let size = this.queueStore.size;
-    this.logger(`$queues size: ${size}`)
+    this.logger('($queues)', `$queues size: ${size}`)
     if (size > 0) {
       return Array.from(this.queueStore)
     }
@@ -66,7 +73,7 @@ export default class SuspendClass extends WatchClass {
    */
   release() {
     let size = this.queueStore.size
-    this.logger(`Release was called ${size}`)
+    this.logger('(release)', `Release was called ${size}`)
     if (size > 0) {
       const queue = Array.from(this.queueStore)
       this.queueStore.clear()

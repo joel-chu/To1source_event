@@ -1,6 +1,7 @@
-import NbEventServiceBase from './privates'
+// The top level 
+import NbStoreService from './store-service'
 // export
-export default class EventService extends NbEventServiceBase {
+export default class EventService extends NbStoreService {
   /**
    * class constructor
    */
@@ -220,7 +221,7 @@ export default class EventService extends NbEventServiceBase {
     this.addToLazyStore(evt, payload, context, type)
     return found;
   }
-  
+
   /**
    * this is an alias to the $trigger
    * @NOTE breaking change in V1.6.0 we swap the parameter around
