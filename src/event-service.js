@@ -1,4 +1,4 @@
-// The top level 
+// The top level
 import NbStoreService from './store-service'
 // export
 export default class EventService extends NbStoreService {
@@ -33,14 +33,14 @@ export default class EventService extends NbStoreService {
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register first then call later
     if (lazyStoreContent === false) {
-      this.logger('$on', `${evt} callback is not in lazy store`)
+      this.logger('($on)', `${evt} callback is not in lazy store`)
       // @TODO we need to check if there was other listener to this
       // event and are they the same type then we could solve that
       // register the different type to the same event name
 
       return this.addToNormalStore(evt, type, callback, context)
     }
-    this.logger('$on', `${evt} found in lazy store`)
+    this.logger('($on)', `${evt} found in lazy store`)
     // this is when they call $trigger before register this callback
     let size = 0;
     lazyStoreContent.forEach(content => {
@@ -70,7 +70,7 @@ export default class EventService extends NbStoreService {
     // this is normal register before call $trigger
     let nStore = this.normalStore;
     if (lazyStoreContent === false) {
-      this.logger('$once', `${evt} not in the lazy store`)
+      this.logger('($once)', `${evt} not in the lazy store`)
       // v1.3.0 $once now allow to add multiple listeners
       return this.addToNormalStore(evt, type, callback, context)
     } else {
@@ -79,7 +79,7 @@ export default class EventService extends NbStoreService {
       // if they call $trigger first, the lazy won't know it's a once call
       // so if in the middle they register any call with the same evt name
       // then this $once call will be fucked - add this to the documentation
-      this.logger('$once', lazyStoreContent)
+      this.logger('($once)', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
       const [ payload, ctx, t ] = list[0]
@@ -107,12 +107,12 @@ export default class EventService extends NbStoreService {
     // this is normal register before call $trigger
     let nStore = this.normalStore;
     if (!nStore.has(evt)) {
-      this.logger(`$only`, `${evt} add to store`)
+      this.logger(`($only)`, `${evt} add to store`)
       added = this.addToNormalStore(evt, type, callback, context)
     }
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
-      this.logger('$only', `${evt} found data in lazy store to execute`)
+      this.logger('($only)', `${evt} found data in lazy store to execute`)
       const list = Array.from(lazyStoreContent)
       // $only allow to trigger this multiple time on the single handler
       list.forEach( l => {
@@ -142,12 +142,12 @@ export default class EventService extends NbStoreService {
     // this is normal register before call $trigger
     let nStore = this.normalStore;
     if (!nStore.has(evt)) {
-      this.logger(`$onlyOnce`, `${evt} add to store`)
+      this.logger(`($onlyOnce)`, `${evt} add to store`)
       added = this.addToNormalStore(evt, type, callback, context)
     }
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
-      this.logger('$onlyOnce', lazyStoreContent)
+      this.logger('($onlyOnce)', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
       const [ payload, ctx, t ] = list[0]
@@ -191,11 +191,11 @@ export default class EventService extends NbStoreService {
     let found = 0;
     // first check the normal store
     let nStore = this.normalStore;
-    this.logger('$trigger', nStore)
+    this.logger('($trigger)', 'normalStore', nStore)
     if (nStore.has(evt)) {
       // @1.8.0 to add the suspend queue
       let added = this.$queue(evt, payload, context, type)
-      this.logger('$trigger', evt, 'found; add to queue: ', added)
+      this.logger('($trigger)', evt, 'found; add to queue: ', added)
       if (added === true) {
         return false; // not executed
       }
@@ -283,7 +283,7 @@ export default class EventService extends NbStoreService {
    * @param {*} value whatever return from callback
    */
   set $done(value) {
-    this.logger('set $done', value)
+    this.logger('($done)', 'value: ', value)
     if (this.keep) {
       this.result.push(value)
     } else {
@@ -298,7 +298,7 @@ export default class EventService extends NbStoreService {
    */
   get $done() {
     if (this.keep) {
-      this.logger(this.result)
+      this.logger('(get $done)', this.result)
       return this.result[this.result.length - 1]
     }
     return this.result;

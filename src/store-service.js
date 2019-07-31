@@ -8,7 +8,7 @@ import SuspendClass from './suspend'
 
 export default class NbEventServiceBase extends SuspendClass {
 
-  constructor(config) {
+  constructor(config = {}) {
     super()
     if (config.logger && typeof config.logger === 'function') {
       this.logger = config.logger;
@@ -19,19 +19,21 @@ export default class NbEventServiceBase extends SuspendClass {
     // we need to init the store first otherwise it could be a lot of checking later
     this.normalStore = new Map()
     this.lazyStore = new Map()
-
   }
 
   /**
-   * validate the event name
-   * @param {string} evt event name
+   * validate the event name(s)
+   * @param {string[]} evt event name
    * @return {boolean} true when OK
    */
-  validateEvt(evt) {
-    if (typeof evt === 'string') {
-      return true;
-    }
-    throw new Error(`event name must be string type!`)
+  validateEvt(...evt) {
+    evt.forEach(e => {
+      if (typeof e !== 'string') {
+        this.logger('(validateEvt)', e)
+        throw new Error(`event name must be string type!`)
+      }
+    })
+    return true;
   }
 
   /**
@@ -67,7 +69,7 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {void} the result store in $done
    */
   run(callback, payload, ctx) {
-    this.logger('run', callback, payload, ctx)
+    this.logger('(run)', callback, payload, ctx)
     this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
   }
 
@@ -80,10 +82,10 @@ export default class NbEventServiceBase extends SuspendClass {
   takeFromStore(evt, storeName = 'lazyStore') {
     let store = this[storeName]; // it could be empty at this point
     if (store) {
-      this.logger('takeFromStore', storeName, store)
+      this.logger('(takeFromStore)', storeName, store)
       if (store.has(evt)) {
         let content = store.get(evt)
-        this.logger('takeFromStore', content)
+        this.logger('(takeFromStore)', `has ${evt}`, content)
         store.delete(evt)
         return content;
       }
@@ -102,10 +104,10 @@ export default class NbEventServiceBase extends SuspendClass {
   addToStore(store, evt, ...args) {
     let fnSet;
     if (store.has(evt)) {
-      this.logger('addToStore', `${evt} existed`)
+      this.logger('(addToStore)', `${evt} existed`)
       fnSet = store.get(evt)
     } else {
-      this.logger('addToStore', `create new Set for ${evt}`)
+      this.logger('(addToStore)', `create new Set for ${evt}`)
       // this is new
       fnSet = new Set()
     }
@@ -120,7 +122,7 @@ export default class NbEventServiceBase extends SuspendClass {
         }
       } else {
         if (!this.checkContentExist(args, fnSet)) {
-          this.logger('addToStore', `insert new`, args)
+          this.logger('(addToStore)', `insert new`, args)
           fnSet.add(args)
         }
       }
@@ -154,8 +156,7 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {boolean} true you can add, false then you can't add this type
    */
   checkTypeInStore(evtName, type) {
-    this.validateEvt(evtName)
-    this.validateEvt(type)
+    this.validateEvt(evtName, type)
     let all = this.$get(evtName, true)
     if (all === false) {
        // pristine it means you can add
@@ -173,10 +174,9 @@ export default class NbEventServiceBase extends SuspendClass {
    * therefore we need to use a new method to check it
    */
   checkTypeInLazyStore(evtName, type) {
-    this.validateEvt(evtName)
-    this.validateEvt(type)
+    this.validateEvt(evtName, type)
     let store = this.lazyStore.get(evtName)
-    this.logger('checkTypeInLazyStore', store)
+    this.logger('(checkTypeInLazyStore)', store)
     if (store) {
       return !!Array
         .from(store)
@@ -198,10 +198,10 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {number} size of the store
    */
   addToNormalStore(evt, type, callback, context = null) {
-    this.logger('addToNormalStore', evt, type, 'add to normal store')
+    this.logger('(addToNormalStore)', evt, type, 'try to add to normal store')
     // @TODO we need to check the existing store for the type first!
     if (this.checkTypeInStore(evt, type)) {
-      this.logger(`${type} can add to ${evt} store`)
+      this.logger('(addToNormalStore)', `${type} can add to ${evt} store`)
       let key = this.hashFnToKey(callback)
       let args = [this.normalStore, evt, key, callback, context, type]
       let [_store, size] = Reflect.apply(this.addToStore, this, args)
