@@ -201,7 +201,7 @@ export default class NbEventServiceBase extends SuspendClass {
     this.logger('(addToNormalStore)', evt, type, 'try to add to normal store')
     // @TODO we need to check the existing store for the type first!
     if (this.checkTypeInStore(evt, type)) {
-      this.logger('(addToNormalStore)', `${type} can add to ${evt} store`)
+      this.logger('(addToNormalStore)', `${type} can add to ${evt} normal store`)
       let key = this.hashFnToKey(callback)
       let args = [this.normalStore, evt, key, callback, context, type]
       let [_store, size] = Reflect.apply(this.addToStore, this, args)

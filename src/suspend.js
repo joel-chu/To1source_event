@@ -1,12 +1,11 @@
 // making all the functionality on it's own
 // import { WatchClass } from './watch'
 
-export default class SuspendClass extends WatchClass {
+export default class SuspendClass {
 
   constructor() {
-    super()
     // suspend, release and queue
-    this.suspend = null;
+    this.__suspend__ = null;
     this.queueStore = new Set()
     /*
     this.watch('suspend', function(value, prop, oldValue) {
@@ -29,11 +28,13 @@ export default class SuspendClass extends WatchClass {
    */
   set $suspend(value) {
     if (typeof value === 'boolean') {
-      const lastValue = this.suspend;
-      this.suspend = value;
-      this.logger('($suspend)', `${lastValue} chnage to ${value}`)
+      const lastValue = this.__suspend__;
+      this.__suspend__ = value;
+      this.logger('($suspend)', `${lastValue} change to ${value}`)
       if (lastValue === true && value === false) {
-        this.release()
+        setTimeout(() => {
+          this.release()
+        }, 1)
       }
     } else {
       throw new Error(`$suspend only accept Boolean value!`)
@@ -46,12 +47,12 @@ export default class SuspendClass extends WatchClass {
    * @return {Boolean} true when added or false when it's not
    */
   $queue(...args) {
-    if (this.suspend === true) {
+    if (this.__suspend__ === true) {
       this.logger('($queue)', 'added to $queue', args)
       // there shouldn't be any duplicate ...
       this.queueStore.add(args)
     }
-    return this.suspend;
+    return this.__suspend__;
   }
 
   /**

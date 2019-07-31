@@ -47,7 +47,7 @@ test.cb('Setting the suspend should able to trigger the release call', t => {
     return value + ' ha ha'
   })
 
-  evtSrv.suspend = true;
+  evtSrv.$suspend = true;
 
   evtSrv.$trigger(evtName, 'you loser')
 
@@ -57,11 +57,11 @@ test.cb('Setting the suspend should able to trigger the release call', t => {
 
   debug('$queues', q)
 
-  evtSrv.suspend = false;
+  evtSrv.$suspend = false;
 
   setTimeout(() => {
     t.is(evtSrv.$done, 'you loser ha ha')
     t.end()
-  }, 1)
+  }, 10)
 
 })
