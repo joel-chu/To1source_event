@@ -30,7 +30,7 @@ export default class SuspendClass {
     if (typeof value === 'boolean') {
       const lastValue = this.__suspend__;
       this.__suspend__ = value;
-      this.logger('($suspend)', `${lastValue} change to ${value}`)
+      this.logger('($suspend)', `Change from ${lastValue} --> ${value}`)
       if (lastValue === true && value === false) {
         setTimeout(() => {
           this.release()
@@ -61,7 +61,7 @@ export default class SuspendClass {
    */
   get $queues() {
     let size = this.queueStore.size;
-    this.logger('($queues)', `$queues size: ${size}`)
+    this.logger('($queues)', `size: ${size}`)
     if (size > 0) {
       return Array.from(this.queueStore)
     }
