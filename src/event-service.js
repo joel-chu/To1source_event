@@ -48,6 +48,7 @@ export default class EventService extends NbStoreService {
       if (t && t !== type) {
         throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
       }
+      this.logger(`($on)`, `call run on ${evt}`)
       this.run(callback, payload, context || ctx)
       size += this.addToNormalStore(evt, type, callback, context || ctx)
     })
@@ -86,6 +87,7 @@ export default class EventService extends NbStoreService {
       if (t && t !== type) {
         throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
       }
+      this.logger('($once)', `call run for ${evt}`)
       this.run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
@@ -120,6 +122,7 @@ export default class EventService extends NbStoreService {
         if (t && t !== type) {
           throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
         }
+        this.logger(`($only)`, `call run for ${evt}`)
         this.run(callback, payload, context || ctx)
       })
     }
@@ -128,7 +131,7 @@ export default class EventService extends NbStoreService {
 
   /**
    * $only + $once this is because I found a very subtile bug when we pass a
-   * resolver, rejecter - and it never fire because that's OLD adeed in v1.4.0
+   * resolver, rejecter - and it never fire because that's OLD added in v1.4.0
    * @param {string} evt event name
    * @param {function} callback to call later
    * @param {object} [context=null] exeucte context
@@ -154,6 +157,7 @@ export default class EventService extends NbStoreService {
       if (t && t !== 'onlyOnce') {
         throw new Error(`You are trying to register an event already been taken by other type: ${t}`)
       }
+      this.logger(`($onlyOnce)`, `call run for ${evt}`)
       this.run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
@@ -197,6 +201,7 @@ export default class EventService extends NbStoreService {
       let added = this.$queue(evt, payload, context, type)
       this.logger('($trigger)', evt, 'found; add to queue: ', added)
       if (added === true) {
+        this.logger('($trigger)', evt, 'not executed. Exit now.')
         return false; // not executed
       }
       let nSet = Array.from(nStore.get(evt))
@@ -207,6 +212,7 @@ export default class EventService extends NbStoreService {
         ++found;
         // this.logger('found', found)
         let [ _, callback, ctx, type ] = nSet[i]
+        this.logger(`($trigger)`, `call run for ${evt}`)
         this.run(callback, payload, context || ctx)
         if (type === 'once' || type === 'onlyOnce') {
           hasOnce = true;
@@ -232,8 +238,7 @@ export default class EventService extends NbStoreService {
    * @return {*} from $trigger
    */
   $call(evt, params, type = false, context = null) {
-    let args = [evt, params]
-    args.push(context, type)
+    let args = [evt, params, context, type]
     return Reflect.apply(this.$trigger, this, args)
   }
 
