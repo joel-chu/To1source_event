@@ -177,6 +177,7 @@ export default class EventService extends NbStoreService {
     if (this.validateType(type)) {
       this.$off(evt)
       let method = this['$' + type]
+      this.logger(`($replace)`, evt, callback)
       return Reflect.apply(method, this, [evt, callback, context])
     }
     throw new Error(`${type} is not supported!`)
@@ -254,6 +255,7 @@ export default class EventService extends NbStoreService {
     stores.forEach(store => {
       if (store.has(evt)) {
         found = true;
+        this.logger('($off)', evt)
         store.delete(evt)
       }
     })
