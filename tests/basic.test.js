@@ -11,9 +11,16 @@ test.before( t => {
   })
 })
 
+test(`Should have a is getter`, t => {
+  
+  t.is('nb-event-service', t.context.evtSrv.is)
+})
+
 test('It should able to validate the evt', t => {
   let evtSrv = t.context.evtSrv;
   let fn = (...args) => Reflect.apply(evtSrv.$on, evtSrv, args)
+
+
 
   t.throws(() => fn('some', false) , Error, 'Should throw error because callback is not a function')
 })

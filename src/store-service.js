@@ -11,7 +11,13 @@ export default class NbEventServiceBase extends SuspendClass {
   constructor(config = {}) {
     super()
     if (config.logger && typeof config.logger === 'function') {
-      this.logger = config.logger;
+      if (config.name) {
+        this.logger = (...args) => {
+          Reflect.apply(config.logger, null, [`[${config.name}]`, ...args])
+        }
+      } else {
+        this.logger = config.logger;
+      }
     }
     this.keep = config.keep;
     // for the $done setter
@@ -19,6 +25,11 @@ export default class NbEventServiceBase extends SuspendClass {
     // we need to init the store first otherwise it could be a lot of checking later
     this.normalStore = new Map()
     this.lazyStore = new Map()
+  }
+
+  // for id if the instance is this class
+  get is() {
+    return 'nb-event-service'
   }
 
   /**
@@ -80,7 +91,7 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {object|boolean} content or false on not found
    */
   takeFromStore(evt, storeName = 'lazyStore') {
-    let store = this[storeName]; // it could be empty at this point
+    let store = this[storeName] // it could be empty at this point
     if (store) {
       this.logger('(takeFromStore)', storeName, store)
       if (store.has(evt)) {
