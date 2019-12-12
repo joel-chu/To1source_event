@@ -8,7 +8,6 @@
   "files": [
     "alias.js",
     "index.js",
-    "main.js",
     "dist",
     "src"
   ],
