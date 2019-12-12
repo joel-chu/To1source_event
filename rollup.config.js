@@ -7,18 +7,19 @@ import buble from 'rollup-plugin-buble'
 import { terser } from 'rollup-plugin-terser'
 
 const env = process.env.NODE_ENV;
+const target = process.env.TARGET;
 const base = join(__dirname)
 const outDir = join(base, 'dist')
-
+// default
 const inputFile = env === 'alias' ? join('src', 'alias.js') : 'index.js'
-const outputFile = env === 'alias' ? 'alias.js' : 'nb-event-service.js'
+const outputFile = env === 'alias' ? `alias.${target}.js` : `nb-event-service.${target}.js`
 
 export default {
   input: join(base, inputFile),
   output: {
     name: 'NBEventService',
     file: join(outDir, outputFile),
-    format: 'umd',
+    format: target,
     sourcemap: true
   },
   plugins: [

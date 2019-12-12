@@ -4,6 +4,10 @@
  * @param {string} s the converted to string function
  * @return {string} the hashed function string
  */
-export default function hashCode(s) {
+export function hashCode(s) {
 	return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)
+}
+// wrapper to make sure it string 
+export function hashCode2Str(s) {
+  return hashCode(s) + ''
 }

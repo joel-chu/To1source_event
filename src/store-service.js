@@ -3,7 +3,7 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
-import genHaskKey from './hash-code'
+import { hashCode2Str } from './hash-code'
 import SuspendClass from './suspend'
 
 export default class NbEventServiceBase extends SuspendClass {
@@ -11,13 +11,7 @@ export default class NbEventServiceBase extends SuspendClass {
   constructor(config = {}) {
     super()
     if (config.logger && typeof config.logger === 'function') {
-      if (config.name) {
-        this.logger = (...args) => {
-          Reflect.apply(config.logger, null, [`[${config.name}]`, ...args])
-        }
-      } else {
-        this.logger = config.logger;
-      }
+      this.logger = config.logger;
     }
     this.keep = config.keep;
     // for the $done setter
@@ -290,6 +284,6 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {string} hashKey
    */
   hashFnToKey(fn) {
-    return genHaskKey(fn.toString()) + '';
+    return hashCode2Str(fn.toString())
   }
 }
