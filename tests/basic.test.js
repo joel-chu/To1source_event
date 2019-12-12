@@ -1,6 +1,6 @@
 const test = require('ava')
 // import the cjs version for testing
-const NBEventService = require('../main')
+const NBEventService = require('../dist/nb-event-service.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:basic')
 let value = 1000;
@@ -12,7 +12,7 @@ test.before( t => {
 })
 
 test(`Should have a is getter`, t => {
-  
+
   t.is('nb-event-service', t.context.evtSrv.is)
 })
 

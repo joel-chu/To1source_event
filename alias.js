@@ -1,3 +1,43 @@
-const NBEventService = require('./src/cjs-alias')
-// try to get rip of that default shit
-module.exports = NBEventService.default ? NBEventService.default : NBEventService
+// this is an alias class that will create several alias method to their counter part
+// that will match up the other EventEmitter library out there for the developer to swap over
+
+import EventService from './src/event-service'
+
+export default class AliasEventService extends EventService {
+
+  constructor(options = {}) {
+    super(options)
+  }
+
+  on(...args) {
+    return Reflect.apply(this.$on, this, args)
+  }
+
+  off(...args) {
+    return Reflect.apply(this.$off, this, args)
+  }
+
+  emit(...args) {
+    return Reflect.apply(this.$trigger, this, args)
+  }
+
+  once(...args) {
+    return Reflect.apply(this.$once, this, args)
+  }
+
+  only(...args) {
+    return Reflect.apply(this.$only, this, args)
+  }
+
+  onlyOnce(...args) {
+    return Reflect.apply(this.$onlyOnce, this, args)
+  }
+
+  get(...args) {
+    return Reflect.apply(this.$get, this, args)
+  }
+
+  replace(...args) {
+    return Reflect.apply(this.$replace, this, args)
+  }
+}
