@@ -2,7 +2,7 @@
 const test = require('ava')
 const { WatchClass } = require('../src/watch')
 const debug = require('debug')('nb-event-service:watch')
-const NBEventService = require('../main')
+const NBEventService = require('../dist/nb-event-service.cjs')
 
 test.before(t => {
   t.context.watchObj = new WatchClass()

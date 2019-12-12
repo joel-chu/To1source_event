@@ -1,6 +1,6 @@
 const test = require('ava')
 
-const NBEventService = require('../main')
+const NBEventService = require('../dist/nb-event-service.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:only-problem')
 let value = 1000;
@@ -57,7 +57,7 @@ test.cb('$once should allow to add more than one listner', t => {
 
 test.only('It should be fixed with the check type before adding to the store, but the $done value can be unpredictable', t => {
 
-  let evtName = 'once-problem'; 
+  let evtName = 'once-problem';
   let evtSrv = t.context.evtSrv;
 
   evtSrv.$trigger(evtName, 1000)

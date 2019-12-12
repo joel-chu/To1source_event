@@ -1,6 +1,6 @@
 const test = require('ava')
 
-const NBEventService = require('../main')
+const NBEventService =  require('../dist/nb-event-service.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:only-problem')
 let value = 1000;
