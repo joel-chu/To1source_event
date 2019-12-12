@@ -5,6 +5,7 @@ import { join } from 'path'
 
 import buble from 'rollup-plugin-buble'
 import { terser } from 'rollup-plugin-terser'
+import size from 'rollup-plugin-bundle-size'
 
 const env = process.env.NODE_ENV;
 const target = process.env.TARGET;
@@ -24,6 +25,7 @@ export default {
   },
   plugins: [
     buble(),
-    terser()
+    terser(),
+    size()
   ]
 }
