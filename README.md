@@ -143,31 +143,29 @@ This method will return
 * false - if there is nothing to call
 * i - the total events been called
 
-#### $call(eventName, params, type, context)
+#### $call(eventName, type, context) => (...params)
 
-**This is breaking change in V1.6.0**
+**Breaking change in V1.9.1**
+
+It takes three parameter then return a function to accept the parameters
 
 * eventName (string) this will trigger the callback that register with this `eventName` whether that actually exist or not
-* params (mixed) optional - data you want to pass to your callback method
-* type (string) available types are `on`, `only`, `once`, `onlyOnce` this is for trigger event before it get register and prevent other type to register it
+* type (string) optional - available types are `on`, `only`, `once`, `onlyOnce` this is for trigger event before it get register and prevent other type to register it
 * context (object || null) optional - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
 
-This basically it's a shorthand of `$trigger` if you know that your callback only execute in `null` and purposely register a type to prevent
-other to register it later
-
-This is useful shorthand, also trigger event before its register
+Then the return function will accept parameter as spread. Internally it calls `$trigger`, but the return function accept parameter as spread
+to prevent an edge case, when you only have one parameter but it's an array. The spread will make sure it's an array of any type (in the edge case it will be array of an array) and the data will pass to the call back correctly.
 
 Example:
 
 ```js
 // call before event register
-es.$call('some-event', 1001, 'only')
+es.$call('some-event', 'only')([1001]) // note the function call
 // now try to register it with a different event handler
-es.$on('some-event', function(num) {
-  return ++num;
+es.$on('some-event', function(nums) {
+  return ++num[0]
 })
 // it will throw Error that tells you it has been register with `only` type already
-
 ```
 
 #### $get(evt)

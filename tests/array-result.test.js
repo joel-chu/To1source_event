@@ -3,9 +3,28 @@
 const test = require('ava')
 
 const NBEventService = require('../dist/nb-event-service-alias.cjs')
-const debug  = require('debug')('nb-event-service:test:array')
+const logger = require('debug')('nb-event-service:test:array')
+
+test.before(t => {
+  t.context.evtSrv = new NBEventService({
+    logger
+  })
+  t.context.arrayParam = ['cats', 'dog', 'pig']
+})
 
 test.cb(`We should able to get the result back as an array`, t => {
-  
+
+  t.plan(1)
+  let evtName = 'array-params'
+  const evt = t.context.evtSrv
+
+  evt.$on(evtName, function(value) {
+    logger('value', value)
+    t.is(3, value.length)
+    t.end()
+    return value
+  })
+
+  evt.$call(evtName)(t.context.arrayParam)
 
 })

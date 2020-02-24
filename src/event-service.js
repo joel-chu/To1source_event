@@ -231,16 +231,19 @@ export default class EventService extends NbStoreService {
 
   /**
    * this is an alias to the $trigger
-   * @NOTE breaking change in V1.6.0 we swap the parameter around
+   * @NOTE breaking change in V1.6.0 we swap the parameter aroun
+   * @NOTE breaking change: v1.9.1 it return an function to accept the params as spread
    * @param {string} evt event name
-   * @param {*} params pass to the callback
    * @param {string} type of call
    * @param {object} context what context callback execute in
    * @return {*} from $trigger
    */
-  $call(evt, params, type = false, context = null) {
-    let args = [evt, params, context, type]
-    return Reflect.apply(this.$trigger, this, args)
+  $call(evt, type = false, context = null) {
+    const ctx = this
+    return (...args) => {
+      let _args = [evt, args, context, type]
+      return Reflect.apply(ctx.$trigger, ctx, _args)
+    }
   }
 
   /**
