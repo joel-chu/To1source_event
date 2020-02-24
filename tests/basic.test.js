@@ -111,7 +111,7 @@ test('Using the $call alias to $trigger should do the same thing', t => {
   }
   t.context.evtSrv.$once(evtName, callback)
   t.context.evtSrv.$trigger(evtName)
-  t.context.evtSrv.$call(evtName)
+  t.context.evtSrv.$call(evtName)()
 
   t.is(ctn, 1)
 })
@@ -126,7 +126,7 @@ test('Using $trigger and $call should make the callback run again', t => {
   }
 
   t.context.evtSrv.$trigger(evtName)
-  t.context.evtSrv.$call(evtName)
+  t.context.evtSrv.$call(evtName)()
 
   t.context.evtSrv.$on(evtName, callback)
 

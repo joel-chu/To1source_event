@@ -44,7 +44,7 @@ test('using $call should able to pass the type without passing the context', t =
   let es = t.context.evtSrv;
   let evt = 'just-calling'
 
-  es.$call(evt, 100, 'only')
+  es.$call(evt, 'only')(100)
 
   const fn = (num) => es.$on(evt, num => {
     debug(num)

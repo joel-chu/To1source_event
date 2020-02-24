@@ -40,7 +40,7 @@ test('only should only allow to add one listner', t => {
   evtSrv.$only(evt, function(num) {
     return num * 10;
   })
-  evtSrv.$call(evt, 100)
+  evtSrv.$call(evt)(100)
   t.is(evtSrv.$done, 110)
 })
 
@@ -49,7 +49,7 @@ test('Test the trigger before call $only and see if that works the same', t => {
   let evt = 'test-only-reverse'
   let evtSrv = t.context.evtSrv;
 
-  evtSrv.$call(evt, 'x')
+  evtSrv.$call(evt)('x')
 
   let result1 = evtSrv.$only(evt, function(A) {
     debug(A, ctn)
@@ -58,7 +58,7 @@ test('Test the trigger before call $only and see if that works the same', t => {
 
   t.truthy(result1)
 
-  evtSrv.$call(evt, 'y')
+  evtSrv.$call(evt)('y')
 
   let result2 = evtSrv.$only(evt, function(B) {
     debug(B, ctn)

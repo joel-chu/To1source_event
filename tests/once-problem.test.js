@@ -49,7 +49,7 @@ test.cb('$once should allow to add more than one listner', t => {
     return 2;
   })
 
-  evtSrv.$call(evtName)
+  evtSrv.$call(evtName)()
 
   t.is(evtSrv.$done, 2)
 
