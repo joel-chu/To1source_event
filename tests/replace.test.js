@@ -16,7 +16,7 @@ test('It should able to validate against the type', t => {
   let wrongType = 'whatever'
   let fn = (type) => evtSrv.$replace('some-event', () => {}, null, type)
 
-  t.throws(() => fn(wrongType), Error, 'It should throw if we pass the wrong type')
+  t.throws(() => fn(wrongType), /*new Error()*/ null, 'It should throw if we pass the wrong type')
 
 })
 

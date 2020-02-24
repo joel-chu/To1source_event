@@ -22,7 +22,7 @@ test('It should able to validate the evt', t => {
 
 
 
-  t.throws(() => fn('some', false) , Error, 'Should throw error because callback is not a function')
+  t.throws(() => fn('some', false) , /*new Error()*/ null, 'Should throw error because callback is not a function')
 })
 
 test.cb('It should able to bind a simple test and callback', t => {
