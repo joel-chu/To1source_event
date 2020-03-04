@@ -37,7 +37,6 @@ export default class EventService extends NbStoreService {
       // @TODO we need to check if there was other listener to this
       // event and are they the same type then we could solve that
       // register the different type to the same event name
-
       return this.addToNormalStore(evt, type, callback, context)
     }
     this.logger('($on)', `${evt} found in lazy store`)
@@ -202,7 +201,7 @@ export default class EventService extends NbStoreService {
     if (nStore.has(evt)) {
       // @1.8.0 to add the suspend queue
       let added = this.$queue(evt, payload, context, type)
-      this.logger('($trigger)', evt, 'found; add to queue: ', added)
+      this.logger('($trigger) "${evt}" found, add to queue: ', added)
       if (added === true) {
         this.logger('($trigger)', evt, 'not executed. Exit now.')
         return false // not executed

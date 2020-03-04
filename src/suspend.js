@@ -33,9 +33,9 @@ export default class SuspendClass {
       this.__suspend__ = value
       this.logger('($suspend)', `Change from "${lastValue}" --> "${value}"`)
       if (lastValue === true && value === false) {
-        setTimeout(() => {
-          this.release()
-        }, 1) 
+        // setTimeout(() => {
+        this.release()
+        // }, 1)
       }
     } else {
       throw new Error(`$suspend only accept Boolean value! we got ${typeof value}`)

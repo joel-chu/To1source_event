@@ -1,6 +1,6 @@
 {
   "name": "nb-event-service",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "description": "An universal event service for Browser / Node",
   "module": "index.js",
   "browser": "dist/nb-event-service.umd.js",
