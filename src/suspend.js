@@ -5,7 +5,7 @@ export default class SuspendClass {
 
   constructor() {
     // suspend, release and queue
-    this.__suspend__ = null;
+    this.__suspend__ = null
     this.queueStore = new Set()
     /*
     this.watch('suspend', function(value, prop, oldValue) {
@@ -28,16 +28,16 @@ export default class SuspendClass {
    */
   set $suspend(value) {
     if (typeof value === 'boolean') {
-      const lastValue = this.__suspend__;
-      this.__suspend__ = value;
-      this.logger('($suspend)', `Change from ${lastValue} --> ${value}`)
+      const lastValue = this.__suspend__
+      this.__suspend__ = value
+      this.logger('($suspend)', `Change from "${lastValue}" --> "${value}"`)
       if (lastValue === true && value === false) {
         setTimeout(() => {
           this.release()
         }, 1)
       }
     } else {
-      throw new Error(`$suspend only accept Boolean value!`)
+      throw new Error(`$suspend only accept Boolean value! we got ${typeof value}`)
     }
   }
 
@@ -49,10 +49,10 @@ export default class SuspendClass {
   $queue(...args) {
     if (this.__suspend__ === true) {
       this.logger('($queue)', 'added to $queue', args)
-      // there shouldn't be any duplicate ...
+      // @TODO there shouldn't be any duplicate, but how to make sure?
       this.queueStore.add(args)
     }
-    return this.__suspend__;
+    return this.__suspend__
   }
 
   /**
@@ -60,7 +60,7 @@ export default class SuspendClass {
    * @return {array} Set turn into Array before return
    */
   get $queues() {
-    let size = this.queueStore.size;
+    let size = this.queueStore.size
     this.logger('($queues)', `size: ${size}`)
     if (size > 0) {
       return Array.from(this.queueStore)
@@ -74,7 +74,7 @@ export default class SuspendClass {
    */
   release() {
     let size = this.queueStore.size
-    this.logger('(release)', `Release was called ${size}`)
+    this.logger('(release)', `Release was called with ${size} item${size > 1 : 's': ''}`)
     if (size > 0) {
       const queue = Array.from(this.queueStore)
       this.queueStore.clear()

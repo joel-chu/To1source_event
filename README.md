@@ -57,10 +57,10 @@ It will return the total number of events that get registered.
 * callback (function) it will receive the `params` that call
 * context (object|null) optional same as above
 
-$once allow you to bind one or more listener to the same event. But once this event fired (triggered)
+`$once` allow you to bind one or more listener to the same event. But once this event fired (triggered)
 it will remove itself from the event store, and no longer available. This behavior is changed in V1.3.0.
 
-There is a potential problem with $once you can see below. It's no really a bug per se, but due to our
+There is a potential problem with `$once` you can see below. It's not really a bug per se, but due to our
 own unique feature that can call event before even it existed (yeah, it's magic)
 
 
@@ -77,11 +77,11 @@ ee.$once('someEvent', function() {
 })
 ```
 
-In v1.3.0 we change the behavior of $once, now you can register more than one handler.
+In v1.3.0 we change the behavior of `$once`, now you can register more than one handler.
 But if you look at the above example, you register it with `$on` then `$once`.
 
-What happen is, the `$once` call execute the `$trigger` from the earlier call, then it will
-remove this event from the event handler store. Therefore, you `$on` will never fire again.
+What happen is, the `$once` call execute by the `$trigger` from the earlier call, then it will
+remove this event from the event handler store. Therefore, your `$on` will never fire again.
 
 So you have to make sure which event you **REALLY** want to register with what.
 
@@ -138,10 +138,10 @@ Type can be `on`, `only`, `once`, `onlyOnce` default value is `on`
 * context (object || null) optional - When we execute the callback, we will add this context to the `Reflect.apply` or default to null
 * type (string) available types are `on`, `only`, `once`, `onlyOnce` this is for trigger event before it get register and prevent other type to register it
 
-This method will return
+This method will return:
 
 * false - if there is nothing to call
-* i - the total events been called
+* i - the total number of event been called
 
 #### $call(eventName, type, context) => (...params)
 
@@ -177,25 +177,35 @@ Or it will return `false` if there is nothing
 #### $suspend setter
 
 This is new in V1.8.0. We watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
-Then when you set this to false, all the previous suspended call will get release.
+Then when you set this to false, all the previous suspended call(s) will get release (execute).
 
 ```js
 const evtSrv = new NBEventService()
+
 evtSrv.$on('some-event', value => {
-  return value + 1;
+  return value + 1
 })
 
-evtSrv.$suspend = true;
+evtSrv.$suspend = true
 
 evtSrv.$trigger('some-event', 100)
+// what happen inside
+console.log(evtSrv.$done) // null
 
-evtSrv.$done === null
-
-evtSrv.$suspend = false;
-
-evtSrv.$done === 101
+evtSrv.$suspend = false
+// what happen now
+console.log(evtSrv.$done) // 101
 
 ```
+
+#### $debug(idx)
+
+This method only logging output, so make sure you have pass a logger when init the object.
+
+- 0 lazyStore
+- 1 normalStore
+
+If you don't pass anything, it will log all the stores to show what is inside.
 
 ## Alias version
 
@@ -226,7 +236,7 @@ Example:
 
 ```js
 es.$on('add', function add(val) {
-  return val + 1;
+  return val + 1
 })
 
 es.$trigger('add', 1000)
@@ -239,28 +249,24 @@ You will get a 1001. This might be useful in some situation. Please note, it wil
 whenever a event got trigger, if at the same time some other event trigger then your value
 might be different from what you expected. So use this with caution.
 
-## Examples
-
-Coming soon with more update to date example.
-
 ## Test
+
+We use [ava](https://github.com/avajs/ava) for testing.
 
 ```sh
 $ npm test  
 ```
 
-We use ava for testing
-
 ## Build
+
+We use [rollup](https://rollupjs.org/guide/en/) for building process.
 
 ```sh
 $ npm run build
 ```
 
-It will kick start the rollup building process
-
 ---
 
 ISC
 
-[Joel Chu](https://joelchu.com) [NEWBRAN LTD](https://newbran.ch) (c) 2019
+[Joel Chu](https://joelchu.com) [NEWBRAN LTD](https://newbran.ch) (c) 2020

@@ -11,11 +11,11 @@ export default class NbEventServiceBase extends SuspendClass {
   constructor(config = {}) {
     super()
     if (config.logger && typeof config.logger === 'function') {
-      this.logger = config.logger;
+      this.logger = config.logger
     }
-    this.keep = config.keep;
+    this.keep = config.keep
     // for the $done setter
-    this.result = config.keep ? [] : null;
+    this.result = config.keep ? [] : null
     // we need to init the store first otherwise it could be a lot of checking later
     this.normalStore = new Map()
     this.lazyStore = new Map()
@@ -35,10 +35,10 @@ export default class NbEventServiceBase extends SuspendClass {
     evt.forEach(e => {
       if (typeof e !== 'string') {
         this.logger('(validateEvt)', e)
-        throw new Error(`event name must be string type!`)
+        throw new Error(`Event name must be string type! we got ${typeof e}`)
       }
     })
-    return true;
+    return true
   }
 
   /**
@@ -50,10 +50,10 @@ export default class NbEventServiceBase extends SuspendClass {
   validate(evt, callback) {
     if (this.validateEvt(evt)) {
       if (typeof callback === 'function') {
-        return true;
+        return true
       }
     }
-    throw new Error(`callback required to be function type!`)
+    throw new Error(`callback required to be function type! we got ${typeof callback}`)
   }
 
   /**
@@ -62,8 +62,9 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {boolean} true on OK
    */
   validateType(type) {
+    const _type = (type+'').toLowerCase()
     const types = ['on', 'only', 'once', 'onlyOnce']
-    return !!types.filter(t => type === t).length;
+    return !!types.filter(t => _type === t).length
   }
 
   /**
@@ -74,7 +75,7 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {void} the result store in $done
    */
   run(callback, payload, ctx) {
-    this.logger('(run)', callback, payload, ctx)
+    this.logger('(run) callback:', callback, 'payload:', payload, 'context:', ctx)
     this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
   }
 
@@ -90,13 +91,13 @@ export default class NbEventServiceBase extends SuspendClass {
       this.logger('(takeFromStore)', storeName, store)
       if (store.has(evt)) {
         let content = store.get(evt)
-        this.logger('(takeFromStore)', `has ${evt}`, content)
+        this.logger('(takeFromStore)', `has "${evt}"`, content)
         store.delete(evt)
-        return content;
+        return content
       }
-      return false;
+      return false
     }
-    throw new Error(`${storeName} is not supported!`)
+    throw new Error(`"${storeName}" is not supported!`)
   }
 
   /**
@@ -107,12 +108,12 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {array} store and the size of the store
    */
   addToStore(store, evt, ...args) {
-    let fnSet;
+    let fnSet
     if (store.has(evt)) {
-      this.logger('(addToStore)', `${evt} existed`)
+      this.logger('(addToStore)', `"${evt}" existed`)
       fnSet = store.get(evt)
     } else {
-      this.logger('(addToStore)', `create new Set for ${evt}`)
+      this.logger('(addToStore)', `create new Set for "${evt}"`)
       // this is new
       fnSet = new Set()
     }
@@ -121,7 +122,7 @@ export default class NbEventServiceBase extends SuspendClass {
     if (args.length > 2) {
       if (Array.isArray(args[0])) { // lazy store
         // check if this type of this event already register in the lazy store
-        let [,,t] = args;
+        let [,,t] = args
         if (!this.checkTypeInLazyStore(evt, t)) {
           fnSet.add(args)
         }
@@ -145,13 +146,10 @@ export default class NbEventServiceBase extends SuspendClass {
    */
   checkContentExist(args, fnSet) {
     let list = Array.from(fnSet)
-    return !!list.filter(l => {
-      let [hash,] = l;
-      if (hash === args[0]) {
-        return true;
-      }
-      return false;
-    }).length;
+    return !!list.filter(li => {
+      let [hash,] = li
+      return hash === args[0]
+    }).length
   }
 
   /**
@@ -164,14 +162,14 @@ export default class NbEventServiceBase extends SuspendClass {
     this.validateEvt(evtName, type)
     let all = this.$get(evtName, true)
     if (all === false) {
-       // pristine it means you can add
-      return true;
+      // pristine it means you can add
+      return true
     }
     // it should only have ONE type in ONE event store
     return !all.filter(list => {
-      let [ ,,,t ] = list;
-      return type !== t;
-    }).length;
+      let [ ,,,t ] = list
+      return type !== t
+    }).length
   }
 
   /**
@@ -185,12 +183,12 @@ export default class NbEventServiceBase extends SuspendClass {
     if (store) {
       return !!Array
         .from(store)
-        .filter(l => {
-          let [,,t] = l;
-          return t !== type;
+        .filter(li => {
+          let [,,t] = li
+          return t !== type
         }).length
     }
-    return false;
+    return false
   }
 
   /**
@@ -203,17 +201,17 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {number} size of the store
    */
   addToNormalStore(evt, type, callback, context = null) {
-    this.logger('(addToNormalStore)', evt, type, 'try to add to normal store')
+    this.logger(`(addToNormalStore) try to add "${evt}" + "${type}" to normal store`)
     // @TODO we need to check the existing store for the type first!
     if (this.checkTypeInStore(evt, type)) {
-      this.logger('(addToNormalStore)', `${type} can add to ${evt} normal store`)
+      this.logger('(addToNormalStore)', `"${type}" can add to "${evt}" normal store`)
       let key = this.hashFnToKey(callback)
       let args = [this.normalStore, evt, key, callback, context, type]
       let [_store, size] = Reflect.apply(this.addToStore, this, args)
-      this.normalStore = _store;
-      return size;
+      this.normalStore = _store
+      return size
     }
-    return false;
+    return false
   }
 
   /**
@@ -234,8 +232,9 @@ export default class NbEventServiceBase extends SuspendClass {
       args.push(type)
     }
     let [_store, size] = Reflect.apply(this.addToStore, this, args)
-    this.lazyStore = _store;
-    return size;
+    this.lazyStore = _store
+    this.logger(`(addToLazyStore) size: ${size}`)
+    return size
   }
 
   /**
@@ -244,7 +243,7 @@ export default class NbEventServiceBase extends SuspendClass {
    * @return {array} make sured
    */
   toArray(arg) {
-    return Array.isArray(arg) ? arg : [arg];
+    return Array.isArray(arg) ? arg : [arg]
   }
 
   /**
