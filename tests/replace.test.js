@@ -22,7 +22,7 @@ test('It should able to validate against the type', t => {
 
 
 test.cb('It should able to replace the event callback', t => {
-  let evtSrv = t.context.evtSrv;
+  let evtSrv = t.context.evtSrv
   let evt = 'same-event'
 
   evtSrv.$on(evt, (n) => {

@@ -18,7 +18,7 @@ test('We should have a watch method in the Object', t => {
 test.cb('should able to watch a property change', t => {
   t.plan(3)
 
-  let obj = t.context.watchObj;
+  let obj = t.context.watchObj
 
   obj.prop = false
 
@@ -33,7 +33,7 @@ test.cb('should able to watch a property change', t => {
     obj.prop = true;
   }, 500)
 
-  obj.newProp = 'something';
+  obj.newProp = 'something'
 })
 
 test.cb('Setting the suspend should able to trigger the release call', t => {
@@ -41,7 +41,7 @@ test.cb('Setting the suspend should able to trigger the release call', t => {
   t.plan(2)
 
   const evtName = 'unknown-operation'
-  const evtSrv = t.context.evtSrv;
+  const evtSrv = t.context.evtSrv
 
   evtSrv.$on(evtName, function(value) {
     return value + ' ha ha'
@@ -53,11 +53,11 @@ test.cb('Setting the suspend should able to trigger the release call', t => {
 
   t.falsy(evtSrv.$done)
 
-  let q = evtSrv.$queues;
+  let q = evtSrv.$queues
 
   debug('$queues', q)
 
-  evtSrv.$suspend = false;
+  evtSrv.$suspend = false
 
   setTimeout(() => {
     t.is(evtSrv.$done, 'you loser ha ha')

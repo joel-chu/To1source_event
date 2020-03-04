@@ -13,8 +13,8 @@ test.before( t => {
 
 test('This is how $once normally works', t => {
   // problem is when you call $trigger before you register it with $once
-  let evtName = 'once-normal';
-  let evtSrv = t.context.evtSrv;
+  let evtName = 'once-normal'
+  let evtSrv = t.context.evtSrv
 
   evtSrv.$trigger(evtName, 1000)
 
@@ -33,20 +33,20 @@ test('This is how $once normally works', t => {
 
 test.cb('$once should allow to add more than one listner', t => {
   t.plan(3)
-  let evtName = 'more-once';
-  let evtSrv = t.context.evtSrv;
+  let evtName = 'more-once'
+  let evtSrv = t.context.evtSrv
 
   evtSrv.$once(evtName, function() {
     debug('$once', 'First listener')
     t.pass()
-    return 1;
+    return 1
   })
 
   evtSrv.$once(evtName, function() {
     debug('$once', 'Second listener')
     t.pass()
     t.end()
-    return 2;
+    return 2
   })
 
   evtSrv.$call(evtName)()
@@ -57,21 +57,21 @@ test.cb('$once should allow to add more than one listner', t => {
 
 test.only('It should be fixed with the check type before adding to the store, but the $done value can be unpredictable', t => {
 
-  let evtName = 'once-problem';
-  let evtSrv = t.context.evtSrv;
+  let evtName = 'once-problem'
+  let evtSrv = t.context.evtSrv
 
   evtSrv.$trigger(evtName, 1000)
 
   evtSrv.$on(evtName, function(val) {
-    return (val*0.2) + val;
+    return (val*0.2) + val
   })
   // this should not add
   evtSrv.$once(evtName, function(val) {
-    return (val*0.1) + val;
+    return (val*0.1) + val
   })
 
   evtSrv.$on(evtName, function(val) {
-    return (val*0.3) + val;
+    return (val*0.3) + val
   })
 
   // now the first $on call hijacked the evt
