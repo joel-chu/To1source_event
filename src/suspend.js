@@ -74,7 +74,7 @@ export default class SuspendClass {
    */
   release() {
     let size = this.queueStore.size
-    this.logger('(release)', `Release was called with ${size} item${size > 1 : 's': ''}`)
+    this.logger('(release)', `Release was called with ${size} item${size > 1 ? 's' : ''}`)
     if (size > 0) {
       const queue = Array.from(this.queueStore)
       this.queueStore.clear()
