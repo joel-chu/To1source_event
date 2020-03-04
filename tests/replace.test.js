@@ -12,7 +12,7 @@ test.before(t => {
 })
 
 test('It should able to validate against the type', t => {
-  let evtSrv = t.context.evtSrv;
+  let evtSrv = t.context.evtSrv
   let wrongType = 'whatever'
   let fn = (type) => evtSrv.$replace('some-event', () => {}, null, type)
 

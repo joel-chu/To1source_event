@@ -11,5 +11,29 @@ test.before( t => {
   })
 })
 
+test.cb(`It should able to use the suspend to hold all the calls then release it`, t => {
+  t.plan(2)
+  const evtSrv = t.context.evtSrv
 
-test.todo(`It should able to use the suspend to hold all the calls`)
+  evtSrv.$on('some-event', value => {
+    const result = value + 1
+    debug('result:', result)
+    return result
+  })
+
+  evtSrv.$suspend = true
+
+  evtSrv.$trigger('some-event', 100)
+  // what happen inside
+  t.falsy(evtSrv.$done) // null
+
+  evtSrv.$suspend = false
+  // what happen now
+
+  setTimeout(() => {
+    t.is(evtSrv.$done, 101) // 101
+    t.end()
+  },10)
+
+
+})

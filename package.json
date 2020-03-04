@@ -12,6 +12,7 @@
     "src"
   ],
   "scripts": {
+    "prepare": "npm run build && npm run test",
     "test": "ava",
     "coverage": "nyc ava",
     "build": "npm run build:umd && npm run build:alias:umd && npm run build:cjs && npm run build:alias:cjs",
@@ -19,7 +20,6 @@
     "build:cjs": "TARGET=cjs rollup -c",
     "build:alias:umd": "NODE_ENV=alias TARGET=umd rollup -c",
     "build:alias:cjs": "NODE_ENV=alias TARGET=cjs rollup -c",
-    "prepare": "npm run build && npm run test",
     "test:browser": "node ./tests/fixtures/browser.js",
     "test:basic": "DEBUG=nb-event-service* ava ./tests/basic.test.js",
     "test:ms": "DEBUG=nb-event-service* ava ./tests/map-set.test.js",
@@ -30,7 +30,8 @@
     "test:replace": "DEBUG=nb-event-service* ava ./tests/replace.test.js",
     "test:lazy": "DEBUG=nb-event-service* ava ./tests/lazy.test.js",
     "test:watch": "DEBUG=nb-event-service* ava ./tests/watch.test.js",
-    "test:array": "DEBUG=nb-event-service* ava ./tests/array-result.test.js"
+    "test:array": "DEBUG=nb-event-service* ava ./tests/array-result.test.js",
+    "test:suspend": "DEBUG=nb-event-service* ava ./tests/suspend.test.js"
   },
   "repository": {
     "type": "git",

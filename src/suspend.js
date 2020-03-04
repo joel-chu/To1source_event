@@ -1,5 +1,19 @@
 // making all the functionality on it's own
 // import { WatchClass } from './watch'
+/*
+we use a different way to do the same watch thing now
+this.watch('suspend', function(value, prop, oldValue) {
+  this.logger(`${prop} set from ${oldValue} to ${value}`)
+  // it means it set the suspend = true then release it
+  if (oldValue === true && value === false) {
+    // we want this happen after the return happens
+    setTimeout(() => {
+      this.release()
+    }, 1)
+  }
+  return value; // we need to return the value to store it
+})
+*/
 
 export default class SuspendClass {
 
@@ -7,19 +21,6 @@ export default class SuspendClass {
     // suspend, release and queue
     this.__suspend__ = null
     this.queueStore = new Set()
-    /*
-    this.watch('suspend', function(value, prop, oldValue) {
-      this.logger(`${prop} set from ${oldValue} to ${value}`)
-      // it means it set the suspend = true then release it
-      if (oldValue === true && value === false) {
-        // we want this happen after the return happens
-        setTimeout(() => {
-          this.release()
-        }, 1)
-      }
-      return value; // we need to return the value to store it
-    })
-    */
   }
 
   /**
@@ -34,7 +35,7 @@ export default class SuspendClass {
       if (lastValue === true && value === false) {
         setTimeout(() => {
           this.release()
-        }, 1)
+        }, 1) 
       }
     } else {
       throw new Error(`$suspend only accept Boolean value! we got ${typeof value}`)
@@ -43,8 +44,8 @@ export default class SuspendClass {
 
   /**
    * queuing call up when it's in suspend mode
-   * @param {any} value
-   * @return {Boolean} true when added or false when it's not
+   * @param {*} args unknown number of arguments
+   * @return {boolean} true when added or false when it's not
    */
   $queue(...args) {
     if (this.__suspend__ === true) {
@@ -78,7 +79,7 @@ export default class SuspendClass {
     if (size > 0) {
       const queue = Array.from(this.queueStore)
       this.queueStore.clear()
-      this.logger('queue', queue)
+      this.logger('(release queue)', queue)
       queue.forEach(args => {
         this.logger(args)
         Reflect.apply(this.$trigger, this, args)

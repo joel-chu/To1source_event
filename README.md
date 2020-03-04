@@ -174,7 +174,7 @@ es.$on('some-event', function(nums) {
 
 Or it will return `false` if there is nothing
 
-#### $suspend setter
+#### $suspend
 
 This is new in V1.8.0. We watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
 Then when you set this to false, all the previous suspended call(s) will get release (execute).
@@ -197,6 +197,9 @@ evtSrv.$suspend = false
 console.log(evtSrv.$done) // 101
 
 ```
+
+**Please note** there might be a time delay, between you release the queue, and when you get the result.
+So you might want to do a `setTimeout` with very little interval to wait for the queue to get process.
 
 #### $debug(idx)
 
