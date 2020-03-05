@@ -174,7 +174,9 @@ es.$on('some-event', function(nums) {
 
 Or it will return `false` if there is nothing
 
-#### $suspend
+#### $suspend / $release (breaking change in 1.9.4)
+
+**We change `$suspend` from a setter to a function, its an alias to the internal setter, and call `$release()` to release the queue**
 
 This is new in V1.8.0. We watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
 Then when you set this to false, all the previous suspended call(s) will get release (execute).
@@ -186,13 +188,13 @@ evtSrv.$on('some-event', value => {
   return value + 1
 })
 
-evtSrv.$suspend = true
+evtSrv.$suspend()
 
 evtSrv.$trigger('some-event', 100)
 // what happen inside
 console.log(evtSrv.$done) // null
 
-evtSrv.$suspend = false
+evtSrv.$release()
 // what happen now
 console.log(evtSrv.$done) // 101
 

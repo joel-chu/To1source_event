@@ -19,27 +19,21 @@ export default class SuspendClass {
 
   constructor() {
     // suspend, release and queue
-    this.__suspend__ = null
+    this.__suspend_state__ = null
     this.queueStore = new Set()
   }
 
   /**
-   * setter to set the suspend and check if it's boolean value
-   * @param {boolean} value to trigger
+   * Add an alias method
    */
-  set $suspend(value) {
-    if (typeof value === 'boolean') {
-      const lastValue = this.__suspend__
-      this.__suspend__ = value
-      this.logger('($suspend)', `Change from "${lastValue}" --> "${value}"`)
-      if (lastValue === true && value === false) {
-        // setTimeout(() => {
-        this.release()
-        // }, 1)
-      }
-    } else {
-      throw new Error(`$suspend only accept Boolean value! we got ${typeof value}`)
-    }
+  $suspend() {
+    this.logger(`---> SUSPEND ALL OPS <---`)
+    this.__suspend__(true)
+  }
+
+  $release() {
+    this.logger(`---> RELEASE SUSPENDED QUEUE <---`)
+    this.__suspend__(false)
   }
 
   /**
@@ -49,7 +43,7 @@ export default class SuspendClass {
    */
   $queue(...args) {
     if (this.__suspend__ === true) {
-      this.logger('($queue)', 'added to $queue', args)
+      this.logger('($queue) added to $queue', args)
       // @TODO there shouldn't be any duplicate, but how to make sure?
       this.queueStore.add(args)
       return this.queueStore.size
@@ -71,10 +65,27 @@ export default class SuspendClass {
   }
 
   /**
+   * setter to set the suspend and check if it's boolean value
+   * @param {boolean} value to trigger
+   */
+  __suspend__(value) {
+    if (typeof value === 'boolean') {
+      const lastValue = this.__suspend_state__
+      this.__suspend_state__ = value
+      this.logger(`($suspend) Change from "${lastValue}" --> "${value}"`)
+      if (lastValue === true && value === false) {
+        this.__release__()
+      }
+    } else {
+      throw new Error(`$suspend only accept Boolean value! we got ${typeof value}`)
+    }
+  }
+
+  /**
    * Release the queue
    * @return {int} size if any
    */
-  release() {
+  __release__() {
     let size = this.queueStore.size
     this.logger('(release)', `Release was called with ${size} item${size > 1 ? 's' : ''}`)
     if (size > 0) {
