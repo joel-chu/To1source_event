@@ -45,15 +45,16 @@ export default class SuspendClass {
   /**
    * queuing call up when it's in suspend mode
    * @param {*} args unknown number of arguments
-   * @return {boolean} true when added or false when it's not
+   * @return {boolean|number} true when added or false when it's not
    */
   $queue(...args) {
     if (this.__suspend__ === true) {
       this.logger('($queue)', 'added to $queue', args)
       // @TODO there shouldn't be any duplicate, but how to make sure?
       this.queueStore.add(args)
+      return this.queueStore.size
     }
-    return this.__suspend__
+    return !!this.__suspend__
   }
 
   /**
