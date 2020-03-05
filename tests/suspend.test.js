@@ -30,11 +30,5 @@ test(`It should able to use the suspend to hold all the calls then release it`, 
   evtSrv.$release()
   // what happen now
   t.is(evtSrv.$done, 101) // 101
-  /*
-  setTimeout(() => {
-    t.is(evtSrv.$done, 101) // 101
-    t.end()
-  },10)
-  */
 
 })

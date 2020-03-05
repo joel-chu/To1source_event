@@ -77,11 +77,13 @@ test('It should not allow to add the same function again', t => {
   t.is(ctn.length, 1)
 })
 
-test.only('It should only call once if we use the $once option', t => {
+test('It should only call once if we use the $once option', t => {
   let evtName = 'once-call'
   let ctn0 = 0
 
-  const callback = () => {
+  debug(evtName, ctn0)
+
+  const callback0 = () => {
     ++ctn0
     debug(ctn0)
   return ctn0
@@ -93,7 +95,7 @@ test.only('It should only call once if we use the $once option', t => {
   return ctn0
   }
 
-  t.context.evtSrv.$once(evtName, callback)
+  t.context.evtSrv.$once(evtName, callback0)
   t.context.evtSrv.$once(evtName, callback2)
 
   t.context.evtSrv.$trigger(evtName)

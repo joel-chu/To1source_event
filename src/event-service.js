@@ -200,11 +200,11 @@ export default class EventService extends NbStoreService {
     let nStore = this.normalStore
     this.logger('($trigger) normalStore', nStore)
     if (nStore.has(evt)) {
+      this.logger(`($trigger) "${evt}" found`)
       // @1.8.0 to add the suspend queue
       let added = this.$queue(evt, payload, context, type)
-      this.logger(`($trigger) "${evt}" found, add to queue: `, added)
-      if (added === true) {
-        this.logger(`($trigger) "${evt}" not executed. Exit now.`)
+      if (added) {
+        this.logger(`($trigger) Currently suspended "${evt}" added to queue, nothing executed. Exit now.`)
         return false // not executed
       }
       let nSet = Array.from(nStore.get(evt))
@@ -294,7 +294,7 @@ export default class EventService extends NbStoreService {
    * @param {*} value whatever return from callback
    */
   set $done(value) {
-    this.logger('($done) value: ', value)
+    this.logger('($done) set value: ', value)
     if (this.keep) {
       this.result.push(value)
     } else {
@@ -308,7 +308,7 @@ export default class EventService extends NbStoreService {
    * @return {*} whatever last store result
    */
   get $done() {
-    this.logger('($done) results:', this.result)
+    this.logger('($done) get result:', this.result)
     if (this.keep) {
       return this.result[this.result.length - 1]
     }

@@ -35,33 +35,3 @@ test.cb('should able to watch a property change', t => {
 
   obj.newProp = 'something'
 })
-
-test.cb('Setting the suspend should able to trigger the release call', t => {
-
-  t.plan(2)
-
-  const evtName = 'unknown-operation'
-  const evtSrv = t.context.evtSrv
-
-  evtSrv.$on(evtName, function(value) {
-    return value + ' ha ha'
-  })
-
-  evtSrv.$suspend = true;
-
-  evtSrv.$trigger(evtName, 'you loser')
-
-  t.falsy(evtSrv.$done)
-
-  let q = evtSrv.$queues
-
-  debug('$queues', q)
-
-  evtSrv.$suspend = false
-
-  setTimeout(() => {
-    t.is(evtSrv.$done, 'you loser ha ha')
-    t.end()
-  }, 10)
-
-})
