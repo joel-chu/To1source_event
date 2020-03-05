@@ -65,7 +65,7 @@ export default class SuspendClass {
   }
 
   /**
-   * setter to set the suspend and check if it's boolean value
+   * to set the suspend and check if it's boolean value
    * @param {boolean} value to trigger
    */
   __suspend__(value) {
@@ -98,5 +98,7 @@ export default class SuspendClass {
       })
       this.logger(`Release size ${this.queueStore.size}`)
     }
+    
+    return size
   }
 }

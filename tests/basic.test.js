@@ -17,7 +17,7 @@ test(`Should have a is getter`, t => {
 })
 
 test('It should able to validate the evt', t => {
-  let evtSrv = t.context.evtSrv;
+  let evtSrv = t.context.evtSrv
   let fn = (...args) => Reflect.apply(evtSrv.$on, evtSrv, args)
   t.throws(() => fn('some', false) , /*new Error()*/ null, 'Should throw error because callback is not a function')
 })
@@ -77,18 +77,20 @@ test('It should not allow to add the same function again', t => {
   t.is(ctn.length, 1)
 })
 
-test('It should only call once if we use the $once option', t => {
+test.only('It should only call once if we use the $once option', t => {
   let evtName = 'once-call'
-  let ctn = 0;
+  let ctn0 = 0
 
   const callback = () => {
-    ++ctn;
-    debug(ctn)
+    ++ctn0
+    debug(ctn0)
+  return ctn0
   }
 
   const callback2 = () => {
-    ++ctn;
-    debug(ctn)
+    ++ctn0
+    debug(ctn0)
+  return ctn0
   }
 
   t.context.evtSrv.$once(evtName, callback)
@@ -97,32 +99,34 @@ test('It should only call once if we use the $once option', t => {
   t.context.evtSrv.$trigger(evtName)
   t.context.evtSrv.$trigger(evtName)
 
-  t.is(ctn, 1)
+  t.is(ctn0, 1)
 
 })
 
 test('Using the $call alias to $trigger should do the same thing', t => {
   let evtName = 'alias'
-  let ctn = 0;
+  let ctn1 = 0
 
   const callback = () => {
-    ++ctn;
-    debug(ctn)
+    ++ctn1
+    debug(ctn1)
+    return ctn1
   }
   t.context.evtSrv.$once(evtName, callback)
   t.context.evtSrv.$trigger(evtName)
   t.context.evtSrv.$call(evtName)()
 
-  t.is(ctn, 1)
+  t.is(ctn1, 1)
 })
 
 test('Using $trigger and $call should make the callback run again', t => {
   let evtName = 'alias-two'
-  let ctn = 0;
+  let ctn2 = 0
 
   const callback = () => {
-    ++ctn;
-    debug(ctn)
+    ++ctn2
+    debug(ctn2)
+    return ctn2
   }
 
   t.context.evtSrv.$trigger(evtName)
@@ -130,9 +134,8 @@ test('Using $trigger and $call should make the callback run again', t => {
 
   t.context.evtSrv.$on(evtName, callback)
 
-  t.is(ctn, 2)
+  t.is(ctn2, 2)
 
-  t.pass()
 })
 
 test('Should not able to call the method once the $off is called', t => {

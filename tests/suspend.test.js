@@ -21,13 +21,13 @@ test(`It should able to use the suspend to hold all the calls then release it`, 
     return result
   })
 
-  evtSrv.$suspend = true
+  evtSrv.$suspend()
 
   evtSrv.$trigger('some-event', 100)
   // what happen inside
   t.falsy(evtSrv.$done) // null
 
-  evtSrv.$suspend = false
+  evtSrv.$release()
   // what happen now
   t.is(evtSrv.$done, 101) // 101
   /*

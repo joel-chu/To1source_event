@@ -91,7 +91,7 @@ export default class NbEventServiceBase extends SuspendClass {
       this.logger('(takeFromStore)', storeName, store)
       if (store.has(evt)) {
         let content = store.get(evt)
-        this.logger('(takeFromStore)', `has "${evt}"`, content)
+        this.logger(`(takeFromStore) has "${evt}"`, content)
         store.delete(evt)
         return content
       }
@@ -110,10 +110,10 @@ export default class NbEventServiceBase extends SuspendClass {
   addToStore(store, evt, ...args) {
     let fnSet
     if (store.has(evt)) {
-      this.logger('(addToStore)', `"${evt}" existed`)
+      this.logger(`(addToStore) "${evt}" existed`)
       fnSet = store.get(evt)
     } else {
-      this.logger('(addToStore)', `create new Set for "${evt}"`)
+      this.logger(`(addToStore) create new Set for "${evt}"`)
       // this is new
       fnSet = new Set()
     }
@@ -128,7 +128,7 @@ export default class NbEventServiceBase extends SuspendClass {
         }
       } else {
         if (!this.checkContentExist(args, fnSet)) {
-          this.logger('(addToStore)', `insert new`, args)
+          this.logger(`(addToStore) insert new`, args)
           fnSet.add(args)
         }
       }
