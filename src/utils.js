@@ -25,3 +25,28 @@ export function hashCode2Str(s) {
 export function isRegExp(pat) {
   return pat instanceof RegExp
 }
+
+/**
+ * check if its string
+ * @param {*} arg whatever
+ * @return {boolean} false when it's not
+ */
+export function isString(arg) {
+  return typeof arg === 'string'
+}
+
+/**
+ * Find from the array by matching the pattern
+ * @param {*} pattern a string or RegExp object
+ * @return {object} regex object or false when we can not id the input
+ */
+export function getRegex(pattern) {
+  switch (true) {
+    case isRegExp(pattern):
+      return pattern
+    case isString(pattern):
+      return new RegExp(pattern)
+    default:
+      return false
+  }
+}

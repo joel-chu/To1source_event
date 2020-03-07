@@ -6,7 +6,9 @@ This package was [nb-event-service]() and now we move under [@to1source]() names
 
 ## Installation
 
+```sh
     $ npm install @to1source/event
+```
 
 This module works in browser as well as node.js.
 

@@ -14,14 +14,25 @@ test.before( t => {
 
 test.only(`Just play with the regex`, t => {
   const pattern = '_private'
+  const evt1 = 'jsonql_private'
+  const evt2 = 'jsonql_public'
 
-  debug(typeof /\_private/)
-
-  debug(/\_private/ instanceof RegExp)
-
-  t.truthy('jsonql_private'.indexOf(pattern))
-  t.falsy('jsonql_public'.indexOf(pattern) > -1)
+  t.truthy(evt1.indexOf(pattern))
+  t.falsy(evt2.indexOf(pattern) > -1)
   t.truthy('jsonql_private_someFunc_onReady'.indexOf(pattern))
+
+
+  const pattern1 = /\_private/
+
+  // debug(/\_private/ instanceof RegExp)
+
+  debug(pattern1.test(evt1))
+  debug(pattern1.test(evt2))
+
+  const patternRegExp = new RegExp(pattern)
+
+  debug(patternRegExp.test(evt1))
+  debug(patternRegExp.test(evt2))
 })
 
 
@@ -47,23 +58,27 @@ test(`It should able to use the suspend to hold all the calls then release it`, 
 
 })
 
-test(`Testing the $suspendEvent method`, t => {
+test.cb(`Testing the $suspendEvent method`, t => {
+  t.plan(1)
 
-  const evt = new
+  const evt = new To1sourceEvent({ logger })
 
-  $on('some-event-ok', () => {
-    console.log('ok')
+  evt.$on('some-event-ok', () => {
+    debug('ok')
+    t.pass()
+    t.end()
   })
-
-  $on('some-event-not-great', () => {
-    console.log('Not great!')
+  // this shouldn't pass
+  evt.$on('some-event-not-great', () => {
+    debug('Not great!')
+    t.end()
   })
   // @NOTE you can pass the entire event name or just part that can match by indexOf
-  $suspendEvent(`-not-great`)
+  evt.$suspendEvent(`-not-great`)
 
-  $trigger('some-event-ok')
-  $trigger('some-event-not-great')
+  evt.$trigger('some-event-ok')
+  evt.$trigger('some-event-not-great')
 
-  $release()
+  evt.$release()
 
 })
