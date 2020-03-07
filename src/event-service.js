@@ -173,7 +173,7 @@ export default class EventService extends NbStoreService {
    * @param {function} callback to exeucte
    * @param {object} [context = null] or pass a string as type
    * @param {string} [type=on] what type of method to replace
-   * @return {}
+   * @return {*}
    */
   $replace(evt, callback, context = null, type = 'on') {
     if (this.validateType(type)) {
@@ -255,14 +255,14 @@ export default class EventService extends NbStoreService {
    * @return {boolean} true actually delete something
    */
   $off(evt) {
+    // @TODO we will allow a regex pattern to mass remove event
     this.validateEvt(evt)
     let stores = [ this.lazyStore, this.normalStore ]
 
-    return !!stores.filter(store => store.has(evt))
-          .map(store => {
-            this.logger('($off)', evt)
-            store.delete(evt)
-          }).length
+    return !!stores
+          .filter(store => store.has(evt))
+          .map(store => this.removeFromStore(evt, store))
+          .length
   }
 
   /**
@@ -272,21 +272,10 @@ export default class EventService extends NbStoreService {
    * @return {array|boolean} listerner(s) or false when not found
    */
   $get(evt, full = false) {
+    // @TODO should we allow the same Regex to search for all?
     this.validateEvt(evt)
     let store = this.normalStore
-    if (store.has(evt)) {
-
-      return Array
-        .from(store.get(evt))
-        .map( l => {
-          if (full) {
-            return l
-          }
-          let [key, callback, ] = l
-          return callback
-        })
-    }
-    return false
+    return findFromStore(store)
   }
 
   /**

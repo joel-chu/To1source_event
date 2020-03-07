@@ -101,6 +101,43 @@ export default class To1sourceEventBase extends SuspendClass {
   }
 
   /**
+   * This was part of the $get. We take it out
+   * so we could use a regex to remove more than one event
+   * @param {object} store the store to return from
+   * @param {string} evt event name
+   * @return {array|boolean} false when not found
+   */
+  findFromStore(evt, store) {
+    if (store.has(evt)) {
+      return Array
+        .from(store.get(evt))
+        .map( l => {
+          if (full) {
+            return l
+          }
+          let [key, callback, ] = l
+          return callback
+        })
+    }
+    return false
+  }
+
+  /**
+   * Similar to the findFromStore, but remove
+   * @param {string} evt event name
+   * @param {object} store the store to remove from
+   * @return {boolean} false when not found
+   */
+  removeFromStore(evt, store) {
+    if (store.has(evt)) {
+      this.logger('($off)', evt)
+      store.delete(evt)
+    return true
+    }
+    return false
+  }
+
+  /**
    * The add to store step is similar so make it generic for resuse
    * @param {object} store which store to use
    * @param {string} evt event name

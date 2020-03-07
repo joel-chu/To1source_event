@@ -40,8 +40,19 @@ ee.$on('someEvent', function(msg) {
 
 The message will show.
 
-*Please note the new version is using ES6+ (WeakMap, Set, Map, Array.from etc) if you need to
-use this module on older browser, please provide polyfill accordingly*
+---
+
+*Please note the module is using ES6+ (WeakMap, Set, Map, Array.from etc).
+When you use this module on older browser, please provide polyfill accordingly*
+
+When you include this module in browser (using our stock build). You will get a `To1sourceEvent` global object:
+
+```html
+<script>
+  var event = new To1sourceEvent()
+  // then do your thing
+</script>
+```
 
 ## API
 
@@ -176,15 +187,13 @@ es.$on('some-event', function(nums) {
 
 Or it will return `false` if there is nothing
 
-#### $suspend / $release (breaking change in 1.9.4)
-
-**We change `$suspend` from a setter to a function, its an alias to the internal setter, and call `$release()` to release the queue**
+#### $suspend / $release
 
 This is new in V1.8.0. We watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
 Then when you set this to false, all the previous suspended call(s) will get release (execute).
 
 ```js
-const evtSrv = new Event()
+const evtSrv = new To1sourceEvent()
 
 evtSrv.$on('some-event', value => {
   return value + 1
