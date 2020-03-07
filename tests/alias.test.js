@@ -1,13 +1,13 @@
 // test the alias version to make sure it works
 const test = require('ava')
 
-const NBEventService = require('../dist/to1source-event.alias.cjs')
+const To1sourceEvent = require('../dist/to1source-event.alias.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:basic')
 let value = 1000;
 
 test.before( t => {
-  t.context.evtSrv = new NBEventService({
+  t.context.evtSrv = new To1sourceEvent({
     logger
   })
 })

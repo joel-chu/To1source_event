@@ -6,7 +6,7 @@ import {
 import { hashCode2Str } from './hash-code'
 import SuspendClass from './suspend'
 
-export default class NbEventServiceBase extends SuspendClass {
+export default class To1sourceEventBase extends SuspendClass {
 
   constructor(config = {}) {
     super()

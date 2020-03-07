@@ -18,7 +18,7 @@ const outputFile = env === 'alias' ? `to1source-event-alias.${target}.js` : `to1
 export default {
   input: join(base, inputFile),
   output: {
-    name: 'to1sourceEvent',
+    name: 'To1sourceEvent',
     file: join(outDir, outputFile),
     format: target,
     sourcemap: true

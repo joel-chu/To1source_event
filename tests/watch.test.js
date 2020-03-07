@@ -2,11 +2,11 @@
 const test = require('ava')
 const { WatchClass } = require('../src/watch')
 const debug = require('debug')('nb-event-service:watch')
-const NBEventService = require('../dist/to1source-event.cjs')
+const To1sourceEvent = require('../dist/to1source-event.cjs')
 
 test.before(t => {
   t.context.watchObj = new WatchClass()
-  t.context.evtSrv = new NBEventService({
+  t.context.evtSrv = new To1sourceEvent({
     logger: debug.extend('test')
   })
 })

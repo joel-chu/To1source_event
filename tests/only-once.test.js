@@ -1,12 +1,12 @@
 const test = require('ava')
 
-const NBEventService =  require('../dist/to1source-event.cjs')
+const To1sourceEvent =  require('../dist/to1source-event.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:only-once')
 let value = 2000;
 
 test.before(t => {
-  t.context.evtSrv = new NBEventService({
+  t.context.evtSrv = new To1sourceEvent({
     logger
   })
 })

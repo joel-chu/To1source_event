@@ -1,4 +1,4 @@
 // default
-import NBEventService from './src/event-service'
+import To1sourceEvent from './src/event-service'
 
-export default NBEventService
+export default To1sourceEvent

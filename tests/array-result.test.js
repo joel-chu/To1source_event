@@ -2,11 +2,11 @@
 // but by the time it got to the client, it only return the first item in the array
 const test = require('ava')
 
-const NBEventService = require('../dist/to1source-event.cjs')
+const To1sourceEvent = require('../dist/to1source-event.cjs')
 const logger = require('debug')('nb-event-service:test:array')
 
 test.before(t => {
-  t.context.evtSrv = new NBEventService({
+  t.context.evtSrv = new To1sourceEvent({
     logger
   })
   t.context.arrayParam = ['cats', 'dog', 'pig']
