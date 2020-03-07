@@ -11,6 +11,15 @@ test.before( t => {
   })
 })
 
+/*
+test.only(`Just play with the regex`, t => {
+  const pattern = '_private'
+  t.truthy('jsonql_private'.indexOf(pattern))
+  t.falsy('jsonql_public'.indexOf(pattern) > -1)
+  t.truthy('jsonql_private_someFunc_onReady'.indexOf(pattern))
+})
+*/
+
 test(`It should able to use the suspend to hold all the calls then release it`, t => {
   // t.plan(2)
   const evtSrv = t.context.evtSrv

@@ -1,12 +1,15 @@
-# nb-event-service
+# @to1source/event
 
 > A universal Event Service for Javascript.
 
+This package was [nb-event-service]() and now we move under [@to1source]() namespace to continue the development.  
+
 ## Installation
 
-    $ npm install nb-event-service --save
+    $ npm install @to1source/event
 
-This module works in browser as well as node.js
+This module works in browser as well as node.js.
+
 The main different between this module and the other event emitter out there is this:
 
 **We don't care about the order of event registration and handling**
@@ -17,7 +20,6 @@ For example:
 
 ```js
 //  other library like EventEmitter
-
 ee.emitEvent('someEvent')
 
 ee.addListener('someEvent', function() {
@@ -29,17 +31,17 @@ ee.addListener('someEvent', function() {
 The callback in the above example never works and you will never see the message. But our can do it:
 
 ```js
-es.$trigger('someEvent') // <-- not yet exist
+es.$trigger('someEvent', 'Hello world!') // <-- not yet exist
 
-ee.$on('someEvent', function() {
-  console.log('Hello world!')
+ee.$on('someEvent', function(msg) {
+  console.log(msg)
 })
 ```
 
 The message will show.
 
-*Please note the new version is using ES6 features heavily (WeakMap, Set, Map, Array.from etc) if you need to
-use this module on older platform, please provide polyfill accordingly*
+*Please note the new version is using ES6+ (WeakMap, Set, Map, Array.from etc) if you need to
+use this module on older browser, please provide polyfill accordingly*
 
 ## API
 
@@ -182,7 +184,7 @@ This is new in V1.8.0. We watch this property internally, when you set this to t
 Then when you set this to false, all the previous suspended call(s) will get release (execute).
 
 ```js
-const evtSrv = new NBEventService()
+const evtSrv = new Event()
 
 evtSrv.$on('some-event', value => {
   return value + 1
@@ -202,6 +204,31 @@ console.log(evtSrv.$done) // 101
 
 **Please note** there might be a time delay, between you release the queue, and when you get the result.
 So you might want to do a `setTimeout` with very little interval to wait for the queue to get process.
+
+#### $suspendEvent(eventPattern)
+
+This is the similar to `$suspend`, but it allows you to provide a event name pattern to those matching pattern
+
+```js
+
+$on('some-event-ok', () => {
+  console.log('ok')
+})
+
+$on('some-event-not-great', () => {
+  console.log('Not great!')
+})
+// @NOTE you can pass the entire event name or just part that can match by indexOf
+$suspendEvent(`-not-great`)
+
+$trigger('some-event-ok')
+$trigger('some-event-not-great')
+
+$release()
+
+```
+
+In the above example, only the `some-event-ok` will get triggered.
 
 #### $debug(idx)
 

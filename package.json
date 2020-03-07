@@ -45,7 +45,6 @@
   "author": "to1source <tosource@foxmail.com>",
   "license": "UNLICENSED",
   "dependencies": {
-    "acorn": "^7.1.1"
   },
   "ava": {
     "files": [
@@ -69,6 +68,7 @@
     "node": ">=8"
   },
   "devDependencies": {
+    "acorn": "^7.1.1",
     "ava": "^3.5.0",
     "debug": "^4.1.1",
     "esm": "^3.2.25",

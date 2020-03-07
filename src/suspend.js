@@ -20,33 +20,61 @@ export default class SuspendClass {
   constructor() {
     // suspend, release and queue
     this.__suspend_state__ = null
+    // to do this proper we don't use a new prop to hold the event name pattern
+    this.__pattern__ = null
     this.queueStore = new Set()
   }
 
   /**
-   * Add an alias method
+   * start suspend
+   * @return {void}
    */
   $suspend() {
     this.logger(`---> SUSPEND ALL OPS <---`)
     this.__suspend__(true)
   }
 
+  /**
+   * release the queue
+   * @return {void}
+   */
   $release() {
     this.logger(`---> RELEASE SUSPENDED QUEUE <---`)
     this.__suspend__(false)
   }
 
   /**
+   * suspend event by pattern
+   * @param {string} pattern the pattern search matches the event name
+   * @return {void}
+   */
+  $suspendEvent(pattern) {
+    if (pattern && typeof pattern === 'string') {
+      this.__pattern__ = pattern
+      this.$suspend()
+    }
+    throw new Error(`We expect a pattern variable to be string, but got ${typeof pattern}`)
+  }
+
+  /**
    * queuing call up when it's in suspend mode
+   * @param {string} evt the event name
    * @param {*} args unknown number of arguments
    * @return {boolean} true when added or false when it's not
    */
-  $queue(...args) {
+  $queue(evt, ...args) {
     this.logger('($queue) get called')
     if (this.__suspend_state__ === true) {
+      if (this.__pattern__ !== null) {
+        // check the pattern and decide if we want to suspend it or not
+        let found = evt.indexOf(this.__pattern__) > -1
+        if (!found) {
+          return false
+        }
+      }
       this.logger('($queue) added to $queue', args)
       // @TODO there shouldn't be any duplicate, but how to make sure?
-      this.queueStore.add(args)
+      this.queueStore.add([evt].concat(args))
       // return this.queueStore.size
     }
     return !!this.__suspend_state__
@@ -88,7 +116,9 @@ export default class SuspendClass {
    */
   __release__() {
     let size = this.queueStore.size
-    this.logger('(release)', `Release was called with ${size} item${size > 1 ? 's' : ''}`)
+    let pattern = this.__pattern__
+    this.__pattern__ = null
+    this.logger('(release)', `Release was called with ${size}${pattern ? ' for "' + pattern + '"': ''} item${size > 1 ? 's' : ''}`)
     if (size > 0) {
       const queue = Array.from(this.queueStore)
       this.queueStore.clear()
