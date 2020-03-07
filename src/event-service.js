@@ -15,6 +15,16 @@ export default class EventService extends StoreService {
    */
   logger() {}
 
+  // for id if the instance is this class
+  get $name() {
+    return 'to1source-event'
+  }
+
+  // take this down in the next release
+  get is() {
+    return this.$name
+  }
+
   //////////////////////////
   //    PUBLIC METHODS    //
   //////////////////////////

@@ -85,6 +85,6 @@ test.cb(`Testing the $suspendEvent method`, t => {
   evt.$trigger('some-event-ok')
   evt.$trigger('some-event-not-great')
 
-  evt.$release()
+  // evt.$release()
 
 })

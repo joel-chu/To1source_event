@@ -14,7 +14,7 @@ This module works in browser as well as node.js.
 
 The main different between this module and the other event emitter out there is this:
 
-**We don't care about the order of event registration and handling**
+> We don't care about the order of event registration and handling
 
 Basically you can trigger an event that doesn't exist (well, sort of, its magic)
 
@@ -160,8 +160,6 @@ This method will return:
 
 #### $call(eventName, type, context) => (...params)
 
-**Breaking change in V1.9.1**
-
 It takes three parameter then return a function to accept the parameters
 
 * eventName (string) this will trigger the callback that register with this `eventName` whether that actually exist or not
@@ -213,12 +211,9 @@ console.log(evtSrv.$done) // 101
 
 ```
 
-**Please note** there might be a time delay, between you release the queue, and when you get the result.
-So you might want to do a `setTimeout` with very little interval to wait for the queue to get process.
-
 #### $suspendEvent(eventPattern)
 
-This is the similar to `$suspend`, but it allows you to provide a event name pattern to those matching pattern
+This is the similar to `$suspend`, but it allows you to provide a event name pattern to those event name that matches.
 
 ```js
 
@@ -229,8 +224,10 @@ $on('some-event-ok', () => {
 $on('some-event-not-great', () => {
   console.log('Not great!')
 })
-// @NOTE you can pass the entire event name or just part that can match by indexOf
+// @NOTE you can pass the entire event name or just part that can match
 $suspendEvent(`-not-great`)
+// or pass an RegExp object
+$suspendEvent(/\-not-great/) // note the second call will overwrite the first one
 
 $trigger('some-event-ok')
 $trigger('some-event-not-great')
@@ -254,7 +251,8 @@ If you don't pass anything, it will log all the stores to show what is inside.
 
 If you don't like the `$`, you can use the alias version.
 
-For browser you can include the `nb-event-service/dist/alias.js` for node you can `require('nb-event-service/alias')`
+For browser you can include the `dist/to1source-event-alias.js`, for ES6 `import To1sourceEvent from '@to1source/event/alias'`
+for node you can `require('@tosource/event/dist/alias')`
 
 And that will gives you the following alias version:
 
@@ -266,6 +264,31 @@ And that will gives you the following alias version:
 - only --> $only
 - onlyOnce --> $onlyOnce
 - replace --> $replace
+
+If you want everything alias, then roll your own by extending this class
+
+```js
+// node
+import To1sourceEvent from '@to1source/event/alias'
+
+class MyEventClass extends To1sourceEvent {
+  constructor(config) {
+    super(config)
+  }
+
+  // you can overwrite the $name getter to give yourself a new name
+  get $name() {
+    return 'roll-my-own-event-class'
+  }
+
+  // then do more of your alias
+  // example 
+  suspend() {
+    return this.$suspend()
+  }
+}
+
+```
 
 ## $done getter
 

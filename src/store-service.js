@@ -21,11 +21,6 @@ export default class StoreService extends SuspendClass {
     this.lazyStore = new Map()
   }
 
-  // for id if the instance is this class
-  get is() {
-    return 'nb-event-service'
-  }
-
   /**
    * validate the event name(s)
    * @param {string[]} evt event name

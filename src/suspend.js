@@ -51,9 +51,9 @@ export default class SuspendClass {
    */
   $suspendEvent(pattern) {
     const regex = getRegex(pattern)
-    if (regex !== false) {
+    if (isRegExp(regex)) {
       this.__pattern__ = regex
-      this.$suspend()
+      return this.$suspend()
     }
     throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
   }
