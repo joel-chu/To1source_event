@@ -1,8 +1,8 @@
 // The top level
 import { TAKEN_BY_OTHER_TYPE_ERR } from './constants'
-import NbStoreService from './store-service'
+import StoreService from './store-service'
 // export
-export default class EventService extends NbStoreService {
+export default class EventService extends StoreService {
   /**
    * class constructor
    */

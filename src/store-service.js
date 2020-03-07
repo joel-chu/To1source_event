@@ -3,10 +3,10 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
-import { hashCode2Str } from './hash-code'
+import { hashCode2Str } from './utils'
 import SuspendClass from './suspend'
 
-export default class To1sourceEventBase extends SuspendClass {
+export default class StoreService extends SuspendClass {
 
   constructor(config = {}) {
     super()

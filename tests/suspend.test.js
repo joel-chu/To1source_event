@@ -17,6 +17,8 @@ test.only(`Just play with the regex`, t => {
 
   debug(typeof /\_private/)
 
+  debug(/\_private/ instanceof RegExp)
+
   t.truthy('jsonql_private'.indexOf(pattern))
   t.falsy('jsonql_public'.indexOf(pattern) > -1)
   t.truthy('jsonql_private_someFunc_onReady'.indexOf(pattern))
