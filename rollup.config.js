@@ -1,5 +1,5 @@
 /**
- * rollup config for build browser version
+ * rollup config for build browser / node version
  */
 import { join } from 'path'
 
@@ -13,12 +13,12 @@ const base = join(__dirname)
 const outDir = join(base, 'dist')
 // default
 const inputFile = env === 'alias' ? 'alias.js' : 'index.js'
-const outputFile = env === 'alias' ? `nb-event-service-alias.${target}.js` : `nb-event-service.${target}.js`
+const outputFile = env === 'alias' ? `to1source-event-alias.${target}.js` : `to1source-event.${target}.js`
 
 export default {
   input: join(base, inputFile),
   output: {
-    name: 'NBEventService',
+    name: 'to1sourceEvent',
     file: join(outDir, outputFile),
     format: target,
     sourcemap: true

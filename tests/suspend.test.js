@@ -1,6 +1,6 @@
 // test the suspend feature
 const test = require('ava')
-const NBEventService = require('../dist/nb-event-service.cjs')
+const NBEventService = require('../dist/to1source-event.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:basic')
 let value = 1000
@@ -39,5 +39,26 @@ test(`It should able to use the suspend to hold all the calls then release it`, 
   evtSrv.$release()
   // what happen now
   t.is(evtSrv.$done, 101) // 101
+
+})
+
+test(`Testing the $suspendEvent method`, t => {
+
+  const evt = new
+
+  $on('some-event-ok', () => {
+    console.log('ok')
+  })
+
+  $on('some-event-not-great', () => {
+    console.log('Not great!')
+  })
+  // @NOTE you can pass the entire event name or just part that can match by indexOf
+  $suspendEvent(`-not-great`)
+
+  $trigger('some-event-ok')
+  $trigger('some-event-not-great')
+
+  $release()
 
 })

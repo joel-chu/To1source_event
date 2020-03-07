@@ -1,7 +1,7 @@
 // testing the lazy store with a type using the context parameter
 const test = require('ava')
 
-const NBEventService =  require('../dist/nb-event-service.cjs')
+const NBEventService =  require('../dist/to1source-event.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:lazy')
 

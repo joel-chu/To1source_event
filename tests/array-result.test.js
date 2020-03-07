@@ -2,7 +2,7 @@
 // but by the time it got to the client, it only return the first item in the array
 const test = require('ava')
 
-const NBEventService = require('../dist/nb-event-service-alias.cjs')
+const NBEventService = require('../dist/to1source-event.cjs')
 const logger = require('debug')('nb-event-service:test:array')
 
 test.before(t => {
