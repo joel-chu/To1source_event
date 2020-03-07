@@ -13,7 +13,7 @@ test.before( t => {
 
 test(`Should have a is getter`, t => {
 
-  t.is('nb-event-service', t.context.evtSrv.is)
+  t.is('to1source-event', t.context.evtSrv.$name)
 })
 
 test('It should able to validate the evt', t => {
