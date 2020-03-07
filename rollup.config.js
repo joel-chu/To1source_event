@@ -13,7 +13,7 @@ const base = join(__dirname)
 const outDir = join(base, 'dist')
 // default
 const inputFile = env === 'alias' ? 'alias.js' : 'index.js'
-const outputFile = env === 'alias' ? `to1source-event-alias.${target}.js` : `to1source-event.${target}.js`
+const outputFile = env === 'alias' ? (target === 'cjs' ? `alias.js` : 'to1source-event-alias.js') : `to1source-event.${target}.js`
 
 export default {
   input: join(base, inputFile),

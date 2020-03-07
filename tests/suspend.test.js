@@ -15,7 +15,7 @@ test.before( t => {
 })
 
 
-test.only(`Just play with the regex`, t => {
+test.skip(`Just play with the regex`, t => {
   const pattern = '_private'
   const evt1 = 'jsonql_private'
   const evt2 = 'jsonql_public'
