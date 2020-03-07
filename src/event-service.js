@@ -285,7 +285,7 @@ export default class EventService extends StoreService {
     // @TODO should we allow the same Regex to search for all?
     this.validateEvt(evt)
     let store = this.normalStore
-    return this.findFromStore(evt, store)
+    return this.findFromStore(evt, store, full)
   }
 
   /**

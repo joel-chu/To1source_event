@@ -100,9 +100,10 @@ export default class StoreService extends SuspendClass {
    * so we could use a regex to remove more than one event
    * @param {object} store the store to return from
    * @param {string} evt event name
+   * @param {boolean} full return just the callback or everything
    * @return {array|boolean} false when not found
    */
-  findFromStore(evt, store) {
+  findFromStore(evt, store, full = false) {
     if (store.has(evt)) {
       return Array
         .from(store.get(evt))
