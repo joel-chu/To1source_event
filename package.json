@@ -44,8 +44,7 @@
   ],
   "author": "to1source <tosource@foxmail.com>",
   "license": "UNLICENSED",
-  "dependencies": {
-  },
+  "dependencies": {},
   "ava": {
     "files": [
       "tests/*.test.js"
