@@ -42,8 +42,6 @@ ee.$on('someEvent', function(msg) {
 
 The message will show.
 
----
-
 *Please note the module is using ES6+ (WeakMap, Set, Map, Array.from etc).
 When you use this module on older browser, please provide polyfill accordingly*
 
@@ -76,7 +74,7 @@ It will return the total number of events that get registered.
 it will remove itself from the event store, and no longer available. This behavior is changed in V1.3.0.
 
 There is a potential problem with `$once` you can see below. It's not really a bug per se, but due to our
-own unique feature that can call event before even it existed (yeah, it's magic)
+own unique feature that can call event before it existed (yeah, it's kinda magic)
 
 
 ```js
@@ -138,7 +136,7 @@ Just like what it said on the tin; its `$only` + `$once`. You should able to fig
 It will return
 
 * true - event been clear
-* false - such even doesn't exist
+* false - such event doesn't exist
 
 #### $replace(eventName, callback, context = null, type = 'on')
 
@@ -183,13 +181,13 @@ es.$on('some-event', function(nums) {
 
 #### $get(evt)
 
-* return all the listeners for that particular event name from the internal store. Handy for debug.
+It returns all the listeners for that particular event name from the internal store. Handy for debug.
 
 Or it will return `false` if there is nothing
 
-#### $suspend / $release
+#### $suspend + $release
 
-This is new in V1.8.0. We watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
+We have a `suspend state`, and watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
 Then when you set this to false, all the previous suspended call(s) will get release (execute).
 
 ```js
@@ -213,7 +211,7 @@ console.log(evtSrv.$done) // 101
 
 #### $suspendEvent(eventPattern)
 
-This is the similar to `$suspend`, but it allows you to provide a event name pattern to those event name that matches.
+This is similar to `$suspend`, but it allows you to provide an event name pattern to those event name that matches.
 
 ```js
 
@@ -232,7 +230,7 @@ $suspendEvent(/\-not-great/) // note the second call will overwrite the first on
 $trigger('some-event-ok')
 $trigger('some-event-not-great')
 
-$release()
+// $release() --> when you can $release, the previous block event will get executed
 
 ```
 
