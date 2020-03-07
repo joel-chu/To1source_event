@@ -1,6 +1,6 @@
 {
   "name": "@to1source/event",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An universal event (emitter) service for Browser / Node",
   "module": "index.js",
   "browser": "dist/to1source-event.umd.js",
@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitee.com:to1source/to1source_event.git"
+    "url": "https://git@gitee.com:to1source/to1source_event.git"
   },
   "keywords": [
     "event",

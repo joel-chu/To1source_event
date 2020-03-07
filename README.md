@@ -1,8 +1,8 @@
 # @to1source/event
 
-> A universal Event Service for Javascript.
+> An universal Event Emitter / Bus for Javascript.
 
-This package was [nb-event-service]() and now we move under [@to1source]() namespace to continue the development.  
+This package was [nb-event-service](https://npmjs.com/package/nb-event-service) and now we move under [@to1source/event](https://www.npmjs.com/package/@to1source/event) namespace to continue the development.  
 
 ## Installation
 
@@ -282,7 +282,7 @@ class MyEventClass extends To1sourceEvent {
   }
 
   // then do more of your alias
-  // example 
+  // example
   suspend() {
     return this.$suspend()
   }
