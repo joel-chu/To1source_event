@@ -3,7 +3,7 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
-import { hashCode2Str } from './utils'
+import { hashCode2Str, isString } from './utils'
 import SuspendClass from './suspend'
 
 export default class StoreService extends SuspendClass {
@@ -33,7 +33,7 @@ export default class StoreService extends SuspendClass {
    */
   validateEvt(...evt) {
     evt.forEach(e => {
-      if (typeof e !== 'string') {
+      if (!isString(e)) {
         this.logger('(validateEvt)', e)
         throw new Error(`Event name must be string type! we got ${typeof e}`)
       }
@@ -62,9 +62,9 @@ export default class StoreService extends SuspendClass {
    * @return {boolean} true on OK
    */
   validateType(type) {
-    const _type = (type+'').toLowerCase()
+    this.validateEvt(type)
     const types = ['on', 'only', 'once', 'onlyOnce']
-    return !!types.filter(t => _type === t).length
+    return !!types.filter(t => type === t).length
   }
 
   /**

@@ -14,6 +14,7 @@ this.watch('suspend', function(value, prop, oldValue) {
   return value; // we need to return the value to store it
 })
 */
+import { getRegex, isRegExp } from './utils'
 
 export default class SuspendClass {
 
@@ -49,11 +50,12 @@ export default class SuspendClass {
    * @return {void}
    */
   $suspendEvent(pattern) {
-    if (pattern && typeof pattern === 'string') {
-      this.__pattern__ = pattern
+    const regex = getRegex(pattern)
+    if (regex !== false) {
+      this.__pattern__ = regex
       this.$suspend()
     }
-    throw new Error(`We expect a pattern variable to be string, but got ${typeof pattern}`)
+    throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof pattern}" instead`)
   }
 
   /**
@@ -65,9 +67,9 @@ export default class SuspendClass {
   $queue(evt, ...args) {
     this.logger('($queue) get called')
     if (this.__suspend_state__ === true) {
-      if (this.__pattern__ !== null) {
+      if (isRegExp(this.__pattern__)) { // it's better then check if its not null
         // check the pattern and decide if we want to suspend it or not
-        let found = evt.indexOf(this.__pattern__) > -1
+        let found = this.__pattern__.test(evt)
         if (!found) {
           return false
         }
