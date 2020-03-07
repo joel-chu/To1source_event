@@ -42,9 +42,9 @@ export function isString(arg) {
  */
 export function getRegex(pattern) {
   switch (true) {
-    case isRegExp(pattern):
+    case isRegExp(pattern) === true:
       return pattern
-    case isString(pattern):
+    case isString(pattern) === true:
       return new RegExp(pattern)
     default:
       return false

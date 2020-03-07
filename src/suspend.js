@@ -55,7 +55,7 @@ export default class SuspendClass {
       this.__pattern__ = regex
       this.$suspend()
     }
-    throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof pattern}" instead`)
+    throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
   }
 
   /**
@@ -120,7 +120,7 @@ export default class SuspendClass {
     let size = this.queueStore.size
     let pattern = this.__pattern__
     this.__pattern__ = null
-    this.logger('(release)', `Release was called with ${size}${pattern ? ' for "' + pattern + '"': ''} item${size > 1 ? 's' : ''}`)
+    this.logger(`(release) was called with ${size}${pattern ? ' for "' + pattern + '"': ''} item${size > 1 ? 's' : ''}`)
     if (size > 0) {
       const queue = Array.from(this.queueStore)
       this.queueStore.clear()
