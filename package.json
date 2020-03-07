@@ -1,10 +1,10 @@
 {
-  "name": "nb-event-service",
-  "version": "1.9.4",
+  "name": "@to1source/event",
+  "version": "1.0.0",
   "description": "An universal event (emitter) service for Browser / Node",
   "module": "index.js",
-  "browser": "dist/nb-event-service.umd.js",
-  "main": "dist/nb-event-service.cjs.js",
+  "browser": "dist/to1source-event.umd.js",
+  "main": "dist/to1source-event.cjs.js",
   "files": [
     "alias.js",
     "index.js",
@@ -35,15 +35,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com:newbranltd/nb-event-service"
+    "url": "git+ssh://git@gitee.com:to1source/to1source_event.git"
   },
   "keywords": [
     "event",
     "javascript",
     "node"
   ],
-  "author": "Joel Chu <joelchu@foxmail.com>",
-  "license": "ISC",
+  "author": "to1source <tosource@foxmail.com>",
+  "license": "UNLICENSED",
   "dependencies": {},
   "ava": {
     "files": [
