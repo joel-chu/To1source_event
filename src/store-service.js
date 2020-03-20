@@ -5,9 +5,9 @@ import {
 } from './store'
 import {
   AVAILABLE_TYPES,
-  ON_MAX_META_NAME
+  MAX_CALL_TYPE
 } from './constants'
-import { hashCode2Str, isString } from './utils'
+
 import SuspendClass from './suspend'
 
 export default class StoreService extends SuspendClass {
@@ -23,59 +23,8 @@ export default class StoreService extends SuspendClass {
     // we need to init the store first otherwise it could be a lot of checking later
     this.normalStore = new Map()
     this.lazyStore = new Map()
-  }
-
-  /**
-   * validate the event name(s)
-   * @param {string[]} evt event name
-   * @return {boolean} true when OK
-   */
-  validateEvt(...evt) {
-    evt.forEach(e => {
-      if (!isString(e)) {
-        this.logger('(validateEvt)', e)
-        throw new Error(`Event name must be string type! we got ${typeof e}`)
-      }
-    })
-    return true
-  }
-
-  /**
-   * Simple quick check on the two main parameters
-   * @param {string} evt event name
-   * @param {function} callback function to call
-   * @return {boolean} true when OK
-   */
-  validate(evt, callback) {
-    if (this.validateEvt(evt)) {
-      if (typeof callback === 'function') {
-        return true
-      }
-    }
-    throw new Error(`callback required to be function type! we got ${typeof callback}`)
-  }
-
-  /**
-   * Check if this type is correct or not added in V1.5.0
-   * @param {string} type for checking
-   * @return {boolean} true on OK
-   */
-  validateType(type) {
-    this.validateEvt(type)
-    
-    return !!AVAILABLE_TYPES.filter(t => type === t).length
-  }
-
-  /**
-   * Run the callback
-   * @param {function} callback function to execute
-   * @param {array} payload for callback
-   * @param {object} ctx context or null
-   * @return {void} the result store in $done
-   */
-  run(callback, payload, ctx) {
-    this.logger('(run) callback:', callback, 'payload:', payload, 'context:', ctx)
-    this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
+    // this is the new throw away map
+    this.maxStore = new Map()
   }
 
   /**
@@ -192,20 +141,6 @@ export default class StoreService extends SuspendClass {
 
     return [store, fnSet.size]
   }
-
-  /**
-   * This is a new store method for the onMax method 
-   * it doesn't check if a method already add to the store 
-   * instead it checks against the max field how many items currently in store
-   * and stop adding once it reaches the max number 
-   */
-  createMaxStore(evtName, max) {
-    const fnSet = this.getStoreSet(this.normalStore, evtName)
-    if (fnSet.size > 0) { // there is already something in the store
-      
-    }
-  }
-
 
   /**
    * @param {array} args for compare
@@ -353,13 +288,5 @@ export default class StoreService extends SuspendClass {
     return NB_EVENT_SERVICE_PRIVATE_LAZY.get(this)
   }
 
-  /**
-   * generate a hashKey to identify the function call
-   * The build-in store some how could store the same values!
-   * @param {function} fn the converted to string function
-   * @return {string} hashKey
-   */
-  hashFnToKey(fn) {
-    return hashCode2Str(fn.toString())
-  }
+
 }

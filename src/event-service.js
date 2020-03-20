@@ -4,7 +4,7 @@ import {
   ONLY_TYPE,
   ONCE_TYPE,
   ONLY_ONCE_TYPE,
-  ON_MAX_TYPE,
+  MAX_CALL_TYPE,
   TAKEN_BY_OTHER_TYPE_ERR 
 } from './constants'
 import { isInt } from './utils'
@@ -193,31 +193,31 @@ export default class EventService extends StoreService {
   }
 
   /**
-   * @1.1.0 limited the amount of callback can add to one event
-   * The problem is $on allow (n) $only allow 1 but what if we just want two -> <n 
-   * callbacks hence this method 
+   * change the way how it suppose to work, instead of create another new store
+   * We perform this check on the trigger end, so we set the number max 
+   * whenever we call the callback, we increment a value in the store 
+   * once it reaches that number we remove that event from the store,
+   * also this will not get add to the lazy store, 
+   * which means the event must register before we can fire it
+   * therefore we don't have to deal with the backward check
    * @param {string} evtName the event to get pre-registered
-   * @param {number} max pass the max amount of callback can add to this event 
+   * @param {number} max pass the max amount of callback can add to this event
+   * @param {array<*>} args the argument pass to the callback 
    * @return {function} the event handler 
    */
-  $onLimited(evtName, max) {
+  $max(evtName, max) {
     $this.validateEvt(evtName)
-    // what we do here now is to create the store data without checking the callback 
-    // with a additional property max 
-    
+    if (isInt(max) && max > 0) {
+      // find this in the normalStore
+      const fnSet = $get(evt, true)
+      if (fnSet !== false) {
 
-    if (isInt(max)) {
-      /**
-       * The actual method to accept the callback
-       * @param {function} callback 
-       * @param {*} context
-       * @param {string} type
-       */
-      return function onLimitedHandler(callback, context = null) {
 
       }
+      this.logger(`The ${evtName} is not registered`)
+      return false
     }
-    throw new Error(`Expect "max" to be an integer! Instead we got ${typeof max}`)
+    throw new Error(`Expect max to be an integer and greater than zero! But we got [${typeof max}]${max} instead`)
   }
 
   /**
@@ -267,13 +267,13 @@ export default class EventService extends StoreService {
       let hasOnce = false
       // let hasOnly = false
       for (let i=0; i < ctn; ++i) {
-        ++found;
+        ++found
         // this.logger('found', found)
         let [ _, callback, ctx, type ] = nSet[i]
         this.logger(`($trigger) call run for ${evt}`)
         this.run(callback, payload, context || ctx)
         if (type === 'once' || type === 'onlyOnce') {
-          hasOnce = true;
+          hasOnce = true
         }
       }
       if (hasOnce) {
