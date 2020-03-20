@@ -4,7 +4,8 @@ import {
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
 import {
-  AVAILABLE_TYPES
+  AVAILABLE_TYPES,
+  ON_MAX_META_NAME
 } from './constants'
 import { hashCode2Str, isString } from './utils'
 import SuspendClass from './suspend'
@@ -142,13 +143,12 @@ export default class StoreService extends SuspendClass {
   }
 
   /**
-   * The add to store step is similar so make it generic for resuse
-   * @param {object} store which store to use
+   * Take out from addToStore for reuse 
+   * @param {object} store the store to use 
    * @param {string} evt event name
-   * @param {spread} args because the lazy store and normal store store different things
-   * @return {array} store and the size of the store
+   * @return {object} the set within the store 
    */
-  addToStore(store, evt, ...args) {
+  getStoreSet(store, evt) {
     let fnSet
     if (store.has(evt)) {
       this.logger(`(addToStore) "${evt}" existed`)
@@ -158,6 +158,18 @@ export default class StoreService extends SuspendClass {
       // this is new
       fnSet = new Set()
     }
+    return fnSet
+  }
+
+  /**
+   * The add to store step is similar so make it generic for resuse
+   * @param {object} store which store to use
+   * @param {string} evt event name
+   * @param {spread} args because the lazy store and normal store store different things
+   * @return {array} store and the size of the store
+   */
+  addToStore(store, evt, ...args) {
+    const fnSet = this.getStoreSet(store, evt)
     // lazy only store 2 items - this is not the case in V1.6.0 anymore
     // we need to check the first parameter is string or not
     if (args.length > 2) {
@@ -177,8 +189,23 @@ export default class StoreService extends SuspendClass {
       fnSet.add(args)
     }
     store.set(evt, fnSet)
+
     return [store, fnSet.size]
   }
+
+  /**
+   * This is a new store method for the onMax method 
+   * it doesn't check if a method already add to the store 
+   * instead it checks against the max field how many items currently in store
+   * and stop adding once it reaches the max number 
+   */
+  createMaxStore(evtName, max) {
+    const fnSet = this.getStoreSet(this.normalStore, evtName)
+    if (fnSet.size > 0) { // there is already something in the store
+      
+    }
+  }
+
 
   /**
    * @param {array} args for compare
