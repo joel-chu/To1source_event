@@ -5,6 +5,7 @@ import {
   ONCE_TYPE,
   ONLY_ONCE_TYPE,
   MAX_CALL_TYPE,
+  ON_MAX_TYPES,
   TAKEN_BY_OTHER_TYPE_ERR 
 } from './constants'
 import { isInt } from './utils'
@@ -226,6 +227,18 @@ export default class EventService extends StoreService {
   }
 
   /**
+   * Use this instead of $call or $trigger to exeucte the callback
+   * @param {*} evtName 
+   * @param {*} context 
+   */
+  $callmax(evtName, context = null) {
+    const ctx = this 
+    return function execute(...args) {
+      return ctx.$trigger(evtName, args, context, MAX_CALL_TYPE)
+    }
+  }
+
+  /**
    * trigger the event
    * @param {string} evt name NOT allow array anymore!
    * @param {mixed} [payload = []] pass to fn
@@ -254,10 +267,17 @@ export default class EventService extends StoreService {
       for (let i=0; i < ctn; ++i) {
         ++found
         // this.logger('found', found)
-        let [ _, callback, ctx, type ] = nSet[i]
-        this.logger(`($trigger) call run for ${evt}`)
+        let [ _, callback, ctx, _type ] = nSet[i]
+        this.logger(`($trigger) call run for ${type}:${evt}`)
+        // this is when its already registered
+        if (type === ON_MAX_TYPE) {
+
+        }
+
+
         this.run(callback, payload, context || ctx)
-        if (type === 'once' || type === 'onlyOnce') {
+
+        if (_type === 'once' || _type === 'onlyOnce') {
           hasOnce = true
         }
       }

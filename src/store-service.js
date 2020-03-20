@@ -76,6 +76,7 @@ export default class StoreService extends SuspendClass {
       
         return content
       }
+      
       return false
     }
     throw new Error(`"${storeName}" is not supported!`)

@@ -4,9 +4,7 @@ import { AVAILABLE_TYPES } from './constants'
 
 export default class BaseClass {
 
-  constructor() {
-
-  }
+  constructor() {}
 
   /**
    * logger function for overwrite
@@ -36,6 +34,7 @@ export default class BaseClass {
         throw new Error(`Event name must be string type! we got ${typeof e}`)
       }
     })
+
     return true
   }
 
@@ -48,6 +47,7 @@ export default class BaseClass {
   validate(evt, callback) {
     if (this.validateEvt(evt)) {
       if (typeof callback === 'function') {
+
         return true
       }
     }
@@ -74,8 +74,8 @@ export default class BaseClass {
    */
   run(callback, payload, ctx) {
     this.logger('(run) callback:', callback, 'payload:', payload, 'context:', ctx)
-
     this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
+
     return this.$done // return it here first 
   }
 
@@ -86,6 +86,7 @@ export default class BaseClass {
    * @return {string} hashKey
    */
   hashFnToKey(fn) {
+
     return hashCode2Str(fn.toString())
   }
 } 
