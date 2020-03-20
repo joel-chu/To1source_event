@@ -4,7 +4,6 @@ import {
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
 import {
-  AVAILABLE_TYPES,
   MAX_CALL_TYPE
 } from './constants'
 

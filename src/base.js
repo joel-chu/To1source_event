@@ -1,5 +1,6 @@
 // setup a base class to put all the don't know where to put methods 
 import { hashCode2Str, isString } from './utils'
+import { AVAILABLE_TYPES } from './constants'
 
 export default class BaseClass {
 
@@ -16,6 +17,7 @@ export default class BaseClass {
     evt.forEach(e => {
       if (!isString(e)) {
         this.logger('(validateEvt)', e)
+
         throw new Error(`Event name must be string type! we got ${typeof e}`)
       }
     })
@@ -57,9 +59,10 @@ export default class BaseClass {
    */
   run(callback, payload, ctx) {
     this.logger('(run) callback:', callback, 'payload:', payload, 'context:', ctx)
-    this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
-  }
 
+    this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
+    return this.$done // return it here first 
+  }
 
   /**
    * generate a hashKey to identify the function call
