@@ -8,7 +8,22 @@ export default class BaseClass {
 
   }
 
-    /**
+  /**
+   * logger function for overwrite
+   */
+  logger() {}
+
+  // for id if the instance is this class
+  get $name() {
+    return 'to1source-event'
+  }
+
+  // take this down in the next release
+  get is() {
+    return this.$name
+  }
+
+  /**
    * validate the event name(s)
    * @param {string[]} evt event name
    * @return {boolean} true when OK

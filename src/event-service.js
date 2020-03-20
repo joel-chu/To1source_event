@@ -18,21 +18,6 @@ export default class EventService extends StoreService {
     super(config)
   }
 
-  /**
-   * logger function for overwrite
-   */
-  logger() {}
-
-  // for id if the instance is this class
-  get $name() {
-    return 'to1source-event'
-  }
-
-  // take this down in the next release
-  get is() {
-    return this.$name
-  }
-
   //////////////////////////
   //    PUBLIC METHODS    //
   //////////////////////////

@@ -15,6 +15,7 @@ this.watch('suspend', function(value, prop, oldValue) {
 })
 */
 import { getRegex, isRegExp } from './utils'
+
 import BaseClass from './base'
 
 export default class SuspendClass extends BaseClass {
@@ -27,7 +28,7 @@ export default class SuspendClass extends BaseClass {
     // to do this proper we don't use a new prop to hold the event name pattern
     this.__pattern__ = null
 
-    
+
     this.queueStore = new Set()
   }
 

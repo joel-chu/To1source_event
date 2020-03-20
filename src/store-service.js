@@ -3,9 +3,6 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
-import {
-  MAX_CALL_TYPE
-} from './constants'
 import { isInt } from './utils'
 
 import SuspendClass from './suspend'
@@ -24,7 +21,7 @@ export default class StoreService extends SuspendClass {
     this.normalStore = new Map()
     this.lazyStore = new Map()
     // this is the new throw away map
-    this.maxStore = new Map()
+    this.maxCountStore = new Map()
   }
 
   /**
@@ -34,7 +31,7 @@ export default class StoreService extends SuspendClass {
    * @return {number} when return -1 means removed 
    */
   checkMaxStore(evtName, max = null) {
-    const tmp = this.maxStore 
+    const tmp = this.maxCountStore 
     // first check if this exist in the maxStore 
     if (tmp.has(evtName)) {
       let value = tmp.get(evtName)
