@@ -32,7 +32,7 @@
     "test:watch": "DEBUG=nb-event-service* ava ./tests/watch.test.js",
     "test:array": "DEBUG=nb-event-service* ava ./tests/array-result.test.js",
     "test:suspend": "DEBUG=nb-event-service* ava ./tests/suspend.test.js",
-    "test:max": "DEBUG=nb-event-service* ava ./tests/max.test.js"
+    "test:max": "DEBUG=to1source-event* ava ./tests/on-max.test.js"
   },
   "repository": {
     "type": "git",
