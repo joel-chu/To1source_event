@@ -1,5 +1,13 @@
 // The top level
-import { TAKEN_BY_OTHER_TYPE_ERR } from './constants'
+import { 
+  ON_TYPE,
+  ONLY_TYPE,
+  ONCE_TYPE,
+  ONLY_ONCE_TYPE,
+  ON_MAX_TYPE,
+  TAKEN_BY_OTHER_TYPE_ERR 
+} from './constants'
+import { isInt } from './utils'
 import StoreService from './store-service'
 // export
 export default class EventService extends StoreService {
@@ -78,14 +86,14 @@ export default class EventService extends StoreService {
    */
   $once(evt , callback , context = null) {
     this.validate(evt, callback)
-    const type = 'once'
+    
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
-    let nStore = this.normalStore;
+    // let nStore = this.normalStore
     if (lazyStoreContent === false) {
       this.logger(`($once) "${evt}" is not in the lazy store`)
       // v1.3.0 $once now allow to add multiple listeners
-      return this.addToNormalStore(evt, type, callback, context)
+      return this.addToNormalStore(evt, ONCE_TYPE, callback, context)
     } else {
       // now this is the tricky bit
       // there is a potential bug here that cause by the developer
@@ -96,7 +104,7 @@ export default class EventService extends StoreService {
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
       const [ payload, ctx, t ] = list[0]
-      if (t && t !== type) {
+      if (t && t !== ONCE_TYPE) {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger('($once)', `call run "${evt}"`)
@@ -115,15 +123,18 @@ export default class EventService extends StoreService {
    */
   $only(evt, callback, context = null) {
     this.validate(evt, callback)
-    const type = 'only'
+    
     let added = false
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     let nStore = this.normalStore
+
     if (!nStore.has(evt)) {
       this.logger(`($only) "${evt}" add to normalStore`)
-      added = this.addToNormalStore(evt, type, callback, context)
+      
+      added = this.addToNormalStore(evt, ONLY_TYPE, callback, context)
     }
+    
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger(`($only) "${evt}" found data in lazy store to execute`)
@@ -131,13 +142,14 @@ export default class EventService extends StoreService {
       // $only allow to trigger this multiple time on the single handler
       list.forEach( li => {
         const [ payload, ctx, t ] = li
-        if (t && t !== type) {
+        if (t && t !== ONLY_TYPE) {
           throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
         }
         this.logger(`($only) call run "${evt}"`)
         this.run(callback, payload, context || ctx)
       })
     }
+    
     return added
   }
 
@@ -151,30 +163,61 @@ export default class EventService extends StoreService {
    */
   $onlyOnce(evt, callback, context = null) {
     this.validate(evt, callback)
-    const type = 'onlyOnce'
+    
     let added = false
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
-    let nStore = this.normalStore;
+    let nStore = this.normalStore
     if (!nStore.has(evt)) {
       this.logger(`($onlyOnce) "${evt}" add to normalStore`)
-      added = this.addToNormalStore(evt, type, callback, context)
+
+      added = this.addToNormalStore(evt, ONLY_ONCE_TYPE, callback, context)
     }
+
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger('($onlyOnce)', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
       const [ payload, ctx, t ] = list[0]
-      if (t && t !== 'onlyOnce') {
+      if (t && t !== ONLY_ONCE_TYPE) {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger(`($onlyOnce) call run "${evt}"`)
+
       this.run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
     }
     return added
+  }
+
+  /**
+   * @1.1.0 limited the amount of callback can add to one event
+   * The problem is $on allow (n) $only allow 1 but what if we just want two -> <n 
+   * callbacks hence this method 
+   * @param {string} evtName the event to get pre-registered
+   * @param {number} max pass the max amount of callback can add to this event 
+   * @return {function} the event handler 
+   */
+  $onLimited(evtName, max) {
+    $this.validateEvt(evtName)
+    // what we do here now is to create the store data without checking the callback 
+    // with a additional property max 
+    
+
+    if (isInt(max)) {
+      /**
+       * The actual method to accept the callback
+       * @param {function} callback 
+       * @param {*} context
+       * @param {string} type
+       */
+      return function onLimitedHandler(callback, context = null) {
+
+      }
+    }
+    throw new Error(`Expect "max" to be an integer! Instead we got ${typeof max}`)
   }
 
   /**
@@ -185,11 +228,13 @@ export default class EventService extends StoreService {
    * @param {string} [type=on] what type of method to replace
    * @return {*}
    */
-  $replace(evt, callback, context = null, type = 'on') {
+  $replace(evt, callback, context = null, type = ON_TYPE) {
     if (this.validateType(type)) {
       this.$off(evt)
       let method = this['$' + type]
+      
       this.logger(`($replace)`, evt, callback)
+
       return Reflect.apply(method, this, [evt, callback, context])
     }
     throw new Error(`${type} is not supported!`)
@@ -220,7 +265,7 @@ export default class EventService extends StoreService {
       let nSet = Array.from(nStore.get(evt))
       let ctn = nSet.length
       let hasOnce = false
-      let hasOnly = false
+      // let hasOnly = false
       for (let i=0; i < ctn; ++i) {
         ++found;
         // this.logger('found', found)
@@ -255,6 +300,7 @@ export default class EventService extends StoreService {
 
     return (...args) => {
       let _args = [evt, args, context, type]
+
       return Reflect.apply(ctx.$trigger, ctx, _args)
     }
   }

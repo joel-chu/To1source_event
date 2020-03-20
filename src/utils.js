@@ -36,6 +36,18 @@ export function isString(arg) {
 }
 
 /**
+ * check if it's an integer 
+ * @param {*} num input number 
+ * @return {boolean}  
+ */
+export function isInt(num) {
+  if (isString(num)) {
+    throw new Error(`Wrong type, we want number!`)
+  }
+  return !isNaN(parseInt(num))
+}
+
+/**
  * Find from the array by matching the pattern
  * @param {*} pattern a string or RegExp object
  * @return {object} regex object or false when we can not id the input

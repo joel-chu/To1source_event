@@ -3,6 +3,9 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
+import {
+  AVAILABLE_TYPES
+} from './constants'
 import { hashCode2Str, isString } from './utils'
 import SuspendClass from './suspend'
 
@@ -58,8 +61,8 @@ export default class StoreService extends SuspendClass {
    */
   validateType(type) {
     this.validateEvt(type)
-    const types = ['on', 'only', 'once', 'onlyOnce']
-    return !!types.filter(t => type === t).length
+    
+    return !!AVAILABLE_TYPES.filter(t => type === t).length
   }
 
   /**
@@ -84,10 +87,12 @@ export default class StoreService extends SuspendClass {
     let store = this[storeName] // it could be empty at this point
     if (store) {
       this.logger('(takeFromStore)', storeName, store)
+
       if (store.has(evt)) {
         let content = store.get(evt)
         this.logger(`(takeFromStore) has "${evt}"`, content)
         store.delete(evt)
+      
         return content
       }
       return false
@@ -111,7 +116,8 @@ export default class StoreService extends SuspendClass {
           if (full) {
             return l
           }
-          let [key, callback, ] = l
+          let [, callback,] = l
+
           return callback
         })
     }
@@ -127,8 +133,10 @@ export default class StoreService extends SuspendClass {
   removeFromStore(evt, store) {
     if (store.has(evt)) {
       this.logger('($off)', evt)
+
       store.delete(evt)
-    return true
+    
+      return true
     }
     return false
   }
@@ -212,8 +220,11 @@ export default class StoreService extends SuspendClass {
   checkTypeInLazyStore(evtName, type) {
     this.validateEvt(evtName, type)
     let store = this.lazyStore.get(evtName)
+    
     this.logger('(checkTypeInLazyStore)', store)
+
     if (store) {
+    
       return !!Array
         .from(store)
         .filter(li => {
@@ -221,6 +232,7 @@ export default class StoreService extends SuspendClass {
           return t !== type
         }).length
     }
+
     return false
   }
 
@@ -237,13 +249,17 @@ export default class StoreService extends SuspendClass {
     this.logger(`(addToNormalStore) try to add "${type}" --> "${evt}" to normal store`)
     // @TODO we need to check the existing store for the type first!
     if (this.checkTypeInStore(evt, type)) {
+
       this.logger('(addToNormalStore)', `"${type}" --> "${evt}" can add to normal store`)
+      
       let key = this.hashFnToKey(callback)
       let args = [this.normalStore, evt, key, callback, context, type]
       let [_store, size] = Reflect.apply(this.addToStore, this, args)
       this.normalStore = _store
+      
       return size
     }
+
     return false
   }
 
@@ -267,6 +283,7 @@ export default class StoreService extends SuspendClass {
     let [_store, size] = Reflect.apply(this.addToStore, this, args)
     this.lazyStore = _store
     this.logger(`(addToLazyStore) size: ${size}`)
+    
     return size
   }
 
