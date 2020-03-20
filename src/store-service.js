@@ -6,6 +6,7 @@ import {
 import {
   MAX_CALL_TYPE
 } from './constants'
+import { isInt } from './utils'
 
 import SuspendClass from './suspend'
 
@@ -25,6 +26,40 @@ export default class StoreService extends SuspendClass {
     // this is the new throw away map
     this.maxStore = new Map()
   }
+
+  /**
+   * This is one stop shop to check and munipulate the maxStore 
+   * @param {*} evtName 
+   * @param {*} [max=null]  
+   * @return {number} when return -1 means removed 
+   */
+  checkMaxStore(evtName, max = null) {
+    const tmp = this.maxStore 
+    // first check if this exist in the maxStore 
+    if (tmp.has(evtName)) {
+      let value = tmp.get(evtName)
+      if (value > 0) {
+        --value 
+      }
+      if (value > 0) {
+        tmp.set(evtName, value) // just update the value
+      } else {
+        tmp.delete(evtName) // just remove it
+        
+        return -1
+      }
+      
+      return value
+    }
+    if (isInt(max)) {
+      // because this is the setup phrase we just return the max value 
+      tmp.set(evtName, max)
+      
+      return max
+    }
+    throw new Error(`Expect max to be an integer, but we got ${typeof max}`)
+  }
+
 
   /**
    * Take the content out and remove it from store id by the name
