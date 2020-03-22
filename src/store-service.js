@@ -3,8 +3,11 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
-import { NEG_RETURN } from './constants'
-import { isInt } from './utils'
+import {
+  NEG_RETURN,
+  ON_MAX_TYPES
+} from './constants'
+import { isInt, inArray } from './utils'
 
 import SuspendClass from './suspend'
 
@@ -32,11 +35,7 @@ export default class StoreService extends SuspendClass {
    * @return {number} the count of this store
    */
   getMaxStore(evtName) {
-    const store = this.maxCountStore
-    if (store.has(evtName)) {
-      return store.get(evtName)
-    }
-    return NEG_RETURN
+    return this.maxCountStore.get(evtName) || NEG_RETURN
   }
 
   /**
@@ -46,30 +45,36 @@ export default class StoreService extends SuspendClass {
    * @return {number} when return -1 means removed
    */
   checkMaxStore(evtName, max = null) {
-    const tmp = this.maxCountStore
-    // first check if this exist in the maxStore
-    let value = this.getMaxStore()
-    if (value !== NEG_RETURN) {
-      if (value > 0) {
-        --value
-      }
-      if (value > 0) {
-        tmp.set(evtName, value) // just update the value
-      } else {
-        tmp.delete(evtName) // just remove it
-
-        return NEG_RETURN
-      }
-
-      return value
-    }
-    if (isInt(max)) {
+    this.logger(`===========================================`)
+    this.logger('checkMaxStore start', evtName, max)
+    // init the store
+    if (max !== null && isInt(max)) {
       // because this is the setup phrase we just return the max value
-      tmp.set(evtName, max)
-
+      this.maxCountStore.set(evtName, max)
+      this.logger(`Setup max store for ${evtName} with ${max}`)
       return max
     }
-    throw new Error(`Expect max to be an integer, but we got ${typeof max}`)
+    if (max === null) {
+      // first check if this exist in the maxStore
+      let value = this.getMaxStore(evtName)
+
+      this.logger('getMaxStore value', value)
+
+      if (value !== NEG_RETURN) {
+        if (value > 0) {
+          --value
+        }
+        if (value > 0) {
+          this.maxCountStore.set(evtName, value) // just update the value
+        } else {
+          this.maxCountStore.delete(evtName) // just remove it
+          this.logger(`remove ${evtName} from maxStore`)
+          return NEG_RETURN
+        }
+      }
+      return value
+    }
+    throw new Error(`Expect max to be an integer, but we got ${typeof max} ${max}`)
   }
 
   /**
@@ -81,6 +86,7 @@ export default class StoreService extends SuspendClass {
     const evts = this.$get(evtName, true) // return in full
     const search = evts.filter(result => {
       const [ ,,,type ] = result
+
       return inArray(ON_MAX_TYPES, type)
     })
 

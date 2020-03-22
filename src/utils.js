@@ -69,5 +69,4 @@ export function getRegex(pattern) {
  * @param {array} arr to search
  * @param {*} prop to search
  */
- export function inArray(arr, prop) => !!arr.filter(v => prop === v).length
- 
+ export const inArray = (arr, prop) => !!arr.filter(v => prop === v).length

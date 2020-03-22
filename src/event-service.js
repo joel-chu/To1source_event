@@ -189,16 +189,16 @@ export default class EventService extends StoreService {
    * therefore we don't have to deal with the backward check
    * @param {string} evtName the event to get pre-registered
    * @param {number} max pass the max amount of callback can add to this event
-   * @param {*} ctx the context the callback execute in
+   * @param {*} [ctx=null] the context the callback execute in
    * @return {function} the event handler
    */
-  $max(evtName, max, ctx) {
-    $this.validateEvt(evtName)
+  $max(evtName, max, ctx = null) {
+    this.validateEvt(evtName)
     if (isInt(max) && max > 0) {
       // find this in the normalStore
-      const fnSet = $get(evtName, true)
+      const fnSet = this.$get(evtName, true)
       if (fnSet !== false) {
-        const evts = searchMapEvt(evtName)
+        const evts = this.searchMapEvt(evtName)
         if (evts.length) {
           // should only have one anyway
           const [,,,type] = evts[0]
@@ -207,10 +207,12 @@ export default class EventService extends StoreService {
           const _self = this
           // construct the callback
           return function executeMaxCall(...args) {
-            const ctn = getMaxStore(evtName)
+            const ctn = _self.getMaxStore(evtName)
             let value = NEG_RETURN
             if (ctn > 0) {
-              _self.$call(evtName, type, ctx)
+              const fn = _self.$call(evtName, type, ctx)
+              Reflect.apply(fn, _self, args)
+              
               value = _self.checkMaxStore(evtName)
               if (value === NEG_RETURN) {
                 _self.$off(evtName)
