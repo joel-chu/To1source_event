@@ -36,8 +36,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git@gitee.com:to1source/to1source_event.git"
+    "url": "git+ssh://git@gitee.com:to1source/to1source_event.git"
   },
+  "homepage": "https://gitee.com:to1source/to1source_event",
   "keywords": [
     "event",
     "javascript",
