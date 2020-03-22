@@ -26,3 +26,26 @@ test(`Test the max count store`, t => {
   t.is(max4, -1, 'Should be deleted by now')
 
 })
+
+
+test(`Test a pre-registered method with maxCall`, t => {
+  // just do a dev here first
+  const evtCls = t.context.evtCls
+  const evtName = 'max-call-2'
+
+  const checkResult = evtCls.$get(evtName, true)
+
+  t.false(checkResult)
+
+  // now register a $only event
+  const add = evtCls.$only(evtName, (value) => {
+    ++value
+    debug(evtName, value)
+    return value
+  })
+
+  const checkResult1 = evtCls.$get(evtName, true)
+
+  logger('checkResult1', checkResult1)
+
+})

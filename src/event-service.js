@@ -6,9 +6,10 @@ import {
   ONLY_ONCE_TYPE,
   MAX_CALL_TYPE,
   ON_MAX_TYPES,
-  TAKEN_BY_OTHER_TYPE_ERR
+  TAKEN_BY_OTHER_TYPE_ERR,
+  NEG_RETURN
 } from './constants'
-import { isInt } from './utils'
+import { isInt, inArray } from './utils'
 import StoreService from './store-service'
 // export
 export default class EventService extends StoreService {
@@ -188,20 +189,39 @@ export default class EventService extends StoreService {
    * therefore we don't have to deal with the backward check
    * @param {string} evtName the event to get pre-registered
    * @param {number} max pass the max amount of callback can add to this event
-   * @param {array<*>} args the argument pass to the callback
+   * @param {*} ctx the context the callback execute in
    * @return {function} the event handler
    */
-  $max(evtName, max) {
+  $max(evtName, max, ctx) {
     $this.validateEvt(evtName)
     if (isInt(max) && max > 0) {
       // find this in the normalStore
       const fnSet = $get(evtName, true)
       if (fnSet !== false) {
-        
-
+        const evts = searchMapEvt(evtName)
+        if (evts.length) {
+          // should only have one anyway
+          const [,,,type] = evts[0]
+          // now init the max store
+          const value = this.checkMaxStore(evtName, max)
+          const _self = this
+          // construct the callback
+          return function executeMaxCall(...args) {
+            const ctn = getMaxStore(evtName)
+            let value = NEG_RETURN
+            if (ctn > 0) {
+              _self.$call(evtName, type, ctx)
+              value = _self.checkMaxStore(evtName)
+              if (value === NEG_RETURN) {
+                _self.$off(evtName)
+                return NEG_RETURN
+              }
+            }
+            return value
+          }
+        }
       }
-      this.logger(`The ${evtName} is not registered`)
-      return false
+      throw new Error(`The ${evtName} is not registered, can not execute non-existing event at the moment`)
     }
     throw new Error(`Expect max to be an integer and greater than zero! But we got [${typeof max}]${max} instead`)
   }
@@ -224,18 +244,6 @@ export default class EventService extends StoreService {
       return Reflect.apply(method, this, [evt, callback, context])
     }
     throw new Error(`${type} is not supported!`)
-  }
-
-  /**
-   * Use this instead of $call or $trigger to exeucte the callback
-   * @param {*} evtName
-   * @param {*} context
-   */
-  $callmax(evtName, context = null) {
-    const ctx = this
-    return function execute(...args) {
-      return ctx.$trigger(evtName, args, context, MAX_CALL_TYPE)
-    }
   }
 
   /**
@@ -269,11 +277,6 @@ export default class EventService extends StoreService {
         // this.logger('found', found)
         let [ _, callback, ctx, _type ] = nSet[i]
         this.logger(`($trigger) call run for ${type}:${evt}`)
-        // this is when its already registered
-        if (type === ON_MAX_TYPE) {
-
-        }
-
 
         this.run(callback, payload, context || ctx)
 
@@ -303,7 +306,7 @@ export default class EventService extends StoreService {
   $call(evt, type = false, context = null) {
     const ctx = this
 
-    return (...args) => {
+    return function executeCall(...args) {
       let _args = [evt, args, context, type]
 
       return Reflect.apply(ctx.$trigger, ctx, _args)

@@ -36,9 +36,9 @@ export function isString(arg) {
 }
 
 /**
- * check if it's an integer 
- * @param {*} num input number 
- * @return {boolean}  
+ * check if it's an integer
+ * @param {*} num input number
+ * @return {boolean}
  */
 export function isInt(num) {
   if (isString(num)) {
@@ -62,3 +62,12 @@ export function getRegex(pattern) {
       return false
   }
 }
+
+
+/**
+ * in array
+ * @param {array} arr to search
+ * @param {*} prop to search
+ */
+ export function inArray(arr, prop) => !!arr.filter(v => prop === v).length
+ 

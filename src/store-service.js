@@ -3,6 +3,7 @@ import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
 } from './store'
+import { NEG_RETURN } from './constants'
 import { isInt } from './utils'
 
 import SuspendClass from './suspend'
@@ -25,38 +26,66 @@ export default class StoreService extends SuspendClass {
   }
 
   /**
-   * This is one stop shop to check and munipulate the maxStore 
-   * @param {*} evtName 
-   * @param {*} [max=null]  
-   * @return {number} when return -1 means removed 
+   * We need this to pre-check the store, otherwise
+   * the execution will be unable to determine the number of calls
+   * @param {string} evtName event name
+   * @return {number} the count of this store
+   */
+  getMaxStore(evtName) {
+    const store = this.maxCountStore
+    if (store.has(evtName)) {
+      return store.get(evtName)
+    }
+    return NEG_RETURN
+  }
+
+  /**
+   * This is one stop shop to check and munipulate the maxStore
+   * @param {*} evtName
+   * @param {*} [max=null]
+   * @return {number} when return -1 means removed
    */
   checkMaxStore(evtName, max = null) {
-    const tmp = this.maxCountStore 
-    // first check if this exist in the maxStore 
-    if (tmp.has(evtName)) {
-      let value = tmp.get(evtName)
+    const tmp = this.maxCountStore
+    // first check if this exist in the maxStore
+    let value = this.getMaxStore()
+    if (value !== NEG_RETURN) {
       if (value > 0) {
-        --value 
+        --value
       }
       if (value > 0) {
         tmp.set(evtName, value) // just update the value
       } else {
         tmp.delete(evtName) // just remove it
-        
-        return -1
+
+        return NEG_RETURN
       }
-      
+
       return value
     }
     if (isInt(max)) {
-      // because this is the setup phrase we just return the max value 
+      // because this is the setup phrase we just return the max value
       tmp.set(evtName, max)
-      
+
       return max
     }
     throw new Error(`Expect max to be an integer, but we got ${typeof max}`)
   }
 
+  /**
+   * Wrap several get filter ops together to return the callback we are looking for
+   * @param {string} evtName to search for
+   * @return {array} empty array when not found
+   */
+  searchMapEvt(evtName) {
+    const evts = this.$get(evtName, true) // return in full
+    const search = evts.filter(result => {
+      const [ ,,,type ] = result
+      return inArray(ON_MAX_TYPES, type)
+    })
+
+    return search.length ? search : []
+  }
 
   /**
    * Take the content out and remove it from store id by the name
@@ -73,10 +102,10 @@ export default class StoreService extends SuspendClass {
         let content = store.get(evt)
         this.logger(`(takeFromStore) has "${evt}"`, content)
         store.delete(evt)
-      
+
         return content
       }
-      
+
       return false
     }
     throw new Error(`"${storeName}" is not supported!`)
@@ -117,17 +146,17 @@ export default class StoreService extends SuspendClass {
       this.logger('($off)', evt)
 
       store.delete(evt)
-    
+
       return true
     }
     return false
   }
 
   /**
-   * Take out from addToStore for reuse 
-   * @param {object} store the store to use 
+   * Take out from addToStore for reuse
+   * @param {object} store the store to use
    * @param {string} evt event name
-   * @return {object} the set within the store 
+   * @return {object} the set within the store
    */
   getStoreSet(store, evt) {
     let fnSet
@@ -214,11 +243,11 @@ export default class StoreService extends SuspendClass {
   checkTypeInLazyStore(evtName, type) {
     this.validateEvt(evtName, type)
     let store = this.lazyStore.get(evtName)
-    
+
     this.logger('(checkTypeInLazyStore)', store)
 
     if (store) {
-    
+
       return !!Array
         .from(store)
         .filter(li => {
@@ -245,12 +274,12 @@ export default class StoreService extends SuspendClass {
     if (this.checkTypeInStore(evt, type)) {
 
       this.logger('(addToNormalStore)', `"${type}" --> "${evt}" can add to normal store`)
-      
+
       let key = this.hashFnToKey(callback)
       let args = [this.normalStore, evt, key, callback, context, type]
       let [_store, size] = Reflect.apply(this.addToStore, this, args)
       this.normalStore = _store
-      
+
       return size
     }
 
@@ -277,7 +306,7 @@ export default class StoreService extends SuspendClass {
     let [_store, size] = Reflect.apply(this.addToStore, this, args)
     this.lazyStore = _store
     this.logger(`(addToLazyStore) size: ${size}`)
-    
+
     return size
   }
 
