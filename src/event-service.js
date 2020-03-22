@@ -1,12 +1,12 @@
 // The top level
-import { 
+import {
   ON_TYPE,
   ONLY_TYPE,
   ONCE_TYPE,
   ONLY_ONCE_TYPE,
   MAX_CALL_TYPE,
   ON_MAX_TYPES,
-  TAKEN_BY_OTHER_TYPE_ERR 
+  TAKEN_BY_OTHER_TYPE_ERR
 } from './constants'
 import { isInt } from './utils'
 import StoreService from './store-service'
@@ -72,7 +72,7 @@ export default class EventService extends StoreService {
    */
   $once(evt , callback , context = null) {
     this.validate(evt, callback)
-    
+
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     // let nStore = this.normalStore
@@ -109,7 +109,7 @@ export default class EventService extends StoreService {
    */
   $only(evt, callback, context = null) {
     this.validate(evt, callback)
-    
+
     let added = false
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
@@ -117,10 +117,10 @@ export default class EventService extends StoreService {
 
     if (!nStore.has(evt)) {
       this.logger(`($only) "${evt}" add to normalStore`)
-      
+
       added = this.addToNormalStore(evt, ONLY_TYPE, callback, context)
     }
-    
+
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger(`($only) "${evt}" found data in lazy store to execute`)
@@ -135,7 +135,7 @@ export default class EventService extends StoreService {
         this.run(callback, payload, context || ctx)
       })
     }
-    
+
     return added
   }
 
@@ -149,7 +149,7 @@ export default class EventService extends StoreService {
    */
   $onlyOnce(evt, callback, context = null) {
     this.validate(evt, callback)
-    
+
     let added = false
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
@@ -180,24 +180,24 @@ export default class EventService extends StoreService {
 
   /**
    * change the way how it suppose to work, instead of create another new store
-   * We perform this check on the trigger end, so we set the number max 
-   * whenever we call the callback, we increment a value in the store 
+   * We perform this check on the trigger end, so we set the number max
+   * whenever we call the callback, we increment a value in the store
    * once it reaches that number we remove that event from the store,
-   * also this will not get add to the lazy store, 
+   * also this will not get add to the lazy store,
    * which means the event must register before we can fire it
    * therefore we don't have to deal with the backward check
    * @param {string} evtName the event to get pre-registered
    * @param {number} max pass the max amount of callback can add to this event
-   * @param {array<*>} args the argument pass to the callback 
-   * @return {function} the event handler 
+   * @param {array<*>} args the argument pass to the callback
+   * @return {function} the event handler
    */
   $max(evtName, max) {
     $this.validateEvt(evtName)
     if (isInt(max) && max > 0) {
       // find this in the normalStore
-      const fnSet = $get(evt, true)
+      const fnSet = $get(evtName, true)
       if (fnSet !== false) {
-
+        
 
       }
       this.logger(`The ${evtName} is not registered`)
@@ -218,7 +218,7 @@ export default class EventService extends StoreService {
     if (this.validateType(type)) {
       this.$off(evt)
       let method = this['$' + type]
-      
+
       this.logger(`($replace)`, evt, callback)
 
       return Reflect.apply(method, this, [evt, callback, context])
@@ -228,11 +228,11 @@ export default class EventService extends StoreService {
 
   /**
    * Use this instead of $call or $trigger to exeucte the callback
-   * @param {*} evtName 
-   * @param {*} context 
+   * @param {*} evtName
+   * @param {*} context
    */
   $callmax(evtName, context = null) {
-    const ctx = this 
+    const ctx = this
     return function execute(...args) {
       return ctx.$trigger(evtName, args, context, MAX_CALL_TYPE)
     }
