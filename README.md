@@ -90,8 +90,9 @@ ee.$once('someEvent', function() {
 })
 ```
 
-In v1.3.0 we change the behavior of `$once`, now you can register more than one handler.
-But if you look at the above example, you register it with `$on` then `$once`.
+You can register more than one handler.
+
+Take a look at the above example, you register it with `$on` then `$once`.
 
 What happen is, the `$once` call execute by the `$trigger` from the earlier call, then it will
 remove this event from the event handler store. Therefore, your `$on` will never fire again.
@@ -99,8 +100,6 @@ remove this event from the event handler store. Therefore, your `$on` will never
 So you have to make sure which event you **REALLY** want to register with what.
 
 #### $only(eventName , callback, context)
-
-This is a new method in v1.3.0
 
 * eventName (string) the event you want to listen to once, this is first come first serve, and only **ONE** listener
 * callback (function) it will receive the `params` that call
@@ -179,13 +178,13 @@ es.$on('some-event', function(nums) {
 // it will throw Error that tells you it has been register with `only` type already
 ```
 
-#### $max(evt, max)
+#### $max(evt, max) => (...args)
 
 This method let you execute a particular call back (`$on` or `$only` type, because they can get call repeatedly)
 up to `max` time.
 
 To use this method, first you **need** to register an event with `$on` or `$only`. It doesn't work with non-registered event.
-Then you pass the event name and max number, and you will get a function to execute the call. For example:
+Then you pass the event name and max number, and you will get a function back to execute the call. For example:
 
 ```js
 import Event from '@to1source/event'
@@ -209,7 +208,7 @@ Several things to remember:
 
 - If you call `$trigger` or `$call` in between, they won't be counted. This method only register the number of its own call
 - After the count reach max, it will remove the event from the store, and you won't able to call it again
-- It returns `-1` when you can not call it anymore, or a integer below your initial `max` value, because every time you can it, it reduce the count by 1 immediately
+- It returns `-1` then you can not call it anymore, or a integer below your initial `max` value, because every time you call it, it reduces the count by 1 immediately
 
 #### $get(evt)
 

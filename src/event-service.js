@@ -205,14 +205,18 @@ export default class EventService extends StoreService {
           // now init the max store
           const value = this.checkMaxStore(evtName, max)
           const _self = this
-          // construct the callback
+          /**
+           * construct the callback
+           * @param {array<*>} args
+           * @return {number} 
+           */
           return function executeMaxCall(...args) {
             const ctn = _self.getMaxStore(evtName)
             let value = NEG_RETURN
             if (ctn > 0) {
               const fn = _self.$call(evtName, type, ctx)
               Reflect.apply(fn, _self, args)
-              
+
               value = _self.checkMaxStore(evtName)
               if (value === NEG_RETURN) {
                 _self.$off(evtName)
@@ -223,7 +227,9 @@ export default class EventService extends StoreService {
           }
         }
       }
-      throw new Error(`The ${evtName} is not registered, can not execute non-existing event at the moment`)
+      // change in 1.1.1 because we might just call it without knowing if it's register or not
+      this.logger(`The ${evtName} is not registered, can not execute non-existing event at the moment`)
+      return NEG_RETURN
     }
     throw new Error(`Expect max to be an integer and greater than zero! But we got [${typeof max}]${max} instead`)
   }
