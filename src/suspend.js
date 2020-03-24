@@ -27,8 +27,7 @@ export default class SuspendClass extends BaseClass {
     this.__suspend_state__ = null
     // to do this proper we don't use a new prop to hold the event name pattern
     this.__pattern__ = null
-
-
+    
     this.queueStore = new Set()
   }
 
