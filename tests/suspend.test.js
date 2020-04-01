@@ -15,7 +15,7 @@ test.before( t => {
 })
 
 
-test.skip(`Just play with the regex`, t => {
+test(`Just play with the regex`, t => {
   const pattern = '_private'
   const evt1 = 'jsonql_private'
   const evt2 = 'jsonql_public'
@@ -78,6 +78,42 @@ test.cb(`Testing the $suspendEvent method`, t => {
 })
 
 test(`Test the combine $suspendEvent and $releaseEvent`, t => {
-  
+
+  const evtSrv = new To1sourceEvent({ logger })
+
+  evtSrv.$on('some-event-ok', () => {
+    console.log('OK')
+  })
+
+  evtSrv.$on('some-event-not-great', () => {
+    console.log('Not great!')
+  })
+
+  evtSrv.$on('the-usa-is-not-great', () => {
+    console.log(`USA sucks!`)
+  })
+
+  evtSrv.$on('the-uk-is-not-great', () => {
+    console.log(`UK sucks!`)
+  })
+
+  evtSrv.$on('some-other-event-name', () => {
+    console.log(`I will not get affected and continue to work as it was expected`)
+  })
+
+  // @NOTE you can pass the entire event name or just part that can match
+  evtSrv.$suspendEvent(`-not-great`)
+
+  evtSrv.$trigger('some-event-ok') // this will get exeucted
+
+  evtSrv.$trigger('some-event-not-great') // this will not get exeucted
+  evtSrv.$trigger('the-usa-is-not-great')
+  evtSrv.$trigger('the-uk-is-not-great')
+
+  evtSrv.$trigger('some-other-event-name') // this will get execute
+
+  const ctn = evtSrv.$releaseEvent(`-not-great`) // now anything with *-not-great will get released
+
+  t.is(ctn, 3)
 
 })

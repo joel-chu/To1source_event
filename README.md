@@ -251,20 +251,22 @@ It only allow one event pattern for matching.
 
 ```js
 
-$on('some-event-ok', () => {
+const evtSrv = new To1sourceEvent()
+
+evtSrv.$on('some-event-ok', () => {
   console.log('ok')
 })
 
-$on('some-event-not-great', () => {
+evtSrv.$on('some-event-not-great', () => {
   console.log('Not great!')
 })
 // @NOTE you can pass the entire event name or just part that can match
-$suspendEvent(`-not-great`)
+evtSrv.$suspendEvent(`-not-great`)
 // or pass an RegExp object
-$suspendEvent(/\-not-great/) // note the second call will overwrite the first one
+evtSrv.$suspendEvent(/\-not-great/) // note the second call will overwrite the first one
 
-$trigger('some-event-ok')
-$trigger('some-event-not-great')
+evtSrv.$trigger('some-event-ok')
+evtSrv.$trigger('some-event-not-great')
 
 // $release() --> when you can $release, the previous block event will get executed
 
@@ -278,34 +280,36 @@ This is the opposite of the `$suspendEvent` it will release those suspend events
 It will return the number of the released event from queue.
 
 ```js
-$on('some-event-ok', () => {
+const evtSrv = new To1sourceEvent()
+
+evtSrv.$on('some-event-ok', () => {
   console.log('OK')
 })
 
-$on('some-event-not-great', () => {
+evtSrv.$on('some-event-not-great', () => {
   console.log('Not great!')
 })
 
-$on('the-usa-is-not-great', () => {
+evtSrv.$on('the-usa-is-not-great', () => {
   console.log(`USA sucks!`)
 })
 
-$on('some-other-event-name', () => {
+evtSrv.$on('some-other-event-name', () => {
   console.log(`I will not get affected and continue to work as it was expected`)
 })
 
 // @NOTE you can pass the entire event name or just part that can match
-$suspendEvent(`-not-great`)
+evtSrv.$suspendEvent(`-not-great`)
 // or pass an RegExp object
-$suspendEvent(/\-not-great/) // note the second call will overwrite the first one
+evtSrv.$suspendEvent(/\-not-great/) // note the second call will overwrite the first one
 
-$trigger('some-event-ok') // this will get exeucted
+evtSrv.$trigger('some-event-ok') // this will get exeucted
 
-$trigger('some-event-not-great') // this will not get exeucted
+evtSrv.$trigger('some-event-not-great') // this will not get exeucted
 
-$trigger('some-other-event-name') // this will get execute
+evtSrv.$trigger('some-other-event-name') // this will get execute
 
-const ctn = $releaseEvent(`-not-great`) // now anything with *-not-great will get released
+const ctn = evtSrv.$releaseEvent(`-not-great`) // now anything with *-not-great will get released
 
 ```
 
