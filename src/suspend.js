@@ -22,12 +22,11 @@ export default class SuspendClass extends BaseClass {
 
   constructor() {
     super()
-
     // suspend, release and queue
     this.__suspend_state__ = null
     // to do this proper we don't use a new prop to hold the event name pattern
     this.__pattern__ = null
-    
+    // key value pair store to store the queued calls
     this.queueStore = new Set()
   }
 
@@ -45,7 +44,7 @@ export default class SuspendClass extends BaseClass {
    * @return {void}
    */
   $release() {
-    this.logger(`---> RELEASE SUSPENDED QUEUE <---`)
+    this.logger(`---> RELEASE ALL SUSPENDED QUEUE <---`)
     this.__suspend__(false)
   }
 
@@ -59,6 +58,33 @@ export default class SuspendClass extends BaseClass {
     if (isRegExp(regex)) {
       this.__pattern__ = regex
       return this.$suspend()
+    }
+    throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
+  }
+
+  /**
+   * This is pair with $suspnedEvent to release part of the event queue by the pattern (eventName)
+   * @param {*} pattern a eventName of partial eventName to create a RegExp
+   * @return {*} should be the number of queue got released
+   */
+  $releaseEvent(pattern) {
+    const regex = getRegex(pattern)
+    if (isRegExp(regex)) {
+      const self = this
+      // first get the list of events in the queue store that match this pattern
+      return this.$queues
+        .filter(content => {
+          // first index is the eventName
+          return regex.test(content[0])
+        })
+        .map(content => {
+          this.logger(`[release] execute ${content[0]} matches ${regex}`, content)
+          // we just remove it
+          self.queueStore.delete(content)
+          // execute it
+          Reflect.apply(self.$trigger, self, content)
+        })
+        .length // so the result will be the number of queue that get exeucted
     }
     throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
   }
@@ -131,7 +157,8 @@ export default class SuspendClass extends BaseClass {
       this.queueStore.clear()
       this.logger('(release queue)', queue)
       queue.forEach(args => {
-        this.logger(args)
+        this.logger(`[release] execute ${args[0]}`, args)
+
         Reflect.apply(this.$trigger, this, args)
       })
       this.logger(`Release size ${this.queueStore.size}`)

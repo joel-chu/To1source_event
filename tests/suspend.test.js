@@ -23,15 +23,6 @@ test.skip(`Just play with the regex`, t => {
   t.truthy(evt1.indexOf(pattern))
   t.falsy(evt2.indexOf(pattern) > -1)
   t.truthy('jsonql_private_someFunc_onReady'.indexOf(pattern))
-  /*
-  const pattern1 = /\_private/
-  // debug(/\_private/ instanceof RegExp)
-  debug(pattern1.test(evt1))
-  debug(pattern1.test(evt2))
-  const patternRegExp = new RegExp(pattern)
-  debug(patternRegExp.test(evt1))
-  debug(patternRegExp.test(evt2))
-  */
 
   const pat1 = getRegex('some-string')
   const pat2 = getRegex(/some-pattern/)
@@ -84,7 +75,9 @@ test.cb(`Testing the $suspendEvent method`, t => {
 
   evt.$trigger('some-event-ok')
   evt.$trigger('some-event-not-great')
+})
 
-  // evt.$release()
+test(`Test the combine $suspendEvent and $releaseEvent`, t => {
+  
 
 })

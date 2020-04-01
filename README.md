@@ -170,10 +170,10 @@ Example:
 
 ```js
 // call before event register
-es.$call('some-event', 'only')([1001]) // note the function call
+es.$call('some-event', 'only')(1001, 2000) // note the function call
 // now try to register it with a different event handler
-es.$on('some-event', function(nums) {
-  return ++num[0]
+es.$on('some-event', function someEventCallback(num, more) {
+  return num + more
 })
 // it will throw Error that tells you it has been register with `only` type already
 ```
@@ -188,14 +188,18 @@ Then you pass the event name and max number, and you will get a function back to
 
 ```js
 import Event from '@to1source/event'
+
 const evtCls = new Event()
 const evtName = 'some-event-for-testing'
+
 // set up the event callback
 evtCls.$on(evtName, value => ++value)
+
 // next setup the max call
 const countDownFn = evtClass.$max(evtName, 2) // can call it twice
 
 let numberOfCallLeft  
+
 numberOfCallLeft = countDownFn(100)
 // value is 1
 numberOfCallLeft = countDownFn(10000)
@@ -208,7 +212,7 @@ Several things to remember:
 
 - If you call `$trigger` or `$call` in between, they won't be counted. This method only register the number of its own call
 - After the count reach max, it will remove the event from the store, and you won't able to call it again
-- It returns `-1` then you can not call it anymore, or a integer below your initial `max` value, because every time you call it, it reduces the count by 1 immediately
+- when it returns `-1` then you can not call it anymore, or an integer below your initial `max` value, because every time you call it, it reduces the count by 1 immediately
 
 #### $get(evt)
 
@@ -219,7 +223,7 @@ Or it will return `false` if there is nothing
 #### $suspend + $release
 
 We have a `suspend state`, and watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
-Then when you set this to false, all the previous suspended call(s) will get release (execute).
+When you set the suspend state to false, all the previous suspended call(s) will get release (execute).
 
 ```js
 const evtSrv = new To1sourceEvent()
@@ -228,21 +232,22 @@ evtSrv.$on('some-event', value => {
   return value + 1
 })
 
-evtSrv.$suspend()
+evtSrv.$suspend() // suspend all events from this point onward
 
 evtSrv.$trigger('some-event', 100)
 // what happen inside
 console.log(evtSrv.$done) // null
 
-evtSrv.$release()
+evtSrv.$release() // release all the event that has been suspended
 // what happen now
 console.log(evtSrv.$done) // 101
 
 ```
 
-#### $suspendEvent(eventPattern)
+#### $suspendEvent(eventNamePattern)
 
 This is similar to `$suspend`, but it allows you to provide an event name pattern to those event name that matches.
+It only allow one event pattern for matching.
 
 ```js
 
@@ -267,9 +272,46 @@ $trigger('some-event-not-great')
 
 In the above example, only the `some-event-ok` will get triggered.
 
+#### $releaseEvent(eventNamePattern)
+
+This is the opposite of the `$suspendEvent` it will release those suspend events if it matches the `eventNamePattern`.
+It will return the number of the released event from queue.
+
+```js
+$on('some-event-ok', () => {
+  console.log('OK')
+})
+
+$on('some-event-not-great', () => {
+  console.log('Not great!')
+})
+
+$on('the-usa-is-not-great', () => {
+  console.log(`USA sucks!`)
+})
+
+$on('some-other-event-name', () => {
+  console.log(`I will not get affected and continue to work as it was expected`)
+})
+
+// @NOTE you can pass the entire event name or just part that can match
+$suspendEvent(`-not-great`)
+// or pass an RegExp object
+$suspendEvent(/\-not-great/) // note the second call will overwrite the first one
+
+$trigger('some-event-ok') // this will get exeucted
+
+$trigger('some-event-not-great') // this will not get exeucted
+
+$trigger('some-other-event-name') // this will get execute
+
+const ctn = $releaseEvent(`-not-great`) // now anything with *-not-great will get released
+
+```
+
 #### $debug(idx)
 
-This method only logging output, so make sure you have pass a logger when init the object.
+This method only logging output, so make sure you have passed a logger when you create the class instance.
 
 - 0 lazyStore
 - 1 normalStore
@@ -315,13 +357,18 @@ class MyEventClass extends To1sourceEvent {
   suspend() {
     return this.$suspend()
   }
+
+  // or something like this
+  suspendEvent(...args) {
+    return Reflect.apply(this.$suspendEvent, this, args)
+  }
 }
 
 ```
 
 ## $done getter
 
-This is a feature that you don't see in other Event Emitter library.
+This should return the last value that get exeucted
 
 Whenever you execute the callback, the result will store in the internal `$done` setter.
 
@@ -336,12 +383,12 @@ es.$on('add', function add(val) {
 
 es.$trigger('add', 1000)
 
-console.log(es.$done)
+console.log(es.$done) // should see a 1001
 
 ```
 
 You will get a 1001. This might be useful in some situation. Please note, it will get call
-whenever a event got trigger, if at the same time some other event trigger then your value
+whenever an event gets trigger; if at the same time some other event trigger, then your value
 might be different from what you expected. So use this with caution.
 
 ## Test
@@ -362,6 +409,6 @@ $ npm run build
 
 ---
 
-ISC
+UNLICENSED
 
-[Joel Chu](https://joelchu.com) [NEWBRAN LTD](https://newbran.ch) (c) 2020
+[Joel Chu](https://joelchu.com) [NEWBRAN LTD](https://newbran.ch) [TO1SOURCE](https://to1source.cn) (c) 2020
