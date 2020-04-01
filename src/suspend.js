@@ -72,11 +72,9 @@ export default class SuspendClass extends BaseClass {
     if (isRegExp(regex)) {
       const self = this
       // first get the list of events in the queue store that match this pattern
-      return this.$queues
-        .filter(content => {
-          // first index is the eventName
-          return regex.test(content[0])
-        })
+      const ctn = this.$queues
+        // first index is the eventName
+        .filter(content => regex.test(content[0]))
         .map(content => {
           this.logger(`[release] execute ${content[0]} matches ${regex}`, content)
           // we just remove it
@@ -85,6 +83,10 @@ export default class SuspendClass extends BaseClass {
           Reflect.apply(self.$trigger, self, content)
         })
         .length // so the result will be the number of queue that get exeucted
+      // we need to remove this event
+      this.__pattern__ = null
+
+      return ctn
     }
     throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
   }
