@@ -1,6 +1,6 @@
 {
   "name": "@to1source/event",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "An universal event (emitter) service for Browser / Node",
   "module": "index.js",
   "browser": "dist/to1source-event.umd.js",

@@ -117,3 +117,24 @@ test(`Test the combine $suspendEvent and $releaseEvent`, t => {
   t.is(ctn, 3)
 
 })
+
+
+test(`Test the news suspend queue as an array`, t => {
+  let queue = []
+
+  let p1 = getRegex('some-event-name')
+
+  // queue.push(p1)
+
+  const check1 = !queue.filter(q => q === p1).length
+
+  t.true(check1)
+
+  queue.push(p1)
+  
+  const check2 = !queue.filter(q => q === p1).length 
+
+  t.false(check2)
+  
+
+})

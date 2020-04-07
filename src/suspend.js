@@ -25,7 +25,8 @@ export default class SuspendClass extends BaseClass {
     // suspend, release and queue
     this.__suspend_state__ = null
     // to do this proper we don't use a new prop to hold the event name pattern
-    this.__pattern__ = null
+    // @1.2.2 this become an array so we can hold different events
+    this.__pattern__ = []
     // key value pair store to store the queued calls
     this.queueStore = new Set()
   }
@@ -56,8 +57,12 @@ export default class SuspendClass extends BaseClass {
   $suspendEvent(pattern) {
     const regex = getRegex(pattern)
     if (isRegExp(regex)) {
-      this.__pattern__ = regex
-      return this.$suspend()
+      // check if it's already added 
+      if (this.isPatternRegisterd(regex) === false) {
+        this.__pattern__.push(regex)
+        return this.$suspend()
+      }
+      return false
     }
     throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
   }
@@ -69,7 +74,8 @@ export default class SuspendClass extends BaseClass {
    */
   $releaseEvent(pattern) {
     const regex = getRegex(pattern)
-    if (isRegExp(regex)) {
+    if (isRegExp(regex) && this.isPatternRegisterd(pattern)) {
+
       const self = this
       // first get the list of events in the queue store that match this pattern
       const ctn = this.$queues
@@ -83,8 +89,8 @@ export default class SuspendClass extends BaseClass {
           Reflect.apply(self.$trigger, self, content)
         })
         .length // so the result will be the number of queue that get exeucted
-      // we need to remove this event
-      this.__pattern__ = null
+      // we need to remove this event from the pattern queue array 
+      this.__pattern__ = this.__pattern__.filter(p => p !== regex)
 
       return ctn
     }
@@ -92,27 +98,34 @@ export default class SuspendClass extends BaseClass {
   }
 
   /**
-   * queuing call up when it's in suspend mode
+   * queuing call up when it's in suspend mode,
+   * it's currently suspending then add to store then the $trigger will do nothing
    * @param {string} evt the event name
    * @param {*} args unknown number of arguments
    * @return {boolean} true when added or false when it's not
    */
   $queue(evt, ...args) {
     this.logger('($queue) get called')
-    if (this.__suspend_state__ === true) {
-      if (isRegExp(this.__pattern__)) { // it's better then check if its not null
+    
+    const hasPattern = this.__pattern__.length
+    // 1. whole sale suspend all
+    switch (true) {
+      case this.__suspend_state__ === true && !hasPattern:
+        
+        return this.addToQueueStore(evt, args)
+      case hasPattern: 
         // check the pattern and decide if we want to suspend it or not
-        let found = this.__pattern__.test(evt)
+        let found = !!this.__pattern__.filter(p => p.test(evt)).length
         if (!found) {
+          this.logger(`($queue) ${evt} NOT added to $queueStore`, args)
+          // just exit and not add to the queue
           return false
         }
-      }
-      this.logger('($queue) added to $queue', args)
-      // @TODO there shouldn't be any duplicate, but how to make sure?
-      this.queueStore.add([evt].concat(args))
-      // return this.queueStore.size
-    }
-    return !!this.__suspend_state__
+        
+        return this.addToQueueStore(evt, args)
+      default:
+        return false
+    } 
   }
 
   /**
@@ -126,6 +139,28 @@ export default class SuspendClass extends BaseClass {
       return Array.from(this.queueStore)
     }
     return []
+  }
+
+  /**
+   * Wrapper method with a logger 
+   * @param {*} evt 
+   * @param {*} args 
+   * @return {boolean}
+   */
+  addToQueueStore(evt, args) {
+    this.logger(`($queue) ${evt} added to $queueStore`, args)
+    this.queueStore.add([evt].concat(args))
+
+    return true
+  }
+
+  /**
+   * check if certain pattern already registered in the queue
+   * @param {*} pattern
+   * @return {boolean} 
+   */
+  isPatternRegisterd(pattern) {
+    return !!this.__pattern__.filter(p => p === pattern).length
   }
 
   /**
@@ -146,23 +181,27 @@ export default class SuspendClass extends BaseClass {
   }
 
   /**
-   * Release the queue
+   * Release the queue, this is a wholesale release ALL
    * @return {int} size if any
    */
   __release__() {
     let size = this.queueStore.size
     let pattern = this.__pattern__
-    this.__pattern__ = null
-    this.logger(`(release) was called with ${size}${pattern ? ' for "' + pattern + '"': ''} item${size > 1 ? 's' : ''}`)
+    this.__pattern__ = []
+    
+    this.logger(`(release) was called with ${size}${pattern.length ? ' for "' + pattern.join(',') + '"': ''} item${size > 1 ? 's' : ''}`)
+    
     if (size > 0) {
       const queue = Array.from(this.queueStore)
-      this.queueStore.clear()
       this.logger('(release queue)', queue)
+
       queue.forEach(args => {
         this.logger(`[release] execute ${args[0]}`, args)
 
         Reflect.apply(this.$trigger, this, args)
       })
+
+      this.queueStore.clear()
       this.logger(`Release size ${this.queueStore.size}`)
     }
 
