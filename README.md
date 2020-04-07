@@ -220,10 +220,10 @@ It returns all the listeners for that particular event name from the internal st
 
 Or it will return `false` if there is nothing
 
-#### $suspend + $release
+#### $suspend / $release
 
-We have a `suspend state`, and watch this property internally, when you set this to true, we suspend all the `$trigger` and `$call` action.
-When you set the suspend state to false, all the previous suspended call(s) will get release (execute).
+When you call `$suspend` , all the `$trigger` and `$call` action will have no effect and put into a temporary 
+store, and wait until you call `$release`. This is an on / off switch no in between. 
 
 ```js
 const evtSrv = new To1sourceEvent()
@@ -247,7 +247,8 @@ console.log(evtSrv.$done) // 101
 #### $suspendEvent(eventNamePattern)
 
 This is similar to `$suspend`, but it allows you to provide an event name pattern to those event name that matches.
-It only allow one event pattern for matching.
+It allow you to add mutliple `eventNamePattern`. **Important to note that, if `$suspend` has been called, 
+this method has no effect.**
 
 ```js
 
@@ -274,10 +275,13 @@ evtSrv.$trigger('some-event-not-great')
 
 In the above example, only the `some-event-ok` will get triggered.
 
+If you call `$release` instead, then everything will get release at once.
+
 #### $releaseEvent(eventNamePattern)
 
-This is the opposite of the `$suspendEvent` it will release those suspend events if it matches the `eventNamePattern`.
-It will return the number of the released event from queue.
+This is the opposite of the `$suspendEvent`; it will release those suspend events if it matches the `eventNamePattern`.
+It will return the number of the released event from queue. And it's the same like `$suspendEvent`, if `$suspend` already 
+been called; it has no effect.
 
 ```js
 const evtSrv = new To1sourceEvent()

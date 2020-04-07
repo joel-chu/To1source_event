@@ -107,23 +107,22 @@ export default class SuspendClass extends BaseClass {
   $queue(evt, ...args) {
     this.logger('($queue) get called')
     
-    const hasPattern = this.__pattern__.length
     // 1. whole sale suspend all
     switch (true) {
-      case this.__suspend_state__ === true && !hasPattern:
+      case this.__suspend_state__ === true: // this will take priority over the pattern
         
         return this.addToQueueStore(evt, args)
-      case hasPattern: 
+      case !!this.__pattern__.length === true: 
         // check the pattern and decide if we want to suspend it or not
-        let found = !!this.__pattern__.filter(p => p.test(evt)).length
-        if (!found) {
+        if (!!this.__pattern__.filter(p => p.test(evt)).length) {
           this.logger(`($queue) ${evt} NOT added to $queueStore`, args)
-          // just exit and not add to the queue
-          return false
+          
+          return false 
         }
         
         return this.addToQueueStore(evt, args)
       default:
+
         return false
     } 
   }
