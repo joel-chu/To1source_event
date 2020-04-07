@@ -60,7 +60,8 @@ export default class SuspendClass extends BaseClass {
       // check if it's already added 
       if (this.isPatternRegisterd(regex) === false) {
         this.__pattern__.push(regex)
-        return this.$suspend()
+
+        return this.__pattern__.length
       }
       return false
     }
@@ -74,7 +75,7 @@ export default class SuspendClass extends BaseClass {
    */
   $releaseEvent(pattern) {
     const regex = getRegex(pattern)
-    if (isRegExp(regex) && this.isPatternRegisterd(pattern)) {
+    if (isRegExp(regex) && this.isPatternRegisterd(regex)) {
 
       const self = this
       // first get the list of events in the queue store that match this pattern
@@ -94,6 +95,8 @@ export default class SuspendClass extends BaseClass {
 
       return ctn
     }
+
+    this.logger('$releaseEvent throw error ==========================>', this.__pattern__, regex)
     throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
   }
 
@@ -105,9 +108,6 @@ export default class SuspendClass extends BaseClass {
    * @return {boolean} true when added or false when it's not
    */
   $queue(evt, ...args) {
-    this.logger('($queue) get called')
-    
-    // 1. whole sale suspend all
     switch (true) {
       case this.__suspend_state__ === true: // this will take priority over the pattern
         
@@ -115,14 +115,14 @@ export default class SuspendClass extends BaseClass {
       case !!this.__pattern__.length === true: 
         // check the pattern and decide if we want to suspend it or not
         if (!!this.__pattern__.filter(p => p.test(evt)).length) {
-          this.logger(`($queue) ${evt} NOT added to $queueStore`, args)
           
-          return false 
+          return this.addToQueueStore(evt, args)
         }
-        
-        return this.addToQueueStore(evt, args)
+        this.logger(`($queue) ${evt} NOT added to $queueStore`, this.__pattern__)
+          
+        return false 
       default:
-
+        this.logger('($queue) get called NOTHING added')
         return false
     } 
   }
@@ -148,6 +148,9 @@ export default class SuspendClass extends BaseClass {
    */
   addToQueueStore(evt, args) {
     this.logger(`($queue) ${evt} added to $queueStore`, args)
+
+    // @TODO should we check if this already added? 
+    // what if that is a multiple call like $on
     this.queueStore.add([evt].concat(args))
 
     return true
@@ -159,7 +162,10 @@ export default class SuspendClass extends BaseClass {
    * @return {boolean} 
    */
   isPatternRegisterd(pattern) {
-    return !!this.__pattern__.filter(p => p === pattern).length
+    // this is a bit of a hack to compare two regex Object  
+    return !!this.__pattern__.filter(p => (
+      p.toString() === pattern.toString()
+    )).length 
   }
 
   /**
