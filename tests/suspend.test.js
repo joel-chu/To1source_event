@@ -3,6 +3,7 @@ const test = require('ava')
 const To1sourceEvent = require('../dist/to1source-event.cjs')
 const logger = require('debug')('nb-event-service')
 const debug  = require('debug')('nb-event-service:test:basic')
+const colors = require('colors/safe')
 
 const { getRegex, isRegExp } = require('../src/utils')
 
@@ -44,7 +45,6 @@ test(`It should able to use the suspend to hold all the calls then release it`, 
   })
 
   evtSrv.$suspend()
-
   evtSrv.$trigger('some-event', 100)
   // what happen inside
   t.falsy(evtSrv.$done) // null
@@ -52,7 +52,6 @@ test(`It should able to use the suspend to hold all the calls then release it`, 
   evtSrv.$release()
   // what happen now
   t.is(evtSrv.$done, 101) // 101
-
 })
 
 test.cb(`Testing the $suspendEvent method`, t => {
@@ -118,23 +117,81 @@ test(`Test the combine $suspendEvent and $releaseEvent`, t => {
 
 })
 
+test.cb.only(`Testing the multiple suspendEvent and releaseEvent`, t => {
+  let ctn = 0
+  const plan = 5
+  t.plan(plan)
 
-test(`Test the news suspend queue as an array`, t => {
-  let queue = []
 
-  let p1 = getRegex('some-event-name')
+  const loggerX = (str, ...args) => Reflect.apply(debug, null, [colors.blue.bgBrightYellow(str), ...args])
 
-  // queue.push(p1)
+  const loggerY = (str, ...args) => Reflect.apply(debug, null, [colors.red.bgWhite(str), ...args])
 
-  const check1 = !queue.filter(q => q === p1).length
+  const eventNames = [
+    `jsonql/public_onReady`,
+    `jsonql/public_onEmit`,
+    `jsonql/private_onLogin`,
+    `jsonql/private_onEmit`
+  ]
 
-  t.true(check1)
+  const evtSrv = new To1sourceEvent({ logger: loggerX })
+  // this will not get affected 
+  evtSrv.$on(`add`, function(from) {
+    ++ctn 
+    if (from === 'test-add') {
+      loggerY('test-add got triggered')
+      t.pass()
+      return
+    }
 
-  queue.push(p1)
+    loggerY(from)
+    
+    if (ctn >= plan) {
+      t.end()
+    }
+    return ctn 
+  })
+  const add = from => evtSrv.$trigger('add', [from])
+
+  evtSrv.$only(eventNames[0], function(namespace) {
+    t.truthy(namespace, '[1]') // 1
+    add(eventNames[0])
+  })
+
+  evtSrv.$only(eventNames[1], function(payload) {
+    t.truthy(payload, '[2]')
+    add(eventNames[1])
+  })
+
+  evtSrv.$only(eventNames[2], function() {
+    t.pass('[3]')
+    add(eventNames[2])
+  })
+
+  evtSrv.$only(eventNames[3], function(payload) {
+    t.truthy(payload, '[4]')
+    add(eventNames[3])
+  })
+
+  // hold the events 
+
+  evtSrv.$suspendEvent(`jsonql/public`, `jsonql/private`)
   
-  const check2 = !queue.filter(q => q === p1).length 
+  add('test-add')
 
-  t.false(check2)
-  
+  evtSrv.$trigger(eventNames[0], ['jsonql/public'])
+
+  evtSrv.$trigger(eventNames[1], [{name: 'Joel'}])
+
+  evtSrv.$trigger(eventNames[2], [])
+
+  evtSrv.$trigger(eventNames[3], [{msg: 'nothing'}])
+
+  // up until this point there is nothing been trigger
+
+  evtSrv.$releaseEvent(`jsonql/public`)
+
+  evtSrv.$releaseEvent(`jsonql/private`)
 
 })
+

@@ -51,53 +51,57 @@ export default class SuspendClass extends BaseClass {
 
   /**
    * suspend event by pattern
-   * @param {string} pattern the pattern search matches the event name
-   * @return {void}
+   * @param {array.<string>} patterns the pattern search matches the event name
+   * @return {array} if the pattern return is registered or not
    */
-  $suspendEvent(pattern) {
-    const regex = getRegex(pattern)
-    if (isRegExp(regex)) {
-      // check if it's already added 
-      if (this.isPatternRegisterd(regex) === false) {
-        this.__pattern__.push(regex)
+  $suspendEvent(...patterns) {
+    return patterns.map(pattern => {
+      const regex = getRegex(pattern)
+      if (isRegExp(regex)) {
+        // check if it's already added 
+        if (this.isPatternRegisterd(regex) === false) {
+          this.__pattern__.push(regex)
 
-        return this.__pattern__.length
+          return this.__pattern__.length
+        }
+        return false
       }
-      return false
-    }
-    throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
+      throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
+    })
   }
 
   /**
    * This is pair with $suspnedEvent to release part of the event queue by the pattern (eventName)
-   * @param {*} pattern a eventName of partial eventName to create a RegExp
-   * @return {*} should be the number of queue got released
+   * @param {array.<*>} patterns a eventName of partial eventName to create a RegExp
+   * @return {array} should be the number of queue got released
    */
-  $releaseEvent(pattern) {
-    const regex = getRegex(pattern)
-    if (isRegExp(regex) && this.isPatternRegisterd(regex)) {
+  $releaseEvent(...patterns) {
+    return patterns.map(pattern => {
+      const regex = getRegex(pattern)
+      if (isRegExp(regex) && this.isPatternRegisterd(regex)) {
 
-      const self = this
-      // first get the list of events in the queue store that match this pattern
-      const ctn = this.$queues
-        // first index is the eventName
-        .filter(content => regex.test(content[0]))
-        .map(content => {
-          this.logger(`[release] execute ${content[0]} matches ${regex}`, content)
-          // we just remove it
-          self.queueStore.delete(content)
-          // execute it
-          Reflect.apply(self.$trigger, self, content)
-        })
-        .length // so the result will be the number of queue that get exeucted
-      // we need to remove this event from the pattern queue array 
-      this.__pattern__ = this.__pattern__.filter(p => p !== regex)
+        const self = this
+        // first get the list of events in the queue store that match this pattern
+        const ctn = this.$queues
+          // first index is the eventName
+          .filter(content => regex.test(content[0]))
+          .map(content => {
+            this.logger(`[release] execute ${content[0]} matches ${regex}`, content)
+            // we just remove it
+            self.queueStore.delete(content)
+            // execute it
+            Reflect.apply(self.$trigger, self, content)
+          })
+          .length // so the result will be the number of queue that get exeucted
+        // we need to remove this event from the pattern queue array 
+        this.__pattern__ = this.__pattern__.filter(p => p !== regex)
 
-      return ctn
-    }
+        return ctn
+      }
 
-    this.logger('$releaseEvent throw error ==========================>', this.__pattern__, regex)
-    throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
+      this.logger('$releaseEvent throw error ==========================>', this.__pattern__, regex)
+      throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
+    })
   }
 
   /**

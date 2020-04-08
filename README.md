@@ -277,6 +277,14 @@ In the above example, only the `some-event-ok` will get triggered.
 
 If you call `$release` instead, then everything will get release at once.
 
+Also you can pass as many pattern as you want 
+
+
+```js
+evtSrv.$suspendEvent(`event-to-suspend-1`, `event-to-suspend-2`)
+
+```
+
 #### $releaseEvent(eventNamePattern)
 
 This is the opposite of the `$suspendEvent`; it will release those suspend events if it matches the `eventNamePattern`.
@@ -314,6 +322,14 @@ evtSrv.$trigger('some-event-not-great') // this will not get exeucted
 evtSrv.$trigger('some-other-event-name') // this will get execute
 
 const ctn = evtSrv.$releaseEvent(`-not-great`) // now anything with *-not-great will get released
+
+```
+
+Also you can release multiple event like so:
+
+```js
+
+evtSrv.$releaseEvent(`event-to-release-1`, `event-to-release-2`)
 
 ```
 
