@@ -113,11 +113,13 @@ test(`Test the combine $suspendEvent and $releaseEvent`, t => {
 
   const ctn = evtSrv.$releaseEvent(`-not-great`) // now anything with *-not-great will get released
 
+  debug('ctn', ctn)
+
   t.is(ctn, 3)
 
 })
 
-test.cb.only(`Testing the multiple suspendEvent and releaseEvent`, t => {
+test.cb(`Testing the multiple suspendEvent and releaseEvent`, t => {
   let ctn = 0
   const plan = 5
   t.plan(plan)
