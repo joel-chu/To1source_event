@@ -15,7 +15,8 @@
     "prepublishOnly": "npm run build && npm run coverage",
     "test": "ava",
     "coverage": "nyc ava",
-    "build": "rollup -c",
+    "build": "npm run clean:dist && npm run build:rollup",
+    "build:rollup": "rollup -c",
     "clean:dist": "rimraf ./dist",
     "build:test": "rollup -c ./rollup.test.config.js",
     "test:browser": "node ./tests/fixtures/browser.js",
@@ -46,9 +47,7 @@
   "license": "UNLICENSED",
   "ava": {
     "files": [
-      "tests/*.test.js"
-    ],
-    "ignoredByWatcher": [
+      "tests/*.test.js",
       "!tests/helpers/*.*",
       "!tests/fixtures/*.*"
     ],
@@ -63,7 +62,6 @@
     "verbose": false
   },
   "devDependencies": {
-    "acorn": "^8.7.1",
     "ava": "^4.3.0",
     "debug": "^4.3.4",
     "esm": "^3.2.25",
