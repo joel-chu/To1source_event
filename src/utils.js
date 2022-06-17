@@ -63,10 +63,10 @@ export function getRegex(pattern) {
   }
 }
 
-
 /**
  * in array
  * @param {array} arr to search
  * @param {*} prop to search
  */
- export const inArray = (arr, prop) => !!arr.filter(v => prop === v).length
+ // export const inArray = (arr, prop) => !!arr.filter(v => prop === v).length
+ export const inArray = (arr, prop) => arr.includes(prop) // 2022 version

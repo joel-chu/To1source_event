@@ -2,7 +2,7 @@
 // from https://abdulapopoola.com/2015/04/17/how-to-watch-variables-in-javascript/
 // without own modification to make it NOT polluting the global prototype chain
 class WatchClass {}
-
+// @TODO upgrade it with Proxy 
 if (!WatchClass.prototype.watch) {
  Object.defineProperty(WatchClass.prototype, "watch", {
      enumerable: false,

@@ -1,7 +1,7 @@
 // setup a base class to put all the don't know where to put methods 
 import { hashCode2Str, isString } from './utils'
 import { AVAILABLE_TYPES } from './constants'
-
+// main 
 export default class BaseClass {
 
   constructor() {}
@@ -14,11 +14,6 @@ export default class BaseClass {
   // for id if the instance is this class
   get $name() {
     return 'to1source-event'
-  }
-
-  // take this down in the next release
-  get is() {
-    return this.$name
   }
 
   /**
@@ -86,7 +81,6 @@ export default class BaseClass {
    * @return {string} hashKey
    */
   hashFnToKey(fn) {
-
     return hashCode2Str(fn.toString())
   }
 } 

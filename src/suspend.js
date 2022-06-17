@@ -15,13 +15,12 @@ this.watch('suspend', function(value, prop, oldValue) {
 })
 */
 import { getRegex, isRegExp } from './utils'
-
 import BaseClass from './base'
-
+// main 
 export default class SuspendClass extends BaseClass {
 
-  constructor() {
-    super()
+  constructor(config) {
+    super(config)
     // suspend, release and queue
     this.__suspend_state__ = null
     // to do this proper we don't use a new prop to hold the event name pattern
@@ -136,7 +135,6 @@ export default class SuspendClass extends BaseClass {
     }
     return []
   }
-
 
   /**
    * The reason is before we call $trigger we need to remove the pattern from queue

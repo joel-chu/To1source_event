@@ -8,9 +8,8 @@ import {
   ON_MAX_TYPES
 } from './constants'
 import { isInt, inArray } from './utils'
-
 import SuspendClass from './suspend'
-
+// @TODO need to decoup this and make it standalone
 export default class StoreService extends SuspendClass {
 
   constructor(config = {}) {
@@ -129,11 +128,11 @@ export default class StoreService extends SuspendClass {
     if (store.has(evt)) {
       return Array
         .from(store.get(evt))
-        .map( l => {
+        .map( list => {
           if (full) {
-            return l
+            return list
           }
-          let [, callback,] = l
+          let [, callback,] = list
 
           return callback
         })
@@ -150,7 +149,6 @@ export default class StoreService extends SuspendClass {
   removeFromStore(evt, store) {
     if (store.has(evt)) {
       this.logger('($off)', evt)
-
       store.delete(evt)
 
       return true
@@ -191,8 +189,8 @@ export default class StoreService extends SuspendClass {
     if (args.length > 2) {
       if (Array.isArray(args[0])) { // lazy store
         // check if this type of this event already register in the lazy store
-        let [,,t] = args
-        if (!this.checkTypeInLazyStore(evt, t)) {
+        let [,,type] = args
+        if (!this.checkTypeInLazyStore(evt, type)) {
           fnSet.add(args)
         }
       } else {
@@ -216,8 +214,8 @@ export default class StoreService extends SuspendClass {
    */
   checkContentExist(args, fnSet) {
     let list = Array.from(fnSet)
-    return !!list.filter(li => {
-      let [hash,] = li
+    return !!list.filter(_list => {
+      let [hash,] = _list
       return hash === args[0]
     }).length
   }
@@ -249,7 +247,6 @@ export default class StoreService extends SuspendClass {
   checkTypeInLazyStore(evtName, type) {
     this.validateEvt(evtName, type)
     let store = this.lazyStore.get(evtName)
-
     this.logger('(checkTypeInLazyStore)', store)
 
     if (store) {

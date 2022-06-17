@@ -4,13 +4,12 @@ import {
   ONLY_TYPE,
   ONCE_TYPE,
   ONLY_ONCE_TYPE,
-  MAX_CALL_TYPE,
-  ON_MAX_TYPES,
   TAKEN_BY_OTHER_TYPE_ERR,
   NEG_RETURN
 } from './constants'
-import { isInt, inArray } from './utils'
+import { isInt } from './utils'
 import StoreService from './store-service'
+
 // export
 export default class EventService extends StoreService {
   /**
@@ -171,7 +170,6 @@ export default class EventService extends StoreService {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger(`($onlyOnce) call run "${evt}"`)
-
       this.run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
@@ -246,7 +244,6 @@ export default class EventService extends StoreService {
     if (this.validateType(type)) {
       this.$off(evt)
       let method = this['$' + type]
-
       this.logger(`($replace)`, evt, callback)
 
       return Reflect.apply(method, this, [evt, callback, context])
@@ -285,9 +282,7 @@ export default class EventService extends StoreService {
         // this.logger('found', found)
         let [ _, callback, ctx, _type ] = nSet[i]
         this.logger(`($trigger) call run for ${type}:${evt}`)
-
         this.run(callback, payload, context || ctx)
-
         if (_type === 'once' || _type === 'onlyOnce') {
           hasOnce = true
         }
@@ -303,8 +298,8 @@ export default class EventService extends StoreService {
   }
 
   /**
-   * this is an alias to the $trigger
-   * @NOTE breaking change in V1.6.0 we swap the parameter aroun
+   * this is an alias to the $trigger - with a different, it returns a fn to call
+   * @NOTE breaking change in V1.6.0 we swap the parameter around
    * @NOTE breaking change: v1.9.1 it return an function to accept the params as spread
    * @param {string} evt event name
    * @param {string} type of call
