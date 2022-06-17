@@ -24,12 +24,13 @@ export default [{
     file: join(outDir, 'to1source-event.cjs'),
     format: 'cjs',
     sourcemap: true,
-    outputs: 'default'
+    exports: 'default'
   }, {
     file: join(outDir, 'to1source-event.js'),
     format: 'umd',
     sourcemap: true,
-    outputs: 'default'
+    name: 'To1sourceEvent',
+    exports: 'default'
   }],
   plugins
 }, {
@@ -38,12 +39,13 @@ export default [{
     file: join(outDir, 'alias.cjs'),
     format: 'cjs',
     sourcemap: true,
-    outputs: 'default'
+    exports: 'default'
   },{
     file: join(outDir, 'alias.js'),
     format: 'umd',
+    name: 'To1sourceEvent',
     sourcemap: true,
-    outputs: 'default'
+    exports: 'default'
   }],
   plugins
 }]
