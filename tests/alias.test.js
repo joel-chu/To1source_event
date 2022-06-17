@@ -1,7 +1,7 @@
 // test the alias version to make sure it works
 const test = require('ava')
 
-const To1sourceEvent = require('../dist/alias')
+const To1sourceEvent = require('../dist/alias.cjs')
 const logger = require('debug')('to1source-event')
 const debug  = require('debug')('to1source-event:test:basic')
 
@@ -16,7 +16,7 @@ test.before( t => {
 test('It should able to bind a simple test and callback', async (t) => {
   t.plan(1)
   return new Promise(resolver => {
-    let evtName = 'simple'
+    const evtName = 'simple'
     t.context.evtSrv.on(evtName, function(num) {
       t.is(num, value)
       resolver(true)
@@ -28,7 +28,7 @@ test('It should able to bind a simple test and callback', async (t) => {
 test('It should able to emit the event before register the listener', async (t) => {
   t.plan(1)
   return new Promise(resolver => {
-    let evtName = 'simple-reverse'
+    const evtName = 'simple-reverse'
     t.context.evtSrv.emit(evtName, value)
     t.context.evtSrv.on(evtName, function(num) {
       t.is(num, value)
@@ -40,8 +40,8 @@ test('It should able to emit the event before register the listener', async (t) 
 test('It should able to add more than one listerner to the same event', async (t) => {
   t.plan(2)
   return new Promise(resolver => {
-    let evtName = 'multiple'
-    let letter = 'again'
+    const evtName = 'multiple'
+    const letter = 'again'
 
     t.context.evtSrv.on(evtName, function(a) {
       t.is(a , letter)
@@ -56,7 +56,7 @@ test('It should able to add more than one listerner to the same event', async (t
 })
 
 test('It should not allow to add the same function again', t => {
-  let evtName = 'add-once'
+  const evtName = 'add-once'
   const callback = (x) => {
     debug(x)
   }
@@ -70,8 +70,8 @@ test('It should not allow to add the same function again', t => {
 })
 
 test('It should only call once if we use the $once option', t => {
-  let evtName = 'once-call'
-  let ctn = 0;
+  const evtName = 'once-call'
+  let ctn = 0
 
   const callback = () => {
     ++ctn;
@@ -94,8 +94,8 @@ test('It should only call once if we use the $once option', t => {
 })
 
 test('Using the $call alias to $trigger should do the same thing', t => {
-  let evtName = 'alias'
-  let ctn = 0;
+  const evtName = 'alias'
+  let ctn = 0
 
   const callback = () => {
     ++ctn;
@@ -109,8 +109,8 @@ test('Using the $call alias to $trigger should do the same thing', t => {
 })
 
 test('Using $trigger and $call should make the callback run again', t => {
-  let evtName = 'alias-two'
-  let ctn = 0;
+  const evtName = 'alias-two'
+  let ctn = 0
 
   const callback = () => {
     ++ctn;
@@ -128,7 +128,7 @@ test('Using $trigger and $call should make the callback run again', t => {
 
 test('Should not able to call the method once the $off is called', t => {
 
-  let evtName = 'off-event'
+  const evtName = 'off-event'
 
   const callback = (l) => {
     debug(`${l}`)

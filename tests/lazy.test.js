@@ -37,7 +37,11 @@ test('It should throw an error if the event been trigger with one type but try t
     debug(num)
   })
 
-  t.throws(() => fn(), /*Error*/ null, 'It should throw error because its different type')
+  t.throws(
+    () => fn(),
+    undefined,
+    'It should throw error because its different type'
+  )
 })
 
 test('using $call should able to pass the type without passing the context', t => {
@@ -51,8 +55,8 @@ test('using $call should able to pass the type without passing the context', t =
   })
 
   t.throws(
-    () => fn(), 
-    /*Error*/null, 
+    () => fn(),
+    undefined,
     'It should throw error because already register with $only'
   )
 

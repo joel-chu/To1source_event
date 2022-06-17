@@ -3,9 +3,8 @@ const test = require('ava')
 const To1sourceEvent = require('../dist/to1source-event.cjs')
 const logger = require('debug')('to1source-event')
 const debug  = require('debug')('to1source-event:test:basic')
-const colors = require('colors/safe')
 
-const { getRegex, isRegExp } = require('../src/utils')
+const { getRegex, isRegExp } = require('../src/utils.mjs')
 
 let value = 1000
 
@@ -127,9 +126,9 @@ test(`Testing the multiple suspendEvent and releaseEvent`, async (t) => {
 
     let ctn = 0
 
-    const loggerX = (str, ...args) => Reflect.apply(debug, null, [colors.blue.bgBrightYellow(str), ...args])
+    const loggerX = (str, ...args) => Reflect.apply(debug, null, ['LoggerX --->', str, ...args])
 
-    const loggerY = (str, ...args) => Reflect.apply(debug, null, [colors.red.bgWhite(str), ...args])
+    const loggerY = (str, ...args) => Reflect.apply(debug, null, ['LoggerY --->', str, ...args])
 
     const eventNames = [
       `jsonql/public_onReady`,

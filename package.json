@@ -18,6 +18,7 @@
     "build": "npm run build:umd && npm run build:alias:umd && npm run build:cjs && npm run build:alias:cjs",
     "build:umd": "TARGET=umd rollup -c",
     "build:cjs": "TARGET=cjs rollup -c",
+    "build:test": "rollup -c ./rollup.test.config.js",
     "build:alias:umd": "NODE_ENV=alias TARGET=umd rollup -c",
     "build:alias:cjs": "NODE_ENV=alias TARGET=cjs rollup -c",
     "test:browser": "node ./tests/fixtures/browser.js",

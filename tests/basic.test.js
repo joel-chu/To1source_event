@@ -17,11 +17,11 @@ test(`Should have a is getter`, t => {
 })
 
 test('It should able to validate the evt', t => {
-  let evtSrv = t.context.evtSrv
-  let fn = (...args) => Reflect.apply(evtSrv.$on, evtSrv, args)
+  const evtSrv = t.context.evtSrv
+  const fn = (...args) => Reflect.apply(evtSrv.$on, evtSrv, args)
   t.throws(
-    () => fn('some', false) , 
-    /*new Error()*/ null, 
+    () => fn('some', false) ,
+    undefined,
     'Should throw error because callback is not a function'
   )
 })
@@ -29,7 +29,7 @@ test('It should able to validate the evt', t => {
 test('It should able to bind a simple test and callback', async (t) => {
   t.plan(1)
   return new Promise(resolver => {
-    let evtName = 'simple'
+    const evtName = 'simple'
     t.context.evtSrv.$on(evtName, function(num) {
       t.is(num, value)
       resolver(true)
@@ -41,7 +41,7 @@ test('It should able to bind a simple test and callback', async (t) => {
 test('It should able to emit the event before register the listener', async (t) => {
   t.plan(1)
   return new Promise(resolver => {
-    let evtName = 'simple-reverse'
+    const evtName = 'simple-reverse'
     t.context.evtSrv.$trigger(evtName, value)
     t.context.evtSrv.$on(evtName, function(num) {
       t.is(num, value)
