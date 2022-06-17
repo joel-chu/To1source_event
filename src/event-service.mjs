@@ -6,9 +6,9 @@ import {
   ONLY_ONCE_TYPE,
   TAKEN_BY_OTHER_TYPE_ERR,
   NEG_RETURN
-} from './constants'
-import { isInt } from './utils'
-import StoreService from './store-service'
+} from './constants.mjs'
+import { isInt } from './utils.mjs'
+import StoreService from './store-service.mjs'
 
 // export
 export default class EventService extends StoreService {
@@ -206,7 +206,7 @@ export default class EventService extends StoreService {
           /**
            * construct the callback
            * @param {array<*>} args
-           * @return {number} 
+           * @return {number}
            */
           return function executeMaxCall(...args) {
             const ctn = _self.getMaxStore(evtName)

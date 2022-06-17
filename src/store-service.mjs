@@ -2,13 +2,13 @@
 import {
   NB_EVENT_SERVICE_PRIVATE_STORE,
   NB_EVENT_SERVICE_PRIVATE_LAZY
-} from './store'
+} from './store.mjs'
 import {
   NEG_RETURN,
   ON_MAX_TYPES
-} from './constants'
-import { isInt, inArray } from './utils'
-import SuspendClass from './suspend'
+} from './constants.mjs'
+import { isInt, inArray } from './utils.mjs'
+import SuspendClass from './suspend.mjs'
 // @TODO need to decoup this and make it standalone
 export default class StoreService extends SuspendClass {
 

@@ -1,7 +1,7 @@
-// setup a base class to put all the don't know where to put methods 
-import { hashCode2Str, isString } from './utils'
-import { AVAILABLE_TYPES } from './constants'
-// main 
+// setup a base class to put all the don't know where to put methods
+import { hashCode2Str, isString } from './utils.mjs'
+import { AVAILABLE_TYPES } from './constants.mjs'
+// main
 export default class BaseClass {
 
   constructor() {}
@@ -56,7 +56,7 @@ export default class BaseClass {
    */
   validateType(type) {
     this.validateEvt(type)
-    
+
     return !!AVAILABLE_TYPES.filter(t => type === t).length
   }
 
@@ -71,7 +71,7 @@ export default class BaseClass {
     this.logger('(run) callback:', callback, 'payload:', payload, 'context:', ctx)
     this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
 
-    return this.$done // return it here first 
+    return this.$done // return it here first
   }
 
   /**
@@ -83,4 +83,4 @@ export default class BaseClass {
   hashFnToKey(fn) {
     return hashCode2Str(fn.toString())
   }
-} 
+}
