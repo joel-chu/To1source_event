@@ -5,7 +5,9 @@
   "module": "index.mjs",
   "browser": "dist/to1source-event.js",
   "main": "dist/to1source-event.cjs",
+  "typings": "@types/index.d.ts",
   "files": [
+    "@types",
     "alias.mjs",
     "index.mjs",
     "dist",
