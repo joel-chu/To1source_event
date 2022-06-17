@@ -1,6 +1,6 @@
 // testing the watch method
 const test = require('ava')
-const { WatchClass } = require('../src/watch.mjs')
+const { WatchClass } = require('./fixtures/watch.cjs')
 const debug = require('debug')('to1source-event:watch')
 const To1sourceEvent = require('../dist/to1source-event.cjs')
 

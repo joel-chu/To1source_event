@@ -4,7 +4,7 @@ const To1sourceEvent = require('../dist/to1source-event.cjs')
 const logger = require('debug')('to1source-event')
 const debug  = require('debug')('to1source-event:test:basic')
 
-const { getRegex, isRegExp } = require('../src/utils.mjs')
+const { getRegex, isRegExp } = require('./fixtures/utils.cjs')
 
 let value = 1000
 
