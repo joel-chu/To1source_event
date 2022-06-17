@@ -2,12 +2,12 @@
   "name": "@to1source/event",
   "version": "1.4.0",
   "description": "An universal event (emitter) service for Browser / Node",
-  "module": "index.js",
+  "module": "index.mjs",
   "browser": "dist/to1source-event.umd.js",
   "main": "dist/to1source-event.cjs.js",
   "files": [
-    "alias.js",
-    "index.js",
+    "alias.mjs",
+    "index.mjs",
     "dist",
     "src"
   ],

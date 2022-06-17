@@ -12,8 +12,8 @@ const target = process.env.TARGET
 const base = join(__dirname)
 const outDir = join(base, 'dist')
 // default
-const inputFile = env === 'alias' ? 'alias.js' : 'index.js'
-const outputFile = env === 'alias' ? (target === 'cjs' ? `alias.js` : 'to1source-event-alias.js') 
+const inputFile = env === 'alias' ? 'alias.mjs' : 'index.mjs'
+const outputFile = env === 'alias' ? (target === 'cjs' ? `alias.cjs` : 'to1source-event-alias.js')
                                    : `to1source-event.${target}.js`
 
 export default {
@@ -22,7 +22,8 @@ export default {
     name: 'To1sourceEvent',
     file: join(outDir, outputFile),
     format: target,
-    sourcemap: true
+    sourcemap: true,
+    exports: "default"
   },
   plugins: [
     buble(),
