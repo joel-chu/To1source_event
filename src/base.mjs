@@ -4,7 +4,11 @@ import { AVAILABLE_TYPES } from './constants.mjs'
 // main
 export default class BaseClass {
 
-  constructor() {}
+  constructor(config = {}) {
+    if (config.logger && typeof config.logger === 'function') {
+      this.logger = config.logger
+    }
+  }
 
   /**
    * logger function for overwrite
@@ -20,8 +24,9 @@ export default class BaseClass {
    * validate the event name(s)
    * @param {string[]} evt event name
    * @return {boolean} true when OK
+   * @protected
    */
-  validateEvt(...evt) {
+  _validateEvt(...evt) {
     evt.forEach(e => {
       if (!isString(e)) {
         this.logger('(validateEvt)', e)
@@ -38,9 +43,10 @@ export default class BaseClass {
    * @param {string} evt event name
    * @param {function} callback function to call
    * @return {boolean} true when OK
+   * @protected
    */
-  validate(evt, callback) {
-    if (this.validateEvt(evt)) {
+  _validate(evt, callback) {
+    if (this._validateEvt(evt)) {
       if (typeof callback === 'function') {
 
         return true
@@ -53,9 +59,10 @@ export default class BaseClass {
    * Check if this type is correct or not added in V1.5.0
    * @param {string} type for checking
    * @return {boolean} true on OK
+   * @protected
    */
-  validateType(type) {
-    this.validateEvt(type)
+  _validateType(type) {
+    this._validateEvt(type)
 
     return !!AVAILABLE_TYPES.filter(t => type === t).length
   }
@@ -66,8 +73,9 @@ export default class BaseClass {
    * @param {array} payload for callback
    * @param {object} ctx context or null
    * @return {void} the result store in $done
+   * @protected
    */
-  run(callback, payload, ctx) {
+  _run(callback, payload, ctx) {
     this.logger('(run) callback:', callback, 'payload:', payload, 'context:', ctx)
     this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
 
@@ -79,8 +87,18 @@ export default class BaseClass {
    * The build-in store some how could store the same values!
    * @param {function} fn the converted to string function
    * @return {string} hashKey
+   * @protected
    */
-  hashFnToKey(fn) {
+  _hashFnToKey(fn) {
     return hashCode2Str(fn.toString())
+  }
+
+  /**
+   * make sure we store the argument correctly
+   * @param {*} arg could be array
+   * @return {array} make sured
+   */
+  toArray(arg) {
+    return Array.isArray(arg) ? arg : [arg]
   }
 }

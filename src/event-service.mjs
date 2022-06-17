@@ -8,10 +8,10 @@ import {
   NEG_RETURN
 } from './constants.mjs'
 import { isInt } from './utils.mjs'
-import StoreService from './store-service.mjs'
+import SuspendClass from './suspend.mjs'
 
 // export
-export default class EventService extends StoreService {
+export default class EventService extends SuspendClass {
   /**
    * class constructor
    */
@@ -33,7 +33,7 @@ export default class EventService extends StoreService {
    */
   $on(evt , callback , context = null) {
     const type = 'on'
-    this.validate(evt, callback)
+    this._validate(evt, callback)
     // first need to check if this evt is in lazy store
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register first then call later
@@ -53,7 +53,7 @@ export default class EventService extends StoreService {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger(`($on)`, `call run "${evt}"`)
-      this.run(callback, payload, context || ctx)
+      this._run(callback, payload, context || ctx)
       size += this.addToNormalStore(evt, type, callback, context || ctx)
     })
 
@@ -71,7 +71,7 @@ export default class EventService extends StoreService {
    * @return {boolean} result
    */
   $once(evt , callback , context = null) {
-    this.validate(evt, callback)
+    this._validate(evt, callback)
 
     let lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
@@ -94,7 +94,7 @@ export default class EventService extends StoreService {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger('($once)', `call run "${evt}"`)
-      this.run(callback, payload, context || ctx)
+      this._run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
     }
@@ -108,7 +108,7 @@ export default class EventService extends StoreService {
    * @return {boolean} true bind for first time, false already existed
    */
   $only(evt, callback, context = null) {
-    this.validate(evt, callback)
+    this._validate(evt, callback)
 
     let added = false
     let lazyStoreContent = this.takeFromStore(evt)
@@ -132,7 +132,7 @@ export default class EventService extends StoreService {
           throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
         }
         this.logger(`($only) call run "${evt}"`)
-        this.run(callback, payload, context || ctx)
+        this._run(callback, payload, context || ctx)
       })
     }
 
@@ -148,7 +148,7 @@ export default class EventService extends StoreService {
    * @return {void}
    */
   $onlyOnce(evt, callback, context = null) {
-    this.validate(evt, callback)
+    this._validate(evt, callback)
 
     let added = false
     let lazyStoreContent = this.takeFromStore(evt)
@@ -170,7 +170,7 @@ export default class EventService extends StoreService {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger(`($onlyOnce) call run "${evt}"`)
-      this.run(callback, payload, context || ctx)
+      this._run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
     }
@@ -191,7 +191,7 @@ export default class EventService extends StoreService {
    * @return {function} the event handler
    */
   $max(evtName, max, ctx = null) {
-    this.validateEvt(evtName)
+    this._validateEvt(evtName)
     if (isInt(max) && max > 0) {
       // find this in the normalStore
       const fnSet = this.$get(evtName, true)
@@ -241,7 +241,7 @@ export default class EventService extends StoreService {
    * @return {*}
    */
   $replace(evt, callback, context = null, type = ON_TYPE) {
-    if (this.validateType(type)) {
+    if (this._validateType(type)) {
       this.$off(evt)
       let method = this['$' + type]
       this.logger(`($replace)`, evt, callback)
@@ -260,7 +260,7 @@ export default class EventService extends StoreService {
    * @return {number} if it has been execute how many times
    */
   $trigger(evt , payload = [] , context = null, type = false) {
-    this.validateEvt(evt)
+    this._validateEvt(evt)
     let found = 0
     // first check the normal store
     let nStore = this.normalStore
@@ -282,7 +282,7 @@ export default class EventService extends StoreService {
         // this.logger('found', found)
         let [ _, callback, ctx, _type ] = nSet[i]
         this.logger(`($trigger) call run for ${type}:${evt}`)
-        this.run(callback, payload, context || ctx)
+        this._run(callback, payload, context || ctx)
         if (_type === 'once' || _type === 'onlyOnce') {
           hasOnce = true
         }
@@ -323,7 +323,7 @@ export default class EventService extends StoreService {
    */
   $off(evt) {
     // @TODO we will allow a regex pattern to mass remove event
-    this.validateEvt(evt)
+    this._validateEvt(evt)
     let stores = [ this.lazyStore, this.normalStore ]
 
     return !!stores
@@ -340,7 +340,7 @@ export default class EventService extends StoreService {
    */
   $get(evt, full = false) {
     // @TODO should we allow the same Regex to search for all?
-    this.validateEvt(evt)
+    this._validateEvt(evt)
     let store = this.normalStore
     return this.findFromStore(evt, store, full)
   }

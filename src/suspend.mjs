@@ -15,9 +15,9 @@ this.watch('suspend', function(value, prop, oldValue) {
 })
 */
 import { getRegex, isRegExp } from './utils.mjs'
-import BaseClass from './base.mjs'
+import StoreService from './store-service.mjs'
 // main
-export default class SuspendClass extends BaseClass {
+export default class SuspendClass extends StoreService {
 
   constructor(config) {
     super(config)
@@ -79,17 +79,15 @@ export default class SuspendClass extends BaseClass {
       this.logger(`($releaseEvent)`, pattern)
       const regex = getRegex(pattern)
       if (isRegExp(regex) && this.__isPatternRegisterd(regex)) {
-        const self = this
+        const self = this // not necessary to do this anymore
 
         return this.__getToReleaseQueue(regex)
           .map((args, i) => {
-
             Reflect.apply(self.$trigger, self, args)
 
             return i
           }).reduce((a, b) => ++b, 0)
       }
-
       this.logger('$releaseEvent throw error ==========================>', this.__pattern__, regex)
       throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
     })
@@ -141,6 +139,7 @@ export default class SuspendClass extends BaseClass {
    * otherwise, it will never get release
    * @param {*} pattern to find the queue
    * @return {array} queue to get execute
+   * @protected
    */
   __getToReleaseQueue(regex) {
     // first get the list of events in the queue store that match this pattern
@@ -167,6 +166,7 @@ export default class SuspendClass extends BaseClass {
    * @param {*} evt
    * @param {*} args
    * @return {boolean}
+   * @protected
    */
   __addToQueueStore(evt, args) {
     this.logger(`($queue) ${evt} added to $queueStore`, args)
@@ -182,6 +182,7 @@ export default class SuspendClass extends BaseClass {
    * check if certain pattern already registered in the queue
    * @param {*} pattern
    * @return {boolean}
+   * @protected
    */
   __isPatternRegisterd(pattern) {
     // this is a bit of a hack to compare two regex Object
@@ -193,6 +194,7 @@ export default class SuspendClass extends BaseClass {
   /**
    * to set the suspend and check if it's boolean value
    * @param {boolean} value to trigger
+   * @protected
    */
   __suspend__(value) {
     if (typeof value === 'boolean') {
@@ -210,8 +212,9 @@ export default class SuspendClass extends BaseClass {
   /**
    * Release the queue, this is a wholesale release ALL
    * @return {int} size if any
+   * @protected
    */
-  __release__() {
+   __release__() {
     let size = this.queueStore.size
     let pattern = this.__pattern__
     this.__pattern__ = []

@@ -8,15 +8,15 @@ import {
   ON_MAX_TYPES
 } from './constants.mjs'
 import { isInt, inArray } from './utils.mjs'
-import SuspendClass from './suspend.mjs'
+// import SuspendClass from './suspend.mjs'
+import BaseClass from './base.mjs'
+
 // @TODO need to decoup this and make it standalone
-export default class StoreService extends SuspendClass {
+export default class StoreService extends BaseClass {
 
   constructor(config = {}) {
-    super()
-    if (config.logger && typeof config.logger === 'function') {
-      this.logger = config.logger
-    }
+    super(config)
+
     this.keep = config.keep
     // for the $done setter
     this.result = config.keep ? [] : null
@@ -32,6 +32,7 @@ export default class StoreService extends SuspendClass {
    * the execution will be unable to determine the number of calls
    * @param {string} evtName event name
    * @return {number} the count of this store
+   * @protected
    */
   getMaxStore(evtName) {
     return this.maxCountStore.get(evtName) || NEG_RETURN
@@ -42,6 +43,7 @@ export default class StoreService extends SuspendClass {
    * @param {*} evtName
    * @param {*} [max=null]
    * @return {number} when return -1 means removed
+   * @protected
    */
   checkMaxStore(evtName, max = null) {
     this.logger(`===========================================`)
@@ -278,7 +280,7 @@ export default class StoreService extends SuspendClass {
 
       this.logger('(addToNormalStore)', `"${type}" --> "${evt}" can add to normal store`)
 
-      let key = this.hashFnToKey(callback)
+      let key = this._hashFnToKey(callback)
       let args = [this.normalStore, evt, key, callback, context, type]
       let [_store, size] = Reflect.apply(this.addToStore, this, args)
       this.normalStore = _store
@@ -314,15 +316,6 @@ export default class StoreService extends SuspendClass {
   }
 
   /**
-   * make sure we store the argument correctly
-   * @param {*} arg could be array
-   * @return {array} make sured
-   */
-  toArray(arg) {
-    return Array.isArray(arg) ? arg : [arg]
-  }
-
-  /**
    * setter to store the Set in private
    * @param {object} obj a Set
    */
@@ -351,6 +344,4 @@ export default class StoreService extends SuspendClass {
   get lazyStore() {
     return NB_EVENT_SERVICE_PRIVATE_LAZY.get(this)
   }
-
-
 }

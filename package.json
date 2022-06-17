@@ -1,7 +1,7 @@
 {
   "name": "@to1source/event",
   "version": "1.4.0",
-  "description": "An universal event (emitter) service for Browser / Node",
+  "description": "An universal event (emitter) / bus for Browser / Node.js",
   "module": "index.mjs",
   "browser": "dist/to1source-event.js",
   "main": "dist/to1source-event.cjs",
