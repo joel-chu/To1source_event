@@ -14,10 +14,11 @@
     "src"
   ],
   "scripts": {
-    "prepublishOnly": "npm run build && npm run coverage",
-    "test": "ava",
-    "coverage": "nyc ava",
+    "prepublishOnly": "npm run build && npm run test:coverage",
+    "test:ava": "ava",
+    "test:coverage": "nyc ava",
     "build": "npm run clean:dist && npm run build:rollup",
+    "test": "npm run build && npm run test:ava",
     "build:rollup": "rollup -c",
     "clean:dist": "rimraf ./dist",
     "build:test": "rollup -c ./rollup.test.config.js",

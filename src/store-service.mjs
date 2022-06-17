@@ -229,7 +229,7 @@ export default class StoreService extends BaseClass {
    * @return {boolean} true you can add, false then you can't add this type
    */
   checkTypeInStore(evtName, type) {
-    this.validateEvt(evtName, type)
+    this._validateEvt(evtName, type)
     let all = this.$get(evtName, true)
     if (all === false) {
       // pristine it means you can add
@@ -247,7 +247,7 @@ export default class StoreService extends BaseClass {
    * therefore we need to use a new method to check it
    */
   checkTypeInLazyStore(evtName, type) {
-    this.validateEvt(evtName, type)
+    this._validateEvt(evtName, type)
     let store = this.lazyStore.get(evtName)
     this.logger('(checkTypeInLazyStore)', store)
 
