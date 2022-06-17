@@ -3,7 +3,7 @@
 const test = require('ava')
 
 const To1sourceEvent = require('../dist/to1source-event.cjs')
-const logger = require('debug')('nb-event-service:test:array')
+const logger = require('debug')('to1source-event:test:array')
 
 test.before(t => {
   t.context.evtSrv = new To1sourceEvent({
@@ -12,19 +12,19 @@ test.before(t => {
   t.context.arrayParam = ['cats', 'dog', 'pig']
 })
 
-test.cb(`We should able to get the result back as an array`, t => {
-
+test(`We should able to get the result back as an array`, async (t) => {
   t.plan(1)
-  let evtName = 'array-params'
-  const evt = t.context.evtSrv
+  return new Promise(resolver => {
+    let evtName = 'array-params'
+    const evt = t.context.evtSrv
 
-  evt.$on(evtName, function(value) {
-    logger('value', value)
-    t.is(3, value.length)
-    t.end()
-    return value
+    evt.$on(evtName, function(value) {
+      logger('value', value)
+      t.is(3, value.length)
+      resolver(true)
+      return value
+    })
+
+    evt.$call(evtName)(t.context.arrayParam)
   })
-
-  evt.$call(evtName)(t.context.arrayParam)
-
 })

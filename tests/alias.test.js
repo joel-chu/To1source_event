@@ -2,9 +2,10 @@
 const test = require('ava')
 
 const To1sourceEvent = require('../dist/alias')
-const logger = require('debug')('nb-event-service')
-const debug  = require('debug')('nb-event-service:test:basic')
-let value = 1000;
+const logger = require('debug')('to1source-event')
+const debug  = require('debug')('to1source-event:test:basic')
+
+let value = 1000
 
 test.before( t => {
   t.context.evtSrv = new To1sourceEvent({
@@ -12,45 +13,46 @@ test.before( t => {
   })
 })
 
-test.cb('It should able to bind a simple test and callback', t => {
+test('It should able to bind a simple test and callback', async (t) => {
   t.plan(1)
-  let evtName = 'simple'
-  t.context.evtSrv.on(evtName, function(num) {
-    t.is(num, value)
-    t.end()
-  })
-  t.context.evtSrv.emit(evtName, value)
-})
-
-test.cb('It should able to emit the event before register the listener', t => {
-  t.plan(1)
-  let evtName = 'simple-reverse'
-
-  t.context.evtSrv.emit(evtName, value)
-
-  t.context.evtSrv.on(evtName, function(num) {
-    t.is(num, value)
-    t.end()
+  return new Promise(resolver => {
+    let evtName = 'simple'
+    t.context.evtSrv.on(evtName, function(num) {
+      t.is(num, value)
+      resolver(true)
+    })
+    t.context.evtSrv.emit(evtName, value)
   })
 })
 
-test.cb('It should able to add more than one listerner to the same event', t => {
+test('It should able to emit the event before register the listener', async (t) => {
+  t.plan(1)
+  return new Promise(resolver => {
+    let evtName = 'simple-reverse'
+    t.context.evtSrv.emit(evtName, value)
+    t.context.evtSrv.on(evtName, function(num) {
+      t.is(num, value)
+      resolver(true)
+    })
+  })
+})
+
+test('It should able to add more than one listerner to the same event', async (t) => {
   t.plan(2)
+  return new Promise(resolver => {
+    let evtName = 'multiple'
+    let letter = 'again'
 
-  let evtName = 'multiple'
-  let letter = 'again'
+    t.context.evtSrv.on(evtName, function(a) {
+      t.is(a , letter)
+    })
 
-  t.context.evtSrv.on(evtName, function(a) {
-    t.is(a , letter)
+    t.context.evtSrv.on(evtName, function(b) {
+      t.is(b, letter)
+      resolver(true)
+    })
+    t.context.evtSrv.emit(evtName, letter)
   })
-
-  t.context.evtSrv.on(evtName, function(b) {
-    t.is(b, letter)
-    t.end()
-  })
-
-  t.context.evtSrv.emit(evtName, letter)
-
 })
 
 test('It should not allow to add the same function again', t => {
@@ -122,7 +124,6 @@ test('Using $trigger and $call should make the callback run again', t => {
 
   t.is(ctn, 2)
 
-  t.pass()
 })
 
 test('Should not able to call the method once the $off is called', t => {

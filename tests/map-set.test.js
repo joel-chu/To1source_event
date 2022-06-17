@@ -1,6 +1,6 @@
 // testing the using Map and Set
 const test = require('ava')
-const debug = require('debug')('nb-event-service:test:map-set')
+const debug = require('debug')('to1source-event:test:map-set')
 
 test('A Set should not allow the same thing add twice', t => {
   let ctn = 0;
@@ -15,7 +15,7 @@ test('A Set should not allow the same thing add twice', t => {
 })
 
 test('It should able to store a Set inside a Map', t => {
-  let ctn = 0;
+  let ctn = 0
   const testFnA = () => {
     debug(`call A ${++ctn}`)
   }
@@ -31,13 +31,12 @@ test('It should able to store a Set inside a Map', t => {
   let ts1 = testMap.get('key-1')
   ts1.add(testFnA)
   ts1.add(testFnB)
-
-  t.is(testMap.get('key-1').size, 2)
-
+  // this is just for looking from debug
   for (let fn of ts1) {
     fn()
   }
-  t.pass()
+
+  t.is(testMap.get('key-1').size, 2)
 })
 
 test('It should able to store multiple level within a class structure and act like a private property', t => {
@@ -70,8 +69,6 @@ test('It should able to store multiple level within a class structure and act li
   let dummyValue1 = dummyIns.get()
 
   t.is( dummyValue1.get('a').size, 1 )
-
-  t.pass()
 })
 
 test('It should store one item if its adding different thing to the same key', t => {
@@ -103,6 +100,4 @@ test('It should store one item if its adding different thing to the same key', t
   dummyInstance.add(mapB)
 
   t.truthy( dummyInstance.get().has('key-2') )
-
-
 })

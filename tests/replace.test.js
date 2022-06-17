@@ -1,8 +1,8 @@
 const test = require('ava')
 
 const To1sourceEvent =  require('../dist/to1source-event.cjs')
-const logger = require('debug')('nb-event-service')
-const debug  = require('debug')('nb-event-service:test:replace')
+const logger = require('debug')('to1source-event')
+const debug  = require('debug')('to1source-event:test:replace')
 
 
 test.before(t => {
@@ -21,21 +21,23 @@ test('It should able to validate against the type', t => {
 })
 
 
-test.cb('It should able to replace the event callback', t => {
-  let evtSrv = t.context.evtSrv
-  let evt = 'same-event'
+test('It should able to replace the event callback', async (t) => {
+  t.plan(1)
+  return new Promise(resolver => {
+    const evtSrv = t.context.evtSrv
+    const evt = 'same-event'
 
-  evtSrv.$on(evt, (n) => {
-    debug('first callback', n)
+    evtSrv.$on(evt, (n) => {
+      debug('first callback', n)
+    })
+
+    evtSrv.$trigger(evt, 0)
+
+    evtSrv.$replace(evt, (n) => {
+      t.is(n, 1)
+      resolver(true)
+    })
+
+    evtSrv.$trigger(evt, 1)
   })
-
-  evtSrv.$trigger(evt, 0)
-
-  evtSrv.$replace(evt, (n) => {
-    t.is(n, 1)
-    t.end()
-  })
-
-  evtSrv.$trigger(evt, 1)
-
 })

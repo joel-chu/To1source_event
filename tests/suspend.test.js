@@ -1,8 +1,8 @@
 // test the suspend feature
 const test = require('ava')
 const To1sourceEvent = require('../dist/to1source-event.cjs')
-const logger = require('debug')('nb-event-service')
-const debug  = require('debug')('nb-event-service:test:basic')
+const logger = require('debug')('to1source-event')
+const debug  = require('debug')('to1source-event:test:basic')
 const colors = require('colors/safe')
 
 const { getRegex, isRegExp } = require('../src/utils')
@@ -54,26 +54,26 @@ test(`It should able to use the suspend to hold all the calls then release it`, 
   t.is(evtSrv.$done, 101) // 101
 })
 
-test.cb(`Testing the $suspendEvent method`, t => {
+test(`Testing the $suspendEvent method`, async (t) => {
   t.plan(1)
+  return new Promise(resolver => {
+    const evt = new To1sourceEvent({ logger })
 
-  const evt = new To1sourceEvent({ logger })
+    evt.$on('some-event-ok', () => {
+      debug('ok')
+      t.pass()
+      resolver(true)
+    })
+    // this shouldn't pass
+    evt.$on('some-event-not-great', () => {
+      debug('Not great!')
+    })
+    // @NOTE you can pass the entire event name or just part that can match by indexOf
+    evt.$suspendEvent(`-not-great`)
 
-  evt.$on('some-event-ok', () => {
-    debug('ok')
-    t.pass()
-    t.end()
+    evt.$trigger('some-event-ok')
+    evt.$trigger('some-event-not-great')
   })
-  // this shouldn't pass
-  evt.$on('some-event-not-great', () => {
-    debug('Not great!')
-    t.end()
-  })
-  // @NOTE you can pass the entire event name or just part that can match by indexOf
-  evt.$suspendEvent(`-not-great`)
-
-  evt.$trigger('some-event-ok')
-  evt.$trigger('some-event-not-great')
 })
 
 test(`Test the combine $suspendEvent and $releaseEvent`, t => {
@@ -119,81 +119,82 @@ test(`Test the combine $suspendEvent and $releaseEvent`, t => {
 
 })
 
-test.cb(`Testing the multiple suspendEvent and releaseEvent`, t => {
-  let ctn = 0
+test(`Testing the multiple suspendEvent and releaseEvent`, async (t) => {
   const plan = 5
   t.plan(plan)
 
+  return new Promise(resolver => {
 
-  const loggerX = (str, ...args) => Reflect.apply(debug, null, [colors.blue.bgBrightYellow(str), ...args])
+    let ctn = 0
 
-  const loggerY = (str, ...args) => Reflect.apply(debug, null, [colors.red.bgWhite(str), ...args])
+    const loggerX = (str, ...args) => Reflect.apply(debug, null, [colors.blue.bgBrightYellow(str), ...args])
 
-  const eventNames = [
-    `jsonql/public_onReady`,
-    `jsonql/public_onEmit`,
-    `jsonql/private_onLogin`,
-    `jsonql/private_onEmit`
-  ]
+    const loggerY = (str, ...args) => Reflect.apply(debug, null, [colors.red.bgWhite(str), ...args])
 
-  const evtSrv = new To1sourceEvent({ logger: loggerX })
-  // this will not get affected 
-  evtSrv.$on(`add`, function(from) {
-    ++ctn 
-    if (from === 'test-add') {
-      loggerY('test-add got triggered')
-      t.pass()
-      return
-    }
+    const eventNames = [
+      `jsonql/public_onReady`,
+      `jsonql/public_onEmit`,
+      `jsonql/private_onLogin`,
+      `jsonql/private_onEmit`
+    ]
 
-    loggerY(from)
-    
-    if (ctn >= plan) {
-      t.end()
-    }
-    return ctn 
+    const evtSrv = new To1sourceEvent({ logger: loggerX })
+    // this will not get affected
+    evtSrv.$on(`add`, function(from) {
+      ++ctn
+      if (from === 'test-add') {
+        loggerY('test-add got triggered')
+        t.pass()
+        return
+      }
+      loggerY(from)
+      if (ctn >= plan) {
+        resolver(true)
+      }
+      return ctn
+    })
+    const add = from => evtSrv.$trigger('add', [from])
+
+    evtSrv.$only(eventNames[0], function(namespace) {
+      t.truthy(namespace, '[1]') // 1
+      add(eventNames[0])
+    })
+
+    evtSrv.$only(eventNames[1], function(payload) {
+      t.truthy(payload, '[2]')
+      add(eventNames[1])
+    })
+
+    evtSrv.$only(eventNames[2], function() {
+      t.pass('[3]')
+      add(eventNames[2])
+    })
+
+    evtSrv.$only(eventNames[3], function(payload) {
+      t.truthy(payload, '[4]')
+      add(eventNames[3])
+    })
+
+    // hold the events
+
+    evtSrv.$suspendEvent(`jsonql/public`, `jsonql/private`)
+
+    add('test-add')
+
+    evtSrv.$trigger(eventNames[0], ['jsonql/public'])
+
+    evtSrv.$trigger(eventNames[1], [{name: 'Joel'}])
+
+    evtSrv.$trigger(eventNames[2], [])
+
+    evtSrv.$trigger(eventNames[3], [{msg: 'nothing'}])
+
+    // up until this point there is nothing been trigger
+
+    evtSrv.$releaseEvent(`jsonql/public`)
+
+    evtSrv.$releaseEvent(`jsonql/private`)
+
   })
-  const add = from => evtSrv.$trigger('add', [from])
-
-  evtSrv.$only(eventNames[0], function(namespace) {
-    t.truthy(namespace, '[1]') // 1
-    add(eventNames[0])
-  })
-
-  evtSrv.$only(eventNames[1], function(payload) {
-    t.truthy(payload, '[2]')
-    add(eventNames[1])
-  })
-
-  evtSrv.$only(eventNames[2], function() {
-    t.pass('[3]')
-    add(eventNames[2])
-  })
-
-  evtSrv.$only(eventNames[3], function(payload) {
-    t.truthy(payload, '[4]')
-    add(eventNames[3])
-  })
-
-  // hold the events 
-
-  evtSrv.$suspendEvent(`jsonql/public`, `jsonql/private`)
-  
-  add('test-add')
-
-  evtSrv.$trigger(eventNames[0], ['jsonql/public'])
-
-  evtSrv.$trigger(eventNames[1], [{name: 'Joel'}])
-
-  evtSrv.$trigger(eventNames[2], [])
-
-  evtSrv.$trigger(eventNames[3], [{msg: 'nothing'}])
-
-  // up until this point there is nothing been trigger
-
-  evtSrv.$releaseEvent(`jsonql/public`)
-
-  evtSrv.$releaseEvent(`jsonql/private`)
 
 })
-

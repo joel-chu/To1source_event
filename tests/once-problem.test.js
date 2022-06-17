@@ -1,8 +1,8 @@
 const test = require('ava')
 
 const To1sourceEvent = require('../dist/to1source-event.cjs')
-const logger = require('debug')('nb-event-service')
-const debug  = require('debug')('nb-event-service:test:only-problem')
+const logger = require('debug')('to1source-event')
+const debug  = require('debug')('to1source-event:test:only-problem')
 let value = 1000;
 
 test.before( t => {
@@ -13,8 +13,8 @@ test.before( t => {
 
 test('This is how $once normally works', t => {
   // problem is when you call $trigger before you register it with $once
-  let evtName = 'once-normal'
-  let evtSrv = t.context.evtSrv
+  const evtName = 'once-normal'
+  const evtSrv = t.context.evtSrv
 
   evtSrv.$trigger(evtName, 1000)
 
@@ -31,34 +31,36 @@ test('This is how $once normally works', t => {
 
 })
 
-test.cb('$once should allow to add more than one listner', t => {
+test('$once should allow to add more than one listner', async (t) => {
   t.plan(3)
-  let evtName = 'more-once'
-  let evtSrv = t.context.evtSrv
+  return new Promise(resolver => {
+    const evtName = 'more-once'
+    const evtSrv = t.context.evtSrv
 
-  evtSrv.$once(evtName, function() {
-    debug('$once', 'First listener')
-    t.pass()
-    return 1
+    evtSrv.$once(evtName, function() {
+      debug('$once', 'First listener')
+      t.pass()
+      return 1
+    })
+
+    evtSrv.$once(evtName, function() {
+      debug('$once', 'Second listener')
+      t.pass()
+      resolver(true)
+      return 2
+    })
+
+    evtSrv.$call(evtName)()
+
+    t.is(evtSrv.$done, 2)
   })
-
-  evtSrv.$once(evtName, function() {
-    debug('$once', 'Second listener')
-    t.pass()
-    t.end()
-    return 2
-  })
-
-  evtSrv.$call(evtName)()
-
-  t.is(evtSrv.$done, 2)
 
 })
 
-test.only('It should be fixed with the check type before adding to the store, but the $done value can be unpredictable', t => {
+test('It should be fixed with the check type before adding to the store, but the $done value can be unpredictable', t => {
 
-  let evtName = 'once-problem'
-  let evtSrv = t.context.evtSrv
+  const evtName = 'once-problem'
+  const evtSrv = t.context.evtSrv
 
   evtSrv.$trigger(evtName, 1000)
 

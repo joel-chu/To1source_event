@@ -2,8 +2,8 @@
 const test = require('ava')
 
 const To1sourceEvent =  require('../dist/to1source-event.cjs')
-const logger = require('debug')('nb-event-service')
-const debug  = require('debug')('nb-event-service:test:lazy')
+const logger = require('debug')('to1source-event')
+const debug  = require('debug')('to1source-event:test:lazy')
 
 test.before(t => {
   t.context.evtSrv = new To1sourceEvent({
@@ -12,8 +12,8 @@ test.before(t => {
 })
 
 test('when using the context as type in lazy store, other type should not able to add to lazystore', t => {
-  let es = t.context.evtSrv;
-  let evt = 'not-here-yet'
+  const es = t.context.evtSrv
+  const evt = 'not-here-yet'
   // first we trigger an non-exist event
 
   es.$trigger(evt, 1, null, 'on')
@@ -28,8 +28,8 @@ test('when using the context as type in lazy store, other type should not able t
 })
 
 test('It should throw an error if the event been trigger with one type but try to register with another', t => {
-  let es = t.context.evtSrv;
-  let evt = 'some-event'
+  const es = t.context.evtSrv
+  const evt = 'some-event'
 
   es.$trigger(evt, 1, null, 'on')
 
@@ -41,8 +41,8 @@ test('It should throw an error if the event been trigger with one type but try t
 })
 
 test('using $call should able to pass the type without passing the context', t => {
-  let es = t.context.evtSrv;
-  let evt = 'just-calling'
+  const es = t.context.evtSrv
+  const evt = 'just-calling'
 
   es.$call(evt, 'only')(100)
 
@@ -50,6 +50,10 @@ test('using $call should able to pass the type without passing the context', t =
     debug(num)
   })
 
-  t.throws(() => fn(), /*Error*/null, 'It should throw error because already register with $only')
+  t.throws(
+    () => fn(), 
+    /*Error*/null, 
+    'It should throw error because already register with $only'
+  )
 
 })
