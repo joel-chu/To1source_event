@@ -40,6 +40,11 @@
   "homepage": "https://gitee.com:to1source/to1source_event",
   "keywords": [
     "event",
+    "esm",
+    "browser",
+    "eventEmitter",
+    "eventBus",
+    "bus",
     "javascript",
     "node"
   ],
