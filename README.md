@@ -222,8 +222,8 @@ Or it will return `false` if there is nothing
 
 #### $suspend / $release
 
-When you call `$suspend` , all the `$trigger` and `$call` action will have no effect and put into a temporary 
-store, and wait until you call `$release`. This is an on / off switch no in between. 
+When you call `$suspend` , all the `$trigger` and `$call` action will have no effect and put into a temporary
+store, and wait until you call `$release`. This is an on / off switch no in between.
 
 ```js
 const evtSrv = new To1sourceEvent()
@@ -247,7 +247,7 @@ console.log(evtSrv.$done) // 101
 #### $suspendEvent(eventNamePattern)
 
 This is similar to `$suspend`, but it allows you to provide an event name pattern to those event name that matches.
-It allow you to add mutliple `eventNamePattern`. **Important to note that, if `$suspend` has been called, 
+It allow you to add mutliple `eventNamePattern`. **Important to note that, if `$suspend` has been called,
 this method has no effect.**
 
 ```js
@@ -277,7 +277,7 @@ In the above example, only the `some-event-ok` will get triggered.
 
 If you call `$release` instead, then everything will get release at once.
 
-Also you can pass as many pattern as you want 
+Also you can pass as many pattern as you want
 
 
 ```js
@@ -288,7 +288,7 @@ evtSrv.$suspendEvent(`event-to-suspend-1`, `event-to-suspend-2`)
 #### $releaseEvent(eventNamePattern)
 
 This is the opposite of the `$suspendEvent`; it will release those suspend events if it matches the `eventNamePattern`.
-It will return the number of the released event from queue. And it's the same like `$suspendEvent`, if `$suspend` already 
+It will return the number of the released event from queue. And it's the same like `$suspendEvent`, if `$suspend` already
 been called; it has no effect.
 
 ```js
@@ -414,6 +414,10 @@ console.log(es.$done) // should see a 1001
 You will get a 1001. This might be useful in some situation. Please note, it will get call
 whenever an event gets trigger; if at the same time some other event trigger, then your value
 might be different from what you expected. So use this with caution.
+
+## Types for typescript
+
+V.1.5.0 add type definition to the project `@types/index.d.ts` and its included in the package.json.
 
 ## Test
 
