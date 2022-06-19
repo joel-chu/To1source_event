@@ -4,34 +4,34 @@
 class WatchClass {}
 // @TODO upgrade it with Proxy
 if (!WatchClass.prototype.watch) {
- Object.defineProperty(WatchClass.prototype, "watch", {
-     enumerable: false,
-     configurable: true,
-     writable: false,
-     value: function (prop, handler) {
-       var old = this[prop]
-       var cur = old
-       var getter = function () {
-          return cur
-       }
-       var setter = function (val) {
+  Object.defineProperty(WatchClass.prototype, 'watch', {
+    enumerable: false,
+    configurable: true,
+    writable: false,
+    value: function (prop, handler) {
+      var old = this[prop]
+      var cur = old
+      var getter = function () {
+        return cur
+      }
+      var setter = function (val) {
         old = cur
         // We change the order of the params
         cur = handler.call(this, val, prop, old)
 
         return cur
-       }
-       // can't watch constants
-       if (delete this[prop]) {
-        Object.defineProperty(this,prop,{
-            get: getter,
-            set: setter,
-            enumerable: true,
-            configurable: true
+      }
+      // can't watch constants
+      if (delete this[prop]) {
+        Object.defineProperty(this, prop, {
+          get: getter,
+          set: setter,
+          enumerable: true,
+          configurable: true
         })
-       }
+      }
     }
- })
+  })
 }
 
 // instead of polluting the global prototype we create this as an class method instead

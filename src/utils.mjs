@@ -4,8 +4,8 @@
  * @param {string} s the converted to string function
  * @return {string} the hashed function string
  */
-export function hashCode(s) {
-	return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)
+export function hashCode (s) {
+  return s.split('').reduce(function (a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0)
 }
 
 /**
@@ -13,7 +13,7 @@ export function hashCode(s) {
  * @param {*} input whatever
  * @return {string} output
  */
-export function hashCode2Str(s) {
+export function hashCode2Str (s) {
   return hashCode(s) + ''
 }
 
@@ -22,7 +22,7 @@ export function hashCode2Str(s) {
  * @param {*} pat whatever
  * @return {boolean} false when its not
  */
-export function isRegExp(pat) {
+export function isRegExp (pat) {
   return pat instanceof RegExp
 }
 
@@ -31,7 +31,7 @@ export function isRegExp(pat) {
  * @param {*} arg whatever
  * @return {boolean} false when it's not
  */
-export function isString(arg) {
+export function isString (arg) {
   return typeof arg === 'string'
 }
 
@@ -40,9 +40,9 @@ export function isString(arg) {
  * @param {*} num input number
  * @return {boolean}
  */
-export function isInt(num) {
+export function isInt (num) {
   if (isString(num)) {
-    throw new Error(`Wrong type, we want number!`)
+    throw new Error('Wrong type, we want number!')
   }
   return !isNaN(parseInt(num))
 }
@@ -52,7 +52,7 @@ export function isInt(num) {
  * @param {*} pattern a string or RegExp object
  * @return {object} regex object or false when we can not id the input
  */
-export function getRegex(pattern) {
+export function getRegex (pattern) {
   switch (true) {
     case isRegExp(pattern) === true:
       return pattern
@@ -68,5 +68,4 @@ export function getRegex(pattern) {
  * @param {array} arr to search
  * @param {*} prop to search
  */
- // export const inArray = (arr, prop) => !!arr.filter(v => prop === v).length
- export const inArray = (arr, prop) => arr.includes(prop) // 2022 version
+export const inArray = (arr, prop) => arr.includes(prop) // 2022 version

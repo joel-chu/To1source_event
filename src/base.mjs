@@ -3,8 +3,7 @@ import { hashCode2Str, isString } from './utils.mjs'
 import { AVAILABLE_TYPES } from './constants.mjs'
 // main
 export default class BaseClass {
-
-  constructor(config = {}) {
+  constructor (config = {}) {
     if (config.logger && typeof config.logger === 'function') {
       this.logger = config.logger
     }
@@ -13,10 +12,10 @@ export default class BaseClass {
   /**
    * logger function for overwrite
    */
-  logger() {}
+  logger () {}
 
   // for id if the instance is this class
-  get $name() {
+  get $name () {
     return 'to1source-event'
   }
 
@@ -26,7 +25,7 @@ export default class BaseClass {
    * @return {boolean} true when OK
    * @protected
    */
-  _validateEvt(...evt) {
+  _validateEvt (...evt) {
     evt.forEach(e => {
       if (!isString(e)) {
         this.logger('(validateEvt)', e)
@@ -45,10 +44,9 @@ export default class BaseClass {
    * @return {boolean} true when OK
    * @protected
    */
-  _validate(evt, callback) {
+  _validate (evt, callback) {
     if (this._validateEvt(evt)) {
       if (typeof callback === 'function') {
-
         return true
       }
     }
@@ -61,7 +59,7 @@ export default class BaseClass {
    * @return {boolean} true on OK
    * @protected
    */
-  _validateType(type) {
+  _validateType (type) {
     this._validateEvt(type)
 
     return !!AVAILABLE_TYPES.filter(t => type === t).length
@@ -75,7 +73,7 @@ export default class BaseClass {
    * @return {void} the result store in $done
    * @protected
    */
-  _run(callback, payload, ctx) {
+  _run (callback, payload, ctx) {
     this.logger('(run) callback:', callback, 'payload:', payload, 'context:', ctx)
     this.$done = Reflect.apply(callback, ctx, this.toArray(payload))
 
@@ -89,7 +87,7 @@ export default class BaseClass {
    * @return {string} hashKey
    * @protected
    */
-  _hashFnToKey(fn) {
+  _hashFnToKey (fn) {
     return hashCode2Str(fn.toString())
   }
 
@@ -98,7 +96,7 @@ export default class BaseClass {
    * @param {*} arg could be array
    * @return {array} make sured
    */
-  toArray(arg) {
+  toArray (arg) {
     return Array.isArray(arg) ? arg : [arg]
   }
 }

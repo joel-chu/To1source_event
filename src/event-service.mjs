@@ -15,13 +15,9 @@ export default class EventService extends SuspendClass {
   /**
    * class constructor
    */
-  constructor(config = {}) {
+  constructor (config = {}) {
     super(config)
   }
-
-  //////////////////////////
-  //    PUBLIC METHODS    //
-  //////////////////////////
 
   /**
    * Register your evt handler, note we don't check the type here,
@@ -31,11 +27,11 @@ export default class EventService extends SuspendClass {
    * @param {object} [context=null] to execute this call in
    * @return {number} the size of the store
    */
-  $on(evt , callback , context = null) {
+  $on (evt, callback, context = null) {
     const type = 'on'
     this._validate(evt, callback)
     // first need to check if this evt is in lazy store
-    let lazyStoreContent = this.takeFromStore(evt)
+    const lazyStoreContent = this.takeFromStore(evt)
     // this is normal register first then call later
     if (lazyStoreContent === false) {
       this.logger(`($on) "${evt}" is not in lazy store`)
@@ -48,15 +44,14 @@ export default class EventService extends SuspendClass {
     // this is when they call $trigger before register this callback
     let size = 0
     lazyStoreContent.forEach(content => {
-      let [ payload, ctx, t ] = content
+      const [payload, ctx, t] = content
       if (t && t !== type) {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
-      this.logger(`($on)`, `call run "${evt}"`)
+      this.logger('($on)', `call run "${evt}"`)
       this._run(callback, payload, context || ctx)
       size += this.addToNormalStore(evt, type, callback, context || ctx)
     })
-
     this.logger(`($on) return size ${size}`)
     return size
   }
@@ -70,10 +65,9 @@ export default class EventService extends SuspendClass {
    * @param {object} [context=null] the handler execute in
    * @return {boolean} result
    */
-  $once(evt , callback , context = null) {
+  $once (evt, callback, context = null) {
     this._validate(evt, callback)
-
-    let lazyStoreContent = this.takeFromStore(evt)
+    const lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
     // let nStore = this.normalStore
     if (lazyStoreContent === false) {
@@ -89,7 +83,7 @@ export default class EventService extends SuspendClass {
       this.logger('($once)', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
-      const [ payload, ctx, t ] = list[0]
+      const [payload, ctx, t] = list[0]
       if (t && t !== ONCE_TYPE) {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
@@ -107,27 +101,23 @@ export default class EventService extends SuspendClass {
    * @param {object} [context=null] the context the event handler execute in
    * @return {boolean} true bind for first time, false already existed
    */
-  $only(evt, callback, context = null) {
+  $only (evt, callback, context = null) {
     this._validate(evt, callback)
-
     let added = false
-    let lazyStoreContent = this.takeFromStore(evt)
+    const lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
-    let nStore = this.normalStore
-
+    const nStore = this.normalStore
     if (!nStore.has(evt)) {
       this.logger(`($only) "${evt}" add to normalStore`)
-
       added = this.addToNormalStore(evt, ONLY_TYPE, callback, context)
     }
-
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger(`($only) "${evt}" found data in lazy store to execute`)
       const list = Array.from(lazyStoreContent)
       // $only allow to trigger this multiple time on the single handler
-      list.forEach( li => {
-        const [ payload, ctx, t ] = li
+      list.forEach(li => {
+        const [payload, ctx, t] = li
         if (t && t !== ONLY_TYPE) {
           throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
         }
@@ -135,7 +125,6 @@ export default class EventService extends SuspendClass {
         this._run(callback, payload, context || ctx)
       })
     }
-
     return added
   }
 
@@ -147,25 +136,22 @@ export default class EventService extends SuspendClass {
    * @param {object} [context=null] exeucte context
    * @return {void}
    */
-  $onlyOnce(evt, callback, context = null) {
+  $onlyOnce (evt, callback, context = null) {
     this._validate(evt, callback)
-
     let added = false
-    let lazyStoreContent = this.takeFromStore(evt)
+    const lazyStoreContent = this.takeFromStore(evt)
     // this is normal register before call $trigger
-    let nStore = this.normalStore
+    const nStore = this.normalStore
     if (!nStore.has(evt)) {
       this.logger(`($onlyOnce) "${evt}" add to normalStore`)
-
       added = this.addToNormalStore(evt, ONLY_ONCE_TYPE, callback, context)
     }
-
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger('($onlyOnce)', lazyStoreContent)
       const list = Array.from(lazyStoreContent)
       // should never have more than 1
-      const [ payload, ctx, t ] = list[0]
+      const [payload, ctx, t] = list[0]
       if (t && t !== ONLY_ONCE_TYPE) {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
@@ -190,7 +176,7 @@ export default class EventService extends SuspendClass {
    * @param {*} [ctx=null] the context the callback execute in
    * @return {function} the event handler
    */
-  $max(evtName, max, ctx = null) {
+  $max (evtName, max, ctx = null) {
     this._validateEvt(evtName)
     if (isInt(max) && max > 0) {
       // find this in the normalStore
@@ -199,16 +185,16 @@ export default class EventService extends SuspendClass {
         const evts = this.searchMapEvt(evtName)
         if (evts.length) {
           // should only have one anyway
-          const [,,,type] = evts[0]
+          const [,,, type] = evts[0]
           // now init the max store
-          const value = this.checkMaxStore(evtName, max)
+          // const value = this.checkMaxStore(evtName, max)
           const _self = this
           /**
            * construct the callback
            * @param {array<*>} args
            * @return {number}
            */
-          return function executeMaxCall(...args) {
+          return function executeMaxCall (...args) {
             const ctn = _self.getMaxStore(evtName)
             let value = NEG_RETURN
             if (ctn > 0) {
@@ -240,12 +226,11 @@ export default class EventService extends SuspendClass {
    * @param {string} [type=on] what type of method to replace
    * @return {*}
    */
-  $replace(evt, callback, context = null, type = ON_TYPE) {
+  $replace (evt, callback, context = null, type = ON_TYPE) {
     if (this._validateType(type)) {
       this.$off(evt)
-      let method = this['$' + type]
-      this.logger(`($replace)`, evt, callback)
-
+      const method = this['$' + type]
+      this.logger('($replace)', evt, callback)
       return Reflect.apply(method, this, [evt, callback, context])
     }
     throw new Error(`${type} is not supported!`)
@@ -259,28 +244,28 @@ export default class EventService extends SuspendClass {
    * @param {string} [type=false] if pass this then we need to add type to store too
    * @return {number} if it has been execute how many times
    */
-  $trigger(evt , payload = [] , context = null, type = false) {
+  $trigger (evt, payload = [], context = null, type = false) {
     this._validateEvt(evt)
     let found = 0
     // first check the normal store
-    let nStore = this.normalStore
+    const nStore = this.normalStore
     this.logger('($trigger) normalStore', nStore)
     if (nStore.has(evt)) {
       this.logger(`($trigger) "${evt}" found`)
       // @1.8.0 to add the suspend queue
-      let added = this.$queue(evt, payload, context, type)
+      const added = this.$queue(evt, payload, context, type)
       if (added) {
         this.logger(`($trigger) Currently suspended "${evt}" added to queue, nothing executed. Exit now.`)
         return false // not executed
       }
-      let nSet = Array.from(nStore.get(evt))
-      let ctn = nSet.length
+      const nSet = Array.from(nStore.get(evt))
+      const ctn = nSet.length
       let hasOnce = false
       // let hasOnly = false
-      for (let i=0; i < ctn; ++i) {
+      for (let i = 0; i < ctn; ++i) {
         ++found
         // this.logger('found', found)
-        let [ _, callback, ctx, _type ] = nSet[i]
+        const [, callback, ctx, _type] = nSet[i]
         this.logger(`($trigger) call run for ${type}:${evt}`)
         this._run(callback, payload, context || ctx)
         if (_type === 'once' || _type === 'onlyOnce') {
@@ -306,12 +291,10 @@ export default class EventService extends SuspendClass {
    * @param {object} context what context callback execute in
    * @return {*} from $trigger
    */
-  $call(evt, type = false, context = null) {
+  $call (evt, type = false, context = null) {
     const ctx = this
-
-    return function executeCall(...args) {
-      let _args = [evt, args, context, type]
-
+    return function executeCall (...args) {
+      const _args = [evt, args, context, type]
       return Reflect.apply(ctx.$trigger, ctx, _args)
     }
   }
@@ -321,15 +304,15 @@ export default class EventService extends SuspendClass {
    * @param {string} evt name
    * @return {boolean} true actually delete something
    */
-  $off(evt) {
+  $off (evt) {
     // @TODO we will allow a regex pattern to mass remove event
     this._validateEvt(evt)
-    let stores = [ this.lazyStore, this.normalStore ]
+    const stores = [this.lazyStore, this.normalStore]
 
     return !!stores
-          .filter(store => store.has(evt))
-          .map(store => this.removeFromStore(evt, store))
-          .length
+      .filter(store => store.has(evt))
+      .map(store => this.removeFromStore(evt, store))
+      .length
   }
 
   /**
@@ -338,10 +321,10 @@ export default class EventService extends SuspendClass {
    * @param {boolean} [full=false] if true then return the entire content
    * @return {array|boolean} listerner(s) or false when not found
    */
-  $get(evt, full = false) {
+  $get (evt, full = false) {
     // @TODO should we allow the same Regex to search for all?
     this._validateEvt(evt)
-    let store = this.normalStore
+    const store = this.normalStore
     return this.findFromStore(evt, store, full)
   }
 
@@ -349,7 +332,7 @@ export default class EventService extends SuspendClass {
    * store the return result from the run
    * @param {*} value whatever return from callback
    */
-  set $done(value) {
+  set $done (value) {
     this.logger('($done) set value: ', value)
     if (this.keep) {
       this.result.push(value)
@@ -363,7 +346,7 @@ export default class EventService extends SuspendClass {
    * getter for $done
    * @return {*} whatever last store result
    */
-  get $done() {
+  get $done () {
     this.logger('($done) get result:', this.result)
     if (this.keep) {
       return this.result[this.result.length - 1]
@@ -376,9 +359,9 @@ export default class EventService extends SuspendClass {
    * @param {number|null} idx of the store, null means all
    * @return {void}
    */
-  $debug(idx = null) {
-    let names = ['lazyStore', 'normalStore']
-    let stores = [this.lazyStore, this.normalStore]
+  $debug (idx = null) {
+    const names = ['lazyStore', 'normalStore']
+    const stores = [this.lazyStore, this.normalStore]
     if (stores[idx]) {
       this.logger(names[idx], stores[idx])
     } else {

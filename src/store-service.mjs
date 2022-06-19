@@ -13,8 +13,7 @@ import BaseClass from './base.mjs'
 
 // @TODO need to decoup this and make it standalone
 export default class StoreService extends BaseClass {
-
-  constructor(config = {}) {
+  constructor (config = {}) {
     super(config)
 
     this.keep = config.keep
@@ -34,7 +33,7 @@ export default class StoreService extends BaseClass {
    * @return {number} the count of this store
    * @protected
    */
-  getMaxStore(evtName) {
+  getMaxStore (evtName) {
     return this.maxCountStore.get(evtName) || NEG_RETURN
   }
 
@@ -45,8 +44,8 @@ export default class StoreService extends BaseClass {
    * @return {number} when return -1 means removed
    * @protected
    */
-  checkMaxStore(evtName, max = null) {
-    this.logger(`===========================================`)
+  checkMaxStore (evtName, max = null) {
+    this.logger('===========================================')
     this.logger('checkMaxStore start', evtName, max)
     // init the store
     if (max !== null && isInt(max)) {
@@ -58,9 +57,7 @@ export default class StoreService extends BaseClass {
     if (max === null) {
       // first check if this exist in the maxStore
       let value = this.getMaxStore(evtName)
-
       this.logger('getMaxStore value', value)
-
       if (value !== NEG_RETURN) {
         if (value > 0) {
           --value
@@ -83,14 +80,12 @@ export default class StoreService extends BaseClass {
    * @param {string} evtName to search for
    * @return {array} empty array when not found
    */
-  searchMapEvt(evtName) {
+  searchMapEvt (evtName) {
     const evts = this.$get(evtName, true) // return in full
     const search = evts.filter(result => {
-      const [ ,,,type ] = result
-
+      const [,,, type] = result
       return inArray(ON_MAX_TYPES, type)
     })
-
     return search.length ? search : []
   }
 
@@ -100,19 +95,16 @@ export default class StoreService extends BaseClass {
    * @param {string} [storeName = lazyStore] name of store
    * @return {object|boolean} content or false on not found
    */
-  takeFromStore(evt, storeName = 'lazyStore') {
-    let store = this[storeName] // it could be empty at this point
+  takeFromStore (evt, storeName = 'lazyStore') {
+    const store = this[storeName] // it could be empty at this point
     if (store) {
       this.logger('(takeFromStore)', storeName, store)
-
       if (store.has(evt)) {
-        let content = store.get(evt)
+        const content = store.get(evt)
         this.logger(`(takeFromStore) has "${evt}"`, content)
         store.delete(evt)
-
         return content
       }
-
       return false
     }
     throw new Error(`"${storeName}" is not supported!`)
@@ -126,16 +118,15 @@ export default class StoreService extends BaseClass {
    * @param {boolean} full return just the callback or everything
    * @return {array|boolean} false when not found
    */
-  findFromStore(evt, store, full = false) {
+  findFromStore (evt, store, full = false) {
     if (store.has(evt)) {
       return Array
         .from(store.get(evt))
-        .map( list => {
+        .map(list => {
           if (full) {
             return list
           }
-          let [, callback,] = list
-
+          const [, callback] = list
           return callback
         })
     }
@@ -148,11 +139,10 @@ export default class StoreService extends BaseClass {
    * @param {object} store the store to remove from
    * @return {boolean} false when not found
    */
-  removeFromStore(evt, store) {
+  removeFromStore (evt, store) {
     if (store.has(evt)) {
       this.logger('($off)', evt)
       store.delete(evt)
-
       return true
     }
     return false
@@ -164,7 +154,7 @@ export default class StoreService extends BaseClass {
    * @param {string} evt event name
    * @return {object} the set within the store
    */
-  getStoreSet(store, evt) {
+  getStoreSet (store, evt) {
     let fnSet
     if (store.has(evt)) {
       this.logger(`(addToStore) "${evt}" existed`)
@@ -184,20 +174,20 @@ export default class StoreService extends BaseClass {
    * @param {spread} args because the lazy store and normal store store different things
    * @return {array} store and the size of the store
    */
-  addToStore(store, evt, ...args) {
+  addToStore (store, evt, ...args) {
     const fnSet = this.getStoreSet(store, evt)
     // lazy only store 2 items - this is not the case in V1.6.0 anymore
     // we need to check the first parameter is string or not
     if (args.length > 2) {
       if (Array.isArray(args[0])) { // lazy store
         // check if this type of this event already register in the lazy store
-        let [,,type] = args
+        const [,, type] = args
         if (!this.checkTypeInLazyStore(evt, type)) {
           fnSet.add(args)
         }
       } else {
         if (!this.checkContentExist(args, fnSet)) {
-          this.logger(`(addToStore) insert new`, args)
+          this.logger('(addToStore) insert new', args)
           fnSet.add(args)
         }
       }
@@ -214,10 +204,10 @@ export default class StoreService extends BaseClass {
    * @param {object} fnSet A Set to search from
    * @return {boolean} true on exist
    */
-  checkContentExist(args, fnSet) {
-    let list = Array.from(fnSet)
+  checkContentExist (args, fnSet) {
+    const list = Array.from(fnSet)
     return !!list.filter(_list => {
-      let [hash,] = _list
+      const [hash] = _list
       return hash === args[0]
     }).length
   }
@@ -228,16 +218,16 @@ export default class StoreService extends BaseClass {
    * @param {string} type the type to check
    * @return {boolean} true you can add, false then you can't add this type
    */
-  checkTypeInStore(evtName, type) {
+  checkTypeInStore (evtName, type) {
     this._validateEvt(evtName, type)
-    let all = this.$get(evtName, true)
+    const all = this.$get(evtName, true)
     if (all === false) {
       // pristine it means you can add
       return true
     }
     // it should only have ONE type in ONE event store
     return !all.filter(list => {
-      let [ ,,,t ] = list
+      const [,,, t] = list
       return type !== t
     }).length
   }
@@ -246,21 +236,18 @@ export default class StoreService extends BaseClass {
    * This is checking just the lazy store because the structure is different
    * therefore we need to use a new method to check it
    */
-  checkTypeInLazyStore(evtName, type) {
+  checkTypeInLazyStore (evtName, type) {
     this._validateEvt(evtName, type)
-    let store = this.lazyStore.get(evtName)
+    const store = this.lazyStore.get(evtName)
     this.logger('(checkTypeInLazyStore)', store)
-
     if (store) {
-
       return !!Array
         .from(store)
         .filter(li => {
-          let [,,t] = li
+          const [,, t] = li
           return t !== type
         }).length
     }
-
     return false
   }
 
@@ -273,16 +260,15 @@ export default class StoreService extends BaseClass {
    * @param {object} context the context the function execute in or null
    * @return {number} size of the store
    */
-  addToNormalStore(evt, type, callback, context = null) {
+  addToNormalStore (evt, type, callback, context = null) {
     this.logger(`(addToNormalStore) try to add "${type}" --> "${evt}" to normal store`)
     // @TODO we need to check the existing store for the type first!
     if (this.checkTypeInStore(evt, type)) {
-
       this.logger('(addToNormalStore)', `"${type}" --> "${evt}" can add to normal store`)
 
-      let key = this._hashFnToKey(callback)
-      let args = [this.normalStore, evt, key, callback, context, type]
-      let [_store, size] = Reflect.apply(this.addToStore, this, args)
+      const key = this._hashFnToKey(callback)
+      const args = [this.normalStore, evt, key, callback, context, type]
+      const [_store, size] = Reflect.apply(this.addToStore, this, args)
       this.normalStore = _store
 
       return size
@@ -300,15 +286,15 @@ export default class StoreService extends BaseClass {
    * @param {string} [type=false] register a type so no other type can add to this evt
    * @return {number} size of the store
    */
-  addToLazyStore(evt, payload = [], context = null, type = false) {
+  addToLazyStore (evt, payload = [], context = null, type = false) {
     // this is add in V1.6.0
     // when there is type then we will need to check if this already added in lazy store
     // and no other type can add to this lazy store
-    let args = [this.lazyStore, evt, this.toArray(payload), context]
+    const args = [this.lazyStore, evt, this.toArray(payload), context]
     if (type) {
       args.push(type)
     }
-    let [_store, size] = Reflect.apply(this.addToStore, this, args)
+    const [_store, size] = Reflect.apply(this.addToStore, this, args)
     this.lazyStore = _store
     this.logger(`(addToLazyStore) size: ${size}`)
 
@@ -319,14 +305,14 @@ export default class StoreService extends BaseClass {
    * setter to store the Set in private
    * @param {object} obj a Set
    */
-  set normalStore(obj) {
+  set normalStore (obj) {
     NB_EVENT_SERVICE_PRIVATE_STORE.set(this, obj)
   }
 
   /**
    * @return {object} Set object
    */
-  get normalStore() {
+  get normalStore () {
     return NB_EVENT_SERVICE_PRIVATE_STORE.get(this)
   }
 
@@ -334,14 +320,14 @@ export default class StoreService extends BaseClass {
    * setter to store the Set in lazy store
    * @param {object} obj a Set
    */
-  set lazyStore(obj) {
-    NB_EVENT_SERVICE_PRIVATE_LAZY.set(this , obj)
+  set lazyStore (obj) {
+    NB_EVENT_SERVICE_PRIVATE_LAZY.set(this, obj)
   }
 
   /**
    * @return {object} the lazy store Set
    */
-  get lazyStore() {
+  get lazyStore () {
     return NB_EVENT_SERVICE_PRIVATE_LAZY.get(this)
   }
 }

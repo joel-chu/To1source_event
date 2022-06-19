@@ -4,40 +4,39 @@
 import EventService from './src/event-service.mjs'
 
 export default class AliasEventService extends EventService {
-
-  constructor(options = {}) {
+  constructor (options = {}) {
     super(options)
   }
 
-  on(...args) {
+  on (...args) {
     return Reflect.apply(this.$on, this, args)
   }
 
-  off(...args) {
+  off (...args) {
     return Reflect.apply(this.$off, this, args)
   }
 
-  emit(...args) {
+  emit (...args) {
     return Reflect.apply(this.$trigger, this, args)
   }
 
-  once(...args) {
+  once (...args) {
     return Reflect.apply(this.$once, this, args)
   }
 
-  only(...args) {
+  only (...args) {
     return Reflect.apply(this.$only, this, args)
   }
 
-  onlyOnce(...args) {
+  onlyOnce (...args) {
     return Reflect.apply(this.$onlyOnce, this, args)
   }
 
-  get(...args) {
+  get (...args) {
     return Reflect.apply(this.$get, this, args)
   }
 
-  replace(...args) {
+  replace (...args) {
     return Reflect.apply(this.$replace, this, args)
   }
 }
