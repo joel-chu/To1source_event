@@ -187,7 +187,8 @@ export default class EventService extends SuspendClass {
           // should only have one anyway
           const [,,, type] = evts[0]
           // now init the max store
-          // const value = this.checkMaxStore(evtName, max)
+          const value = this.checkMaxStore(evtName, max)
+          this.logger('$max value', value)
           const _self = this
           /**
            * construct the callback
