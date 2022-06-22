@@ -3,12 +3,12 @@
  */
 import { join } from 'path'
 
-import buble from 'rollup-plugin-buble'
+import buble from '@rollup/plugin-buble'
 import { terser } from 'rollup-plugin-terser'
 import size from 'rollup-plugin-bundle-size'
 
-const env = process.env.NODE_ENV
-const target = process.env.TARGET
+// const env = process.env.NODE_ENV
+// const target = process.env.TARGET
 const base = join(__dirname)
 const outDir = join(base, 'dist')
 
@@ -40,7 +40,7 @@ export default [{
     format: 'cjs',
     sourcemap: true,
     exports: 'default'
-  },{
+  }, {
     file: join(outDir, 'alias.js'),
     format: 'umd',
     name: 'To1sourceEvent',
