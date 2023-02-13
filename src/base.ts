@@ -1,6 +1,6 @@
 // setup a base class to put all the share methods
-import { hashCode2Str, isString, trueTypeOf, toArray } from './lib/utils'
-import { AVAILABLE_TYPES, PKG_NAME } from './lib/constants'
+import { hashCode2Str, trueTypeOf, toArray, inArray } from './lib/utils'
+import { AVAILABLE_TYPES, PKG_NAME, EVT_NAME_TYPES } from './lib/constants'
 // types
 export declare type EventClassConfig = {
   logger?: (...args: Array<unknown>) => void
@@ -27,9 +27,10 @@ export default class BaseClass {
   // @TODO should also suport symbol
   protected _validateEvt (...evt: Array<unknown>): boolean {
     evt.forEach((e: unknown) => {
-      if (!isString(e)) {
-        this.logger('ERROR: validteEvt', e)
-        throw new Error(`Event name must be string type! we got ${typeof e}`)
+      const t = trueTypeOf(e)
+      if (!inArray(EVT_NAME_TYPES, t)) {
+        this.logger('ERROR: validteEvt', t)
+        throw new Error(`Event name must be ${EVT_NAME_TYPES.join(' or ')} type! we got ${t}`)
       }
     })
     return true
@@ -48,7 +49,7 @@ export default class BaseClass {
   protected _validateEvtType (type: unknown): boolean {
     this._validateEvt(type)
 
-    return !!AVAILABLE_TYPES.filter(t => type === t).length
+    return inArray(AVAILABLE_TYPES, type)
   }
 
   // encode the function to a hash key
