@@ -21,6 +21,7 @@ export class StoresClass extends BaseClass {
   private normalStore = new Map<EvtName, StoreContent>()
   private lazyStore = new Map<EvtName, StoreContent>()
   private maxCountStore = new Map<EvtName, number>()
+  // reserved for future development 
   private keep = false
 
   constructor(config: ClassConfig = {}) {
@@ -107,7 +108,7 @@ export class StoresClass extends BaseClass {
         const content = store.get(evt)
         this.logger(`(takeFromStore) has "${String(evt)}"`, content)
         store.delete(evt)
-        return content
+        return content as StoreContent
       }
       return false
     }
@@ -125,7 +126,7 @@ export class StoresClass extends BaseClass {
   ) {
     if (store.has(evt)) {
       return Array
-        .from(store.get(evt))
+        .from(store.get(evt) as unknown as Set<unknown>)
         .map(list => {
           if (full) {
             return list
@@ -156,10 +157,10 @@ export class StoresClass extends BaseClass {
    * Take out from addToStore for reuse
    * @NOTE the param order is different because this operation follow this order
    */
-  public getStoreSet (
+  public getStoreSet<T> (
     store: StoreType,
     evt: EvtName
-  ) {
+  ): Set<T> {
     let fnSet
     if (store.has(evt)) {
       this.logger(`(addToStore) "${String(evt)}" existed`)
@@ -169,7 +170,7 @@ export class StoresClass extends BaseClass {
       // this is new
       fnSet = new Set()
     }
-    return fnSet
+    return fnSet as Set<T>
   }
 
   /**
@@ -200,7 +201,7 @@ export class StoresClass extends BaseClass {
     } else { // add straight to lazy store
       fnSet.add(args)
     }
-    store.set(evt, fnSet)
+    store.set(evt, fnSet as unknown as StoreContent)
 
     return [store, fnSet.size]
   }
@@ -258,7 +259,7 @@ export class StoresClass extends BaseClass {
         .from(store)
         .filter(li => {
           const [,, t] = li as Array<StoreContent>
-          return t !== type
+          return t as unknown as string !== type
         }).length
     }
     return false
