@@ -2,16 +2,15 @@
   "name": "@to1source/event",
   "version": "2.0.0-alpha.1",
   "description": "An universal event (emitter) / bus for Browser / Node.js",
-  "module": "index.mjs",
-  "browser": "dist/to1source-event.js",
-  "main": "dist/to1source-event.cjs",
+  "module": "index.js",
+  "browser": "dist/to1source-event.browser.js",
+  "main": "dist/to1source-event.js",
   "typings": "@types/index.d.ts",
   "files": [
     "@types",
-    "alias.mjs",
-    "index.mjs",
-    "dist",
-    "src"
+    "alias.js",
+    "index.js",
+    "dist"
   ],
   "scripts": {
     "prepublishOnly": "npm run build && npm run test:coverage",
@@ -21,21 +20,13 @@
     "test": "npm run build && npm run test:ava",
     "build:rollup": "rollup -c",
     "clean:dist": "rimraf ./dist",
-    "build:test": "rollup -c ./rollup.test.config.js",
-    "test:browser": "node ./tests/fixtures/browser.js",
-    "test:basic": "DEBUG=to1source-event:* ava ./tests/basic.test.js",
-    "test:ms": "DEBUG=to1source-event:* ava ./tests/map-set.test.js",
-    "test:once": "DEBUG=to1source-event:* ava ./tests/once-problem.test.js",
-    "test:alias": "DEBUG=to1source-event:* ava ./tests/alias.test.js",
-    "test:only": "DEBUG=to1source-event:* ava ./tests/only.test.js",
-    "test:oo": "DEBUG=to1source-event:* ava ./tests/only-once.test.js",
-    "test:replace": "DEBUG=to1source-event:* ava ./tests/replace.test.js",
-    "test:lazy": "DEBUG=to1source-event:* ava ./tests/lazy.test.js",
-    "test:watch": "DEBUG=to1source-event:* ava ./tests/watch.test.js",
-    "test:array": "DEBUG=to1source-event:* ava ./tests/array-result.test.js",
-    "test:suspend": "DEBUG=to1source-event:* ava ./tests/suspend.test.js",
-    "test:max": "DEBUG=to1source-event:* ava ./tests/max.test.js",
-    "qunit": "node ./tests/qunit/run-qunit.mjs"
+    "build:tsc": "tsc -p tsconfig.json",
+    "build:browser:esbuild": "esbuild ./src/index.ts --bundle --minify --sourcemap --outfile=./dist/to1source-event.browser.js",
+    "build:esm": "esbuild ./src/index.ts --format=esm --bundle --minify --sourcemap --outfile=./index.js",
+    "build:alias": "esbuild ./src/alias.ts --format=esm --bundle --minify --sourcemap --outfile=./alias.js",
+    "build:umd": "esbuild ./src/index.ts --format=umd --bundle --minify --sourcemap --outfile=./dist/to1source-event.js",
+    "ts:check": "tsc -noEmit",
+    "qunit": "node ./tests/qunit/run-qunit.js"
   },
   "repository": {
     "type": "git",
@@ -55,34 +46,28 @@
   "author": "to1source <tosource@foxmail.com>",
   "license": "UNLICENSED",
   "ava": {
+    "verbose": true,
     "files": [
-      "tests/*.test.js",
-      "!tests/helpers/*.*",
-      "!tests/fixtures/*.*",
-      "!tests/qunit/*.*"
+      "tests/**/*.test.ts",
+      "!tests/qunit/*.*",
+      "!tests/fixtures/*.*"
+    ],
+    "extensions": [
+      "ts"
     ],
     "require": [
-      "esm"
-    ],
-    "cache": true,
-    "concurrency": 5,
-    "failFast": true,
-    "failWithoutAssertions": false,
-    "tap": false,
-    "verbose": false
+      "esbuild-register"
+    ]
   },
   "devDependencies": {
-    "@rollup/plugin-buble": "^1.0.2",
     "ava": "^5.2.0",
     "debug": "^4.3.4",
     "esbuild": "^0.17.7",
-    "esm": "^3.2.25",
     "nyc": "^15.1.0",
     "qunit": "^2.19.4",
     "rimraf": "^4.1.2",
     "rollup": "^3.15.0",
     "rollup-plugin-bundle-size": "^1.0.3",
-    "rollup-plugin-terser": "^7.0.2",
     "server-io-core": "2.5.0",
     "typescript": "^4.9.5"
   }
