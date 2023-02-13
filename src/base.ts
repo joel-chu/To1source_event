@@ -1,17 +1,16 @@
 // setup a base class to put all the share methods
+import type { ClassConfig } from './lib/types'
 import { hashCode2Str, trueTypeOf, toArray, inArray } from './lib/utils'
 import { AVAILABLE_TYPES, PKG_NAME, EVT_NAME_TYPES } from './lib/constants'
-// types
-export declare type EventClassConfig = {
-  logger?: (...args: Array<unknown>) => void
-}
+
+
 export declare type CallbackHandler = (this: unknown, ...args: unknown[]) => unknown
 // def
-export default class BaseClass {
+export class BaseClass {
 
   protected $done: unknown
 
-  constructor(config: EventClassConfig = {}) {
+  constructor(config: ClassConfig = {}) {
     // override the logger method
     if (config.logger && trueTypeOf(config.logger) === 'function') {
       this.logger = config.logger
