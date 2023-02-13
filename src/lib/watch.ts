@@ -4,7 +4,7 @@
 class WatchClass {}
 export declare type WatchProps = any; // @TODO stub it for now
 export declare type CallbackHandler = (...args: any[]) => void
-// @TODO upgrade it with Proxy
+// @ts-ignore @TODO upgrade it with Proxy
 if (!WatchClass.prototype.watch) {
   Object.defineProperty(WatchClass.prototype, 'watch', {
     enumerable: false,
@@ -19,6 +19,7 @@ if (!WatchClass.prototype.watch) {
       var setter = function (val: unknown) {
         old = cur
         // We change the order of the params
+        // @ts-ignore this is untyped
         cur = handler.call(this, val, prop, old)
 
         return cur
@@ -35,6 +36,5 @@ if (!WatchClass.prototype.watch) {
     }
   })
 }
-
 // instead of polluting the global prototype we create this as an class method instead
 export { WatchClass }
