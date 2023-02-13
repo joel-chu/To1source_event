@@ -62,7 +62,8 @@
   "devDependencies": {
     "ava": "^5.2.0",
     "debug": "^4.3.4",
-    "esbuild": "^0.17.7",
+    "esbuild": "^0.17.8",
+    "esbuild-register": "^3.4.2",
     "nyc": "^15.1.0",
     "qunit": "^2.19.4",
     "rimraf": "^4.1.2",
