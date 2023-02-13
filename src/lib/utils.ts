@@ -65,6 +65,10 @@ export function getRegex (pattern: unknown): boolean | RegExp {
   }
 }
 
+export function toArray (arg: unknown) {
+	return Array.isArray(arg) ? arg : [arg]
+}
+
 /**
  * in array
  */
