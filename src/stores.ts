@@ -21,7 +21,7 @@ export class StoresClass extends BaseClass {
   private normalStore = new Map<EvtName, StoreContent>()
   private lazyStore = new Map<EvtName, StoreContent>()
   private maxCountStore = new Map<EvtName, number>()
-  // reserved for future development 
+  // reserved for future development
   private keep = false
 
   constructor(config: ClassConfig = {}) {
@@ -263,6 +263,15 @@ export class StoresClass extends BaseClass {
         }).length
     }
     return false
+  }
+
+  // check if the event name exist in the store
+  has(
+    evtName: EvtName,
+    storeName: string = 'normalStore'
+  ) {
+    const store = this[storeName as StoreNameKey]
+    return store.has(evtName)
   }
 
   /**

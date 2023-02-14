@@ -5,11 +5,15 @@ export type ClassConfig = {
   keep?: boolean
   logger?: GenericFn
 }
-// when using symbol as event name it must re-use the same symbol
-export type EvtName = string | symbol
-export type StoreContentType<T, S> = string | symbol | CallbackType<T, S> | Set<unknown> | null
+// We can't use symbol as event name because we lost the absility to regex search in store
+export type EvtName = string
+
 // because the content is not fixed, so we delegate the typing to the callee
 export type StoreContent = Array<unknown>
 export type StoreType = Map<EvtName, StoreContent>
 
 export type CallbackType<T, S> = (...args: T) => S
+
+export type ContextType = any | null
+
+export type StoreContentType = Set<unknown> | string | null

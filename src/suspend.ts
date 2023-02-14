@@ -1,11 +1,13 @@
-// We need to define this class first before the event
-import type { ClassConfig } from './lib/types'
-
-import { BaseClass } from './base'
+/**
+V.2 this turn into a standalone class
+because this is an additional feature also
+we get a catch-22 problem (in TS, ESM works fine)
+**/
+import type { EvtName } from './lib/types'
 import { StoresClass } from './stores'
 import { getRegex, isRegExp } from './lib/utils'
 // def
-export class SuspendClass extends BaseClass {
+export class SuspendClass {
   // suspend, release and queue
   protected __suspend_state__: boolean | null = null
   // to do this proper we don't use a new prop to hold the event name pattern
@@ -15,11 +17,20 @@ export class SuspendClass extends BaseClass {
   protected queueStore = new Set()
   // the StoreClass instance
   protected $store: StoresClass
+  // placeholder
+  private $trigger
+  // for override
+  private logger(...args: Array<unknown>) {}
 
-  constructor(config: ClassConfig) {
-    super(config)
+  constructor(
+    store: StoresClass,
+    trigger: unknown, // @TODO
+    logger: (...args: Array<unknown>) => void
+  ) {
     // init the store engine
-    this.$store = new StoresClass(config)
+    this.$store = store
+    this.$trigger = trigger
+    this.logger = logger
   }
 
   /**
@@ -71,12 +82,13 @@ export class SuspendClass extends BaseClass {
       if (isRegExp(regex) && this.__isPatternRegisterd(regex)) {
         const self = this // not necessary to do this anymore
 
-        return this.__getToReleaseQueue(regex)
+        return this.__getToReleaseQueue(regex as RegExp)
           .map((args, i) => {
+            // @ts-ignore @TODO
             Reflect.apply(self.$trigger, self, args)
 
             return i
-          }).reduce((a, b) => ++b, 0)
+          }).reduce((_, b) => ++b, 0)
       }
       this.logger('$releaseEvent throw error ==========================>', this.__pattern__, regex)
       throw new Error(`We expect a pattern variable to be string or RegExp, but we got "${typeof regex}" instead`)
@@ -87,20 +99,20 @@ export class SuspendClass extends BaseClass {
   /**
    * queuing call up when it's in suspend mode,
    * it's currently suspending then add to store then the $trigger will do nothing
-   * @param {string} evt the event name
-   * @param {*} args unknown number of arguments
-   * @return {boolean} true when added or false when it's not
    */
-  $queue (evt, ...args) {
+  $queue (
+    evt: EvtName,
+    ...args: Array<unknown>
+  ) {
     switch (true) {
       case this.__suspend_state__ === true: // this will take priority over the pattern
         return this.__addToQueueStore(evt, args)
       case !!this.__pattern__.length === true:
         // check the pattern and decide if we want to suspend it or not
-        if (this.__pattern__.filter(p => p.test(evt)).length) {
+        if (this.__pattern__.filter((p) => (p as RegExp).test(evt)).length) {
           return this.__addToQueueStore(evt, args)
         }
-        this.logger(`($queue) ${evt} NOT added to $queueStore`, this.__pattern__)
+        this.logger(`($queue) ${String(evt)} NOT added to $queueStore`, this.__pattern__)
         return false
       default:
         this.logger('($queue) get called NOTHING added')
@@ -110,7 +122,6 @@ export class SuspendClass extends BaseClass {
 
   /**
    * a getter to get all the store queue
-   * @return {array} Set turn into Array before return
    */
   get $queues () {
     const size = this.queueStore.size
@@ -124,16 +135,17 @@ export class SuspendClass extends BaseClass {
   /**
    * The reason is before we call $trigger we need to remove the pattern from queue
    * otherwise, it will never get release
-   * @param {*} pattern to find the queue
-   * @return {array} queue to get execute
-   * @protected
    */
-  __getToReleaseQueue (regex) {
+  protected __getToReleaseQueue (
+    regex: RegExp
+  ) {
     // first get the list of events in the queue store that match this pattern
     const list = this.$queues
       // first index is the eventName
-      .filter(content => regex.test(content[0]))
-      .map(content => {
+      // @ts-ignore
+      .filter((content) => regex.test(content[0]))
+      .map((content) => {
+        // @ts-ignore
         this.logger(`[release] execute ${content[0]} matches ${regex}`, content)
         // we just remove it
         this.queueStore.delete(content)
@@ -150,28 +162,28 @@ export class SuspendClass extends BaseClass {
 
   /**
    * Wrapper method with a logger
-   * @param {*} evt
-   * @param {*} args
-   * @return {boolean}
    * @protected
    */
-  __addToQueueStore (evt, args) {
+  protected __addToQueueStore (
+    evt: EvtName,
+    args: Array<unknown>
+  ) {
     this.logger(`($queue) ${evt} added to $queueStore`, args)
 
     // @TODO should we check if this already added?
     // what if that is a multiple call like $on
-    this.queueStore.add([evt].concat(args))
+    this.queueStore.add([evt].concat(args as Array<string>))
 
     return true
   }
 
   /**
    * check if certain pattern already registered in the queue
-   * @param {*} pattern
-   * @return {boolean}
    * @protected
    */
-  __isPatternRegisterd (pattern) {
+  protected __isPatternRegisterd (
+    pattern: RegExp
+  ) {
     // this is a bit of a hack to compare two regex Object
     return !!this.__pattern__.filter(p => (
       p.toString() === pattern.toString()
@@ -183,7 +195,9 @@ export class SuspendClass extends BaseClass {
    * @param {boolean} value to trigger
    * @protected
    */
-  __suspend__ (value) {
+  protected __suspend__ (
+    value: unknown
+  ) {
     if (typeof value === 'boolean') {
       const lastValue = this.__suspend_state__
       this.__suspend_state__ = value
@@ -198,10 +212,9 @@ export class SuspendClass extends BaseClass {
 
   /**
    * Release the queue, this is a wholesale release ALL
-   * @return {int} size if any
    * @protected
    */
-  __release__ () {
+  protected __release__ () {
     const size = this.queueStore.size
     const pattern = this.__pattern__
     this.__pattern__ = []
@@ -213,8 +226,9 @@ export class SuspendClass extends BaseClass {
       this.logger('(release queue)', queue)
 
       queue.forEach(args => {
+        // @ts-ignore
         this.logger(`[release] execute ${args[0]}`, args)
-
+        // @ts-ignore
         Reflect.apply(this.$trigger, this, args)
       })
 
