@@ -264,7 +264,7 @@ export class EventClass extends BaseClass {
    */
   $trigger (
     evt: EvtName,
-    payload: Array<unknown> = [],
+    payload: unknown | Array<unknown> = [],
     context: ContextType = null,
     type: string | boolean = false
   ): number | boolean {

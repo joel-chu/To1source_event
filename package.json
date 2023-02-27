@@ -10,10 +10,10 @@
   "files": [
     "dist"
   ],
-  "exports" : {
+  "exports": {
     ".": {
-      "import" : "./dist/index.js",
-      "require" : "./dist/to1source-event.js"
+      "import": "./dist/index.js",
+      "require": "./dist/to1source-event.js"
     },
     "./alias": {
       "import": "./dist/alias.js",
@@ -35,7 +35,7 @@
     "build:cjs": "esbuild ./src/index.ts --format=cjs --bundle --minify --sourcemap --outfile=./dist/to1source-event.js",
     "build:cjs:alias": "esbuild ./src/alias.ts --format=cjs --bundle --minify --sourcemap --outfile=./dist/to1source-event.alias.js",
     "qunit": "node ./tests/qunit/run-qunit.js",
-    "typings" : "tsc -p tsconfig.typings.json"
+    "typings": "tsc -p tsconfig.typings.json"
   },
   "repository": {
     "type": "git",
@@ -69,6 +69,7 @@
     ]
   },
   "devDependencies": {
+    "@types/debug": "^4.1.7",
     "ava": "^5.2.0",
     "debug": "^4.3.4",
     "esbuild": "^0.17.8",
