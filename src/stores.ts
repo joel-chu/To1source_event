@@ -11,7 +11,7 @@ import {
   NEG_RETURN,
   ON_MAX_TYPES
 } from './lib/constants'
-import { isInt, inArray, toArray, trueTypeOf } from './lib/utils'
+import { isInt, inArray, toArray } from './lib/utils'
 import { BaseClass } from './base'
 
 // def
@@ -91,7 +91,7 @@ export class StoresClass extends BaseClass {
     const stores = [this.normalStore, this.lazyStore]
     return !!stores
       .filter(store => store.has(evt))
-      .map(store => this.$store.removeFromStore(evt, store))
+      .map(store => this.removeFromStore(evt, store))
       .length
   }
 
@@ -101,12 +101,12 @@ export class StoresClass extends BaseClass {
   public $debug (idx: number | null) {
     const names = this._stores
     const stores = [this.lazyStore, this.normalStore]
-    if (stores[idx]) {
-      this.logger(names[idx], stores[idx])
-    } else {
+    if (idx === null) {
       stores.map((store, i) => {
         this.logger(names[i], store)
       })
+    } else {
+      this.logger(names[idx], stores[idx])
     }
   }
 
