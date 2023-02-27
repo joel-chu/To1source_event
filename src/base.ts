@@ -1,7 +1,9 @@
 // setup a base class to put all the share methods
 import type {
   ClassConfig,
-  CallbackHandler
+  // CallbackHandler,
+  CallbackType,
+  DebugResult
 } from './lib/types'
 
 import { hashCode2Str, trueTypeOf, toArray, inArray } from './lib/utils'
@@ -10,16 +12,18 @@ import { AVAILABLE_TYPES, PKG_NAME, EVT_NAME_TYPES } from './lib/constants'
 // def
 export class BaseClass {
 
-  protected $done: unknown
+  protected keep = false
+  private result: DebugResult
 
   constructor(config: ClassConfig = {}) {
     // override the logger method
     if (config.logger && trueTypeOf(config.logger) === 'function') {
       this.logger = config.logger
     }
+    this.keep = !!config.keep
   }
-  // @ts-ignore
-  protected logger(...args: Array<unknown>) {}
+
+  protected logger(..._: Array<unknown>) {}
 
   get $name () {
     return PKG_NAME
@@ -59,8 +63,9 @@ export class BaseClass {
   }
 
   // execute the callback
-  protected _run (
-    callback: CallbackHandler,
+  // V.2 use generics
+  protected _run<T,S> (
+    callback: CallbackType<T, S>,
     payload: unknown,
     ctx: unknown
   ) {
@@ -68,6 +73,31 @@ export class BaseClass {
     this.$done = Reflect.apply(callback, ctx, toArray(payload))
 
     return this.$done // return it here first
+  }
+
+  /**
+   * store the return result from the run
+   */
+  set $done (value) {
+    this.logger('($done) set value: ', value)
+    if (this.keep) {
+      (this.result as Array<unknown>).push(value)
+    } else {
+      this.result = value
+    }
+  }
+
+  /**
+   * @TODO is there any real use with the keep prop?
+   * getter for $done
+   */
+  get $done () {
+    this.logger('($done) get result:', this.result)
+    if (this.keep) {
+      const _result = this.result as Array<unknown>
+      return _result[_result.length - 1]
+    }
+    return this.result
   }
 
 }
