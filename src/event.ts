@@ -16,6 +16,7 @@ import {
   TAKEN_BY_OTHER_TYPE_ERR,
   NEG_RETURN
 } from './lib/constants'
+
 import { isInt } from './lib/utils'
 
 import { BaseClass } from './base'
@@ -27,7 +28,7 @@ export class EventClass extends BaseClass {
   protected $store: StoresClass
   private $suspend: SuspendClass
 
-  constructor(config: ClassConfig) {
+  constructor (config: ClassConfig) {
     super(config)
     // init the store engine
     this.$store = new StoresClass(config)
@@ -62,9 +63,10 @@ export class EventClass extends BaseClass {
     this.logger(`($on) ${String(evt)} found in lazy store`)
     // this is when they call $trigger before register this callback
     // @ts-ignore the number is callable?
-    let size = 0
-    (lazyStoreContent as unknown as StoreContentType)
-      .forEach((content: Array<unknown>) => {
+    const lsc = lazyStoreContent as unknown as Array<StoreContent>
+    let size: number = 0
+    lsc.forEach(
+      (content: StoreContent) => {
         const [payload, ctx, t] = content
         if (t && t !== type) {
           throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
@@ -73,7 +75,7 @@ export class EventClass extends BaseClass {
 
         this._run(callback, payload, context || ctx)
         size += this.$store.addToNormalStore(evt, type, callback, context || ctx)
-    })
+      })
     this.logger(`($on) return size ${size}`)
     return size
   }

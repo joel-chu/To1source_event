@@ -1,10 +1,10 @@
 import test from 'ava'
 
 import To1SourceEvent from '../src'
-import debug from 'debug'
+// import debug from 'debug'
 
 const logger0 = console.info //debug('to1source-event')
-const logger1 = debug('to1source-event:test:basic')
+const logger1 = (...args: Array<unknown>) => Reflect.apply(console.info, console, ['test:debug'].concat(args))//debug('to1source-event:test:basic')
 
 let value = 1000
 // @ts-ignore
@@ -130,7 +130,7 @@ test('Using the $call alias to $trigger should do the same thing', t => {
   t.is(ctn1, 1)
 })
 
-test.only('Using $trigger and $call should make the callback run again', t => {
+test('Using $trigger and $call should make the callback run again', t => {
   const evtName = 'alias-two'
   let ctn2 = 0
 
