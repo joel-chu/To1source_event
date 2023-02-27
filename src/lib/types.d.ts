@@ -21,3 +21,5 @@ export type StoreContentType = Set<unknown> | string | null
 export declare type CallbackHandler = (this: unknown, ...args: unknown[]) => unknown
 
 export declare type StoreNameKey = 'lazyStore' | 'normalStore'
+
+export type DebugResult = Array<unknown> | unknown | null | undefined 

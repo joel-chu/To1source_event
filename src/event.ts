@@ -71,7 +71,7 @@ export class EventClass extends BaseClass {
           throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
         }
         this.logger('($on)', `call run "${String(evt)}"`)
-        // @ts-ignore @TODO
+
         this._run(callback, payload, context || ctx)
         size += this.$store.addToNormalStore(evt, type, callback, context || ctx)
     })
@@ -113,7 +113,6 @@ export class EventClass extends BaseClass {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger('($once)', `call run "${String(evt)}"`)
-      // @ts-ignore
       this._run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
@@ -130,12 +129,13 @@ export class EventClass extends BaseClass {
   ) {
     this._validate(evt, callback)
     let added = false
+    // first take the content out from lazy store
+    const lazyStoreContent = this.$store.takeFromStore(evt)
     // this is normal register before call $trigger
     if (!this.$store.has(evt)) {
       this.logger(`($only) "${String(evt)}" add to normalStore`)
       added = this.$store.addToNormalStore(evt, ONLY_TYPE, callback, context)
     }
-    const lazyStoreContent = this.$store.takeFromStore(evt)
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger(`($only) "${String(evt)}" found data in lazy store to execute`)
@@ -147,7 +147,6 @@ export class EventClass extends BaseClass {
           throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
         }
         this.logger(`($only) call run "${String(evt)}"`)
-        // @ts-ignore
         this._run(callback, payload, context || ctx)
       })
     }
@@ -165,13 +164,14 @@ export class EventClass extends BaseClass {
   ) {
     this._validate(evt, callback)
     let added = false
+    // @TODO investigate use isIn
+    const lazyStoreContent = this.$store.takeFromStore(evt)
     // this is normal register before call $trigger
     if (!this.$store.has(evt)) {
       this.logger(`($onlyOnce) "${String(evt)}" add to normalStore`)
       added = this.$store.addToNormalStore(evt, ONLY_ONCE_TYPE, callback, context)
     }
     // now check if evtName register in the lazy store
-    const lazyStoreContent = this.$store.takeFromStore(evt)
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger('($onlyOnce)', lazyStoreContent)
@@ -182,7 +182,6 @@ export class EventClass extends BaseClass {
         throw new Error(`${TAKEN_BY_OTHER_TYPE_ERR} ${t}`)
       }
       this.logger(`($onlyOnce) call run "${String(evt)}"`)
-      // @ts-ignore
       this._run(callback, payload, context || ctx)
       // remove this evt from store
       this.$off(evt)
@@ -191,7 +190,7 @@ export class EventClass extends BaseClass {
   }
 
   /**
-   * change the way how it suppose to work, instead of create another new store
+   * instead of create another new store
    * We perform this check on the trigger end, so we set the number max
    * whenever we call the callback, we increment a value in the store
    * once it reaches that number we remove that event from the store,
@@ -229,7 +228,6 @@ export class EventClass extends BaseClass {
               value = _self.$store.checkMaxStore(evtName)
               if (value === NEG_RETURN) {
                 _self.$off(evtName)
-                return NEG_RETURN
               }
             }
             return value
@@ -278,12 +276,12 @@ export class EventClass extends BaseClass {
     if (this.$store.has(evt)) {
       this.logger(`($trigger) "${String(evt)}" found`)
       // @1.8.0 to add the suspend queue
-      const added = this.$queue(evt, payload, context, type)
+      const added = this.$suspend.$queue(evt, payload, context, type)
       if (added) {
         this.logger(`($trigger) Currently suspended "${String(evt)}" added to queue, nothing executed. Exit now.`)
         return false // not executed
       }
-      const nSet = Array.from(nStore.get(evt))
+      const nSet = this.$store.$get(evt, true) as Array<StoreContent>
       const ctn = nSet.length
       let hasOnce = false
       // let hasOnly = false
@@ -292,18 +290,20 @@ export class EventClass extends BaseClass {
         // this.logger('found', found)
         const [, callback, ctx, _type] = nSet[i]
         this.logger(`($trigger) call run for ${type}:${evt}`)
+        // @ts-ignore
         this._run(callback, payload, context || ctx)
-        if (_type === 'once' || _type === 'onlyOnce') {
+        if (_type === ONCE_TYPE || _type === ONLY_ONCE_TYPE) {
           hasOnce = true
         }
       }
       if (hasOnce) {
-        nStore.delete(evt)
+        // nStore.delete(evt)
+        this.$off(evt)
       }
       return found
     }
     // now this is not register yet
-    this.addToLazyStore(evt, payload, context, type)
+    this.$store.addToLazyStore(evt, payload as Array<StoreContent>, context, type)
     return found
   }
 
@@ -333,69 +333,27 @@ export class EventClass extends BaseClass {
   ): boolean {
     // @TODO we will allow a regex pattern to mass remove event
     this._validateEvt(evt)
-    // @TODO do not expose this anymore
-    const stores = [this.lazyStore, this.normalStore]
 
-    return !!stores
-      .filter(store => store.has(evt))
-      .map(store => this.$store.removeFromStore(evt, store))
-      .length
+    return this.$store.$remove(evt)
   }
 
   /**
    * return all the listener bind to that event name
-   * @param {string} evtName event name
-   * @param {boolean} [full=false] if true then return the entire content
-   * @return {array|boolean} listerner(s) or false when not found
    */
-  $get (evt, full = false) {
-    // @TODO should we allow the same Regex to search for all?
-    this._validateEvt(evt)
-    const store = this.normalStore
-    return this.findFromStore(evt, store, full)
-  }
-
-  /**
-   * store the return result from the run
-   * @param {*} value whatever return from callback
-   */
-  set $done (value) {
-    this.logger('($done) set value: ', value)
-    if (this.keep) {
-      this.result.push(value)
-    } else {
-      this.result = value
-    }
-  }
-
-  /**
-   * @TODO is there any real use with the keep prop?
-   * getter for $done
-   * @return {*} whatever last store result
-   */
-  get $done () {
-    this.logger('($done) get result:', this.result)
-    if (this.keep) {
-      return this.result[this.result.length - 1]
-    }
-    return this.result
+  $get (
+    evt: EvtName,
+    full = false
+  ) {
+    // @TODO should we allow the same Regex to search for all
+    // V.2 only call the $store method
+    return this.$store.$get(evt, full)
   }
 
   /**
    * Take a look inside the stores
-   * @param {number|null} idx of the store, null means all
-   * @return {void}
    */
-  $debug (idx = null) {
-    const names = ['lazyStore', 'normalStore']
-    const stores = [this.lazyStore, this.normalStore]
-    if (stores[idx]) {
-      this.logger(names[idx], stores[idx])
-    } else {
-      stores.map((store, i) => {
-        this.logger(names[i], store)
-      })
-    }
+  $debug (idx: number | null = null): void {
+    this.$store.$debug(idx)
   }
 
 }

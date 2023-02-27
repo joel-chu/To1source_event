@@ -23,7 +23,7 @@ export class StoresClass extends BaseClass {
   // reserved for future development
   protected keep = false
   // useful in many places
-  protected _stores = ['lazyStore', 'normalStore']
+  public _stores = ['lazyStore', 'normalStore']
 
   constructor(config: ClassConfig = {}) {
     super(config)
@@ -80,6 +80,34 @@ export class StoresClass extends BaseClass {
     this._validateEvt(evtName)
     const store = this.normalStore
     return this.findFromStore(evtName, store, full)
+  }
+
+  /**
+   * this was implement in the event class before
+   * in V.2 we implement here and just let event $off calls it
+   * @TODO since we want to pass a RegExp then we only do the remove here without checking
+   */
+  public $remove(evt: EvtName): boolean {
+    const stores = [this.normalStore, this.lazyStore]
+    return !!stores
+      .filter(store => store.has(evt))
+      .map(store => this.$store.removeFromStore(evt, store))
+      .length
+  }
+
+  /**
+   * V.2 move from event class to here
+   */
+  public $debug (idx: number | null) {
+    const names = this._stores
+    const stores = [this.lazyStore, this.normalStore]
+    if (stores[idx]) {
+      this.logger(names[idx], stores[idx])
+    } else {
+      stores.map((store, i) => {
+        this.logger(names[i], store)
+      })
+    }
   }
 
   /**
