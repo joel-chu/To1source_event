@@ -11,9 +11,7 @@ isSymbol(i: unknown) => boolean
 Symbol.toString --> before pass to regex (better strip out the wrapper as well)
 
 **/
-
 import type { EvtName } from './lib/types'
-import { StoresClass } from './stores'
 import { getRegex, isRegExp } from './lib/utils'
 // def
 export class SuspendClass {
@@ -25,19 +23,19 @@ export class SuspendClass {
   // key value pair store to store the queued calls
   private queueStore = new Set()
   // the StoreClass instance
-  private $store: StoresClass
+  // private $store: StoresClass
   // placeholder
   private $trigger
   // for override
   private logger(..._: Array<unknown>) {}
 
   constructor(
-    store: StoresClass,
+    // store: StoresClass,
     trigger: unknown, // @TODO
     logger: (...args: Array<unknown>) => void
   ) {
     // init the store engine
-    this.$store = store
+    // this.$store = store
     this.$trigger = trigger
     this.logger = logger
   }
