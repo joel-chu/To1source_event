@@ -59,13 +59,14 @@ export function toString (arg: unknown): string {
 	if (isSymbol(arg)) {
 		const s = (arg as symbol).toString()
 		const s1 = s.replace('Symbol(', '')
-		// -1 doesn't work with substring? 
+		// -1 doesn't work with substring?
 		return s1.substring(0, s1.length - 1)
 	}
 	try {
 		// @ts-ignore
 		return arg.toString()
 	} catch(e) {
+		// @ts-ignore Error object should able to take more than 1 argument (but tsc throw warning)
 		throw new Error(`Unable to call toString on ${arg}`, e)
 	}
 }
@@ -82,15 +83,16 @@ export function isInt (num: unknown): boolean {
 
 /**
  * Find from the array by matching the pattern
+ * @NOTE V.2 change to throw Error instead
  */
-export function getRegex (pattern: unknown): boolean | RegExp {
+export function getRegex (pattern: unknown): RegExp{
   switch (true) {
     case isRegExp(pattern) === true:
       return pattern as RegExp
     case isString(pattern) === true:
       return new RegExp(pattern as string)
     default:
-      return false
+      throw new Error(`${pattern} can not convert to RegExp!`)
   }
 }
 

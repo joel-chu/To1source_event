@@ -22,7 +22,7 @@ export class StoresClass extends BaseClass {
   private lazyStore = new Map<EvtName, StoreContent>()
   private maxCountStore = new Map<EvtName, number>()
   // reserved for future development
-  private keep = false
+  protected keep = false
 
   constructor(config: ClassConfig = {}) {
     super(config)
