@@ -13,6 +13,16 @@
     "index.js",
     "dist"
   ],
+  "exports" : {
+    ".": {
+      "import" : "./dist/index.js",
+      "require" : "./dist/to1source-event.js"
+    },
+    "alias": {
+      "import": "./dist/alias.js",
+      "require": "./dist/to1source-event.alias.js"
+    }
+  },
   "scripts": {
     "prepublishOnly": "npm run build && npm run test:coverage",
     "test:ava": "ava",
@@ -21,13 +31,13 @@
     "test": "npm run build && npm run test:ava",
     "build:rollup": "rollup -c",
     "clean:dist": "rimraf ./dist",
-    "build:tsc": "tsc -p tsconfig.json",
     "build:browser:esbuild": "esbuild ./src/index.ts --bundle --minify --sourcemap --outfile=./dist/to1source-event.browser.js",
     "build:esm": "esbuild ./src/index.ts --format=esm --bundle --minify --sourcemap --outfile=./dist/index.js",
     "build:alias": "esbuild ./src/alias.ts --format=esm --bundle --minify --sourcemap --outfile=./dist/alias.js",
     "build:umd": "esbuild ./src/index.ts --format=umd --bundle --minify --sourcemap --outfile=./dist/to1source-event.js",
-    "ts:check": "tsc -noEmit",
-    "qunit": "node ./tests/qunit/run-qunit.js"
+    "build:umd:alias": "esbuild ./src/alias.ts --format=umd --bundle --minify --sourcemap --outfile=./dist/to1source-event.alias.js",
+    "qunit": "node ./tests/qunit/run-qunit.js",
+    "typings" : "tsc -p tsconfig.typings.json"
   },
   "repository": {
     "type": "git",
