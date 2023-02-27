@@ -58,7 +58,9 @@ export function toString (arg: unknown): string {
 	// the actual implementation
 	if (isSymbol(arg)) {
 		const s = (arg as symbol).toString()
-		return s
+		const s1 = s.replace('Symbol(', '')
+		// -1 doesn't work with substring? 
+		return s1.substring(0, s1.length - 1)
 	}
 	try {
 		// @ts-ignore
