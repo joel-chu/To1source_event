@@ -20,16 +20,23 @@ import { isInt } from './lib/utils'
 
 import { BaseClass } from './base'
 import { StoresClass } from './stores'
-
+import { SuspendClass } from './suspend'
 // def
 export class EventClass extends BaseClass {
 
   protected $store: StoresClass
+  private $suspend: SuspendClass
 
   constructor(config: ClassConfig) {
     super(config)
     // init the store engine
     this.$store = new StoresClass(config)
+    // V.2 change to a standalone class init inside event constructor
+    this.$suspend = new SuspendClass(
+      this.$store,
+      this.$trigger,
+      this.logger
+    )
   }
 
   /**
@@ -91,11 +98,13 @@ export class EventClass extends BaseClass {
       // v1.3.0 $once now allow to add multiple listeners
       return this.$store.addToNormalStore(evt, ONCE_TYPE, callback, context)
     } else {
+      // @NOTE
       // now this is the tricky bit
-      // there is a potential bug here that cause by the developer
+      // there is a potential bug here that could cause by the developer
       // if they call $trigger first, the lazy won't know it's a once call
       // so if in the middle they register any call with the same evt name
-      // then this $once call will be fucked - add this to the documentation
+      // then this $once call will be screw - add this to the documentation
+      // @TODO need to figure out a back tracking registry to avoid this situation
       this.logger('($once)', lazyStoreContent)
       const list = Array.from(lazyStoreContent as unknown as StoreContent)
       // should never have more than 1
@@ -112,7 +121,7 @@ export class EventClass extends BaseClass {
   }
 
   /**
-   * This one event can only bind one callbackback
+   * one event name can only bind one callbackback
    */
   $only<T, S> (
     evt: EvtName,
@@ -121,12 +130,12 @@ export class EventClass extends BaseClass {
   ) {
     this._validate(evt, callback)
     let added = false
-    const lazyStoreContent = this.$store.takeFromStore(evt)
     // this is normal register before call $trigger
     if (!this.$store.has(evt)) {
       this.logger(`($only) "${String(evt)}" add to normalStore`)
       added = this.$store.addToNormalStore(evt, ONLY_TYPE, callback, context)
     }
+    const lazyStoreContent = this.$store.takeFromStore(evt)
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger(`($only) "${String(evt)}" found data in lazy store to execute`)
@@ -156,12 +165,13 @@ export class EventClass extends BaseClass {
   ) {
     this._validate(evt, callback)
     let added = false
-    const lazyStoreContent = this.$store.takeFromStore(evt)
     // this is normal register before call $trigger
     if (!this.$store.has(evt)) {
       this.logger(`($onlyOnce) "${String(evt)}" add to normalStore`)
       added = this.$store.addToNormalStore(evt, ONLY_ONCE_TYPE, callback, context)
     }
+    // now check if evtName register in the lazy store
+    const lazyStoreContent = this.$store.takeFromStore(evt)
     if (lazyStoreContent !== false) {
       // there are data store in lazy store
       this.logger('($onlyOnce)', lazyStoreContent)
@@ -214,9 +224,8 @@ export class EventClass extends BaseClass {
             const ctn = _self.$store.getMaxStore(evtName)
             let value = NEG_RETURN
             if (ctn > 0) {
-              const fn = _self.$call(evtName, type, ctx)
+              const fn = _self.$call(evtName, type as string, ctx)
               Reflect.apply(fn, _self, args)
-
               value = _self.$store.checkMaxStore(evtName)
               if (value === NEG_RETURN) {
                 _self.$off(evtName)
@@ -255,22 +264,17 @@ export class EventClass extends BaseClass {
 
   /**
    * trigger the event
-   * @param {string} evt name NOT allow array anymore!
-   * @param {mixed} [payload = []] pass to fn
-   * @param {object|string} [context = null] overwrite what stored
-   * @param {string} [type=false] if pass this then we need to add type to store too
-   * @return {number} if it has been execute how many times
    */
   $trigger (
     evt: EvtName,
     payload: Array<unknown> = [],
     context: ContextType = null,
     type: string | boolean = false
-  ) {
+  ): number | boolean {
     this._validateEvt(evt)
     let found = 0
     // first check the normal store
-    this.logger('($trigger) normalStore', nStore)
+    this.logger('($trigger) normalStore')
     if (this.$store.has(evt)) {
       this.logger(`($trigger) "${String(evt)}" found`)
       // @1.8.0 to add the suspend queue
@@ -307,32 +311,34 @@ export class EventClass extends BaseClass {
    * this is an alias to the $trigger - with a different, it returns a fn to call
    * @NOTE breaking change in V1.6.0 we swap the parameter around
    * @NOTE breaking change: v1.9.1 it return an function to accept the params as spread
-   * @param {string} evt event name
-   * @param {string} type of call
-   * @param {object} context what context callback execute in
-   * @return {*} from $trigger
    */
-  $call (evt, type = false, context = null) {
+  $call (
+    evt: EvtName,
+    type: string | boolean = false,
+    context = null
+  ) {
     const ctx = this
-    return function executeCall (...args) {
+    return function executeCall (...args: Array<unknown>) {
       const _args = [evt, args, context, type]
+
       return Reflect.apply(ctx.$trigger, ctx, _args)
     }
   }
 
   /**
    * remove the evt from all the stores
-   * @param {string} evt name
-   * @return {boolean} true actually delete something
    */
-  $off (evt) {
+  $off (
+    evt: EvtName
+  ): boolean {
     // @TODO we will allow a regex pattern to mass remove event
     this._validateEvt(evt)
+    // @TODO do not expose this anymore
     const stores = [this.lazyStore, this.normalStore]
 
     return !!stores
       .filter(store => store.has(evt))
-      .map(store => this.removeFromStore(evt, store))
+      .map(store => this.$store.removeFromStore(evt, store))
       .length
   }
 

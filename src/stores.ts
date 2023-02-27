@@ -4,7 +4,8 @@ import type {
   EvtName,
   StoreContent,
   StoreType,
-  CallbackType
+  CallbackType,
+  StoreNameKey
 } from './lib/types'
 import {
   NEG_RETURN,
@@ -12,8 +13,6 @@ import {
 } from './lib/constants'
 import { isInt, inArray, toArray, trueTypeOf } from './lib/utils'
 import { BaseClass } from './base'
-
-declare type StoreNameKey = 'lazyStore' | 'normalStore'
 
 // def
 export class StoresClass extends BaseClass {
@@ -23,6 +22,8 @@ export class StoresClass extends BaseClass {
   private maxCountStore = new Map<EvtName, number>()
   // reserved for future development
   protected keep = false
+  // useful in many places
+  protected _stores = ['lazyStore', 'normalStore']
 
   constructor(config: ClassConfig = {}) {
     super(config)
@@ -265,13 +266,34 @@ export class StoresClass extends BaseClass {
     return false
   }
 
-  // check if the event name exist in the store
+  /**
+   * check if the event name exist in the store
+   * @TODO what we need to do is check both store
+   * and return where we find it
+   */
   has(
     evtName: EvtName,
     storeName: string = 'normalStore'
   ) {
     const store = this[storeName as StoreNameKey]
     return store.has(evtName)
+  }
+
+  /**
+   * check if this evtName register in one of the store
+   * and return where we finds it
+   */
+  isIn(
+    evtName: EvtName
+  ): string | boolean {
+    const ctn = this._stores.length
+    for (let i = 0; i < ctn; ++i) {
+      const name = this._stores[i]
+      if (this.has(evtName, name)) {
+        return name
+      }
+    }
+    return false
   }
 
   /**
