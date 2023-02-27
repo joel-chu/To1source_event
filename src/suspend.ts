@@ -2,7 +2,16 @@
 V.2 this turn into a standalone class
 because this is an additional feature also
 we get a catch-22 problem (in TS, ESM works fine)
+
+@TODO
+
+for event name that is using Symbol we need to add several methods to help with
+search by regex:
+isSymbol(i: unknown) => boolean
+Symbol.toString --> before pass to regex (better strip out the wrapper as well)
+
 **/
+
 import type { EvtName } from './lib/types'
 import { StoresClass } from './stores'
 import { getRegex, isRegExp } from './lib/utils'

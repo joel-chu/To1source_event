@@ -1,10 +1,12 @@
 // setup a base class to put all the share methods
-import type { ClassConfig } from './lib/types'
+import type {
+  ClassConfig,
+  CallbackHandler
+} from './lib/types'
+
 import { hashCode2Str, trueTypeOf, toArray, inArray } from './lib/utils'
 import { AVAILABLE_TYPES, PKG_NAME, EVT_NAME_TYPES } from './lib/constants'
 
-
-export declare type CallbackHandler = (this: unknown, ...args: unknown[]) => unknown
 // def
 export class BaseClass {
 

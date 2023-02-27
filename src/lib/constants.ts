@@ -22,6 +22,6 @@ export const ON_MAX_TYPES = [
   ONLY_TYPE
 ]
 
-export const PKG_NAME = 'to1source-event' // @TODO add version
+export const PKG_NAME = '@to1source/event' // @TODO add version
 
 export const EVT_NAME_TYPES = ['string', 'symbol']

@@ -42,6 +42,33 @@ export function isString (arg: unknown): boolean {
 }
 
 /**
+ * check if it's a symbol
+ */
+export function isSymbol (arg: unknown): boolean {
+	return trueTypeOf(arg) === 'symbol'
+}
+
+/**
+ * unwrap a string from a symbol
+ */
+export function toString (arg: unknown): string {
+	if (isString(arg)) {
+		return arg as string
+	}
+	// the actual implementation
+	if (isSymbol(arg)) {
+		const s = (arg as symbol).toString()
+		return s
+	}
+	try {
+		// @ts-ignore
+		return arg.toString()
+	} catch(e) {
+		throw new Error(`Unable to call toString on ${arg}`, e)
+	}
+}
+
+/**
  * check if it's an integer
  */
 export function isInt (num: unknown): boolean {
