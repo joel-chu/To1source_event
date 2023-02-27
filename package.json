@@ -23,8 +23,8 @@
     "clean:dist": "rimraf ./dist",
     "build:tsc": "tsc -p tsconfig.json",
     "build:browser:esbuild": "esbuild ./src/index.ts --bundle --minify --sourcemap --outfile=./dist/to1source-event.browser.js",
-    "build:esm": "esbuild ./src/index.ts --format=esm --bundle --minify --sourcemap --outfile=./index.js",
-    "build:alias": "esbuild ./src/alias.ts --format=esm --bundle --minify --sourcemap --outfile=./alias.js",
+    "build:esm": "esbuild ./src/index.ts --format=esm --bundle --minify --sourcemap --outfile=./dist/index.js",
+    "build:alias": "esbuild ./src/alias.ts --format=esm --bundle --minify --sourcemap --outfile=./dist/alias.js",
     "build:umd": "esbuild ./src/index.ts --format=umd --bundle --minify --sourcemap --outfile=./dist/to1source-event.js",
     "ts:check": "tsc -noEmit",
     "qunit": "node ./tests/qunit/run-qunit.js"
