@@ -17,3 +17,5 @@ export type CallbackType<T, S> = (...args: T) => S
 export type ContextType = any | null
 
 export type StoreContentType = Set<unknown> | string | null
+
+export declare type CallbackHandler = (this: unknown, ...args: unknown[]) => unknown
