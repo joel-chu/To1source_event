@@ -19,3 +19,5 @@ export type ContextType = any | null
 export type StoreContentType = Set<unknown> | string | null
 
 export declare type CallbackHandler = (this: unknown, ...args: unknown[]) => unknown
+
+export declare type StoreNameKey = 'lazyStore' | 'normalStore'
