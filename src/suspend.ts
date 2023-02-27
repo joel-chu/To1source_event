@@ -18,18 +18,18 @@ import { getRegex, isRegExp } from './lib/utils'
 // def
 export class SuspendClass {
   // suspend, release and queue
-  protected __suspend_state__: boolean | null = null
+  private __suspend_state__: boolean | null = null
   // to do this proper we don't use a new prop to hold the event name pattern
   // @1.2.2 this become an array so we can hold different events
-  protected __pattern__: Array<RegExp | string> = []
+  private __pattern__: Array<RegExp | string> = []
   // key value pair store to store the queued calls
-  protected queueStore = new Set()
+  private queueStore = new Set()
   // the StoreClass instance
-  protected $store: StoresClass
+  private $store: StoresClass
   // placeholder
   private $trigger
   // for override
-  private logger(...args: Array<unknown>) {}
+  private logger(..._: Array<unknown>) {}
 
   constructor(
     store: StoresClass,
@@ -53,7 +53,7 @@ export class SuspendClass {
   /**
    * release the queue
    */
-  $release () {
+  public $release () {
     this.logger('---> RELEASE ALL SUSPENDED QUEUE <---')
     this.__suspend__(false)
   }
@@ -88,7 +88,7 @@ export class SuspendClass {
     return patterns.map(pattern => {
       this.logger('($releaseEvent)', pattern)
       const regex = getRegex(pattern)
-      if (isRegExp(regex) && this.__isPatternRegisterd(regex)) {
+      if (this.__isPatternRegisterd(regex)) {
         const self = this // not necessary to do this anymore
 
         return this.__getToReleaseQueue(regex as RegExp)
@@ -109,7 +109,7 @@ export class SuspendClass {
    * queuing call up when it's in suspend mode,
    * it's currently suspending then add to store then the $trigger will do nothing
    */
-  $queue (
+  public $queue (
     evt: EvtName,
     ...args: Array<unknown>
   ) {
@@ -145,7 +145,7 @@ export class SuspendClass {
    * The reason is before we call $trigger we need to remove the pattern from queue
    * otherwise, it will never get release
    */
-  protected __getToReleaseQueue (
+  private __getToReleaseQueue (
     regex: RegExp
   ) {
     // first get the list of events in the queue store that match this pattern
@@ -171,9 +171,9 @@ export class SuspendClass {
 
   /**
    * Wrapper method with a logger
-   * @protected
+   * @private
    */
-  protected __addToQueueStore (
+  private __addToQueueStore (
     evt: EvtName,
     args: Array<unknown>
   ) {
@@ -188,9 +188,9 @@ export class SuspendClass {
 
   /**
    * check if certain pattern already registered in the queue
-   * @protected
+   * @private
    */
-  protected __isPatternRegisterd (
+  private __isPatternRegisterd (
     pattern: RegExp
   ) {
     // this is a bit of a hack to compare two regex Object
@@ -202,9 +202,9 @@ export class SuspendClass {
   /**
    * to set the suspend and check if it's boolean value
    * @param {boolean} value to trigger
-   * @protected
+   * @private
    */
-  protected __suspend__ (
+  private __suspend__ (
     value: unknown
   ) {
     if (typeof value === 'boolean') {
@@ -221,9 +221,9 @@ export class SuspendClass {
 
   /**
    * Release the queue, this is a wholesale release ALL
-   * @protected
+   * @private
    */
-  protected __release__ () {
+  private __release__ () {
     const size = this.queueStore.size
     const pattern = this.__pattern__
     this.__pattern__ = []
