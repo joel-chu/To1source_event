@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.1",
   "description": "An universal event (emitter) / bus for Browser / Node.js",
   "type": "module",
-  "module": "index.js",
+  "module": "dist/index.js",
   "browser": "dist/to1source-event.browser.js",
   "main": "dist/to1source-event.js",
   "typings": "dist/typings/*.d.ts",

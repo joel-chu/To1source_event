@@ -4,10 +4,12 @@
 
 This package was [nb-event-service](https://npmjs.com/package/nb-event-service) and now we move under [@to1source/event](https://www.npmjs.com/package/@to1source/event) namespace to continue the development.  
 
+There is no dependency for this package. 
+
 ## Installation
 
 ```sh
-    $ npm install @to1source/event
+$ npm install @to1source/event
 ```
 
 This module works in browser as well as node.js.
@@ -40,23 +42,23 @@ ee.$on('someEvent', function(msg) {
 })
 ```
 
-The message will show.
+The above message will show (as soon as you register the event name with a handler)
 
 *Please note the module is using ES6+ (WeakMap, Set, Map, Array.from etc).
 When you use this module on older browser, please provide polyfill accordingly*
 
-When you include this module in browser (using our stock build). You will get a `To1sourceEvent` global object:
+When you include this module in browser (using our stock build). You will get a `To1SourceEvent` global object:
 
 ```html
 <script>
-  var event = new To1sourceEvent()
+  var event = new To1SourceEvent()
   // then do your thing
 </script>
 ```
 
 ## API
 
-#### $on(eventName, callback, context)
+#### `$on(eventName, callback, context)`
 
 * eventName (string) The event name you want to handle. You can call this multiple times to add different listeners
 * callback (function) it will receive the `params` that call
@@ -64,7 +66,7 @@ When you include this module in browser (using our stock build). You will get a 
 
 It will return the total number of events that get registered.
 
-#### $once(eventName , callback, context)
+#### `$once(eventName , callback, context)`
 
 * eventName (string) the event you want to listen to once, you can call this more than once to add more listener
 * callback (function) it will receive the `params` that call
@@ -99,7 +101,7 @@ remove this event from the event handler store. Therefore, your `$on` will never
 
 So you have to make sure which event you **REALLY** want to register with what.
 
-#### $only(eventName , callback, context)
+#### `$only(eventName , callback, context)`
 
 * eventName (string) the event you want to listen to once, this is first come first serve, and only **ONE** listener
 * callback (function) it will receive the `params` that call
@@ -124,11 +126,11 @@ es.$trigger('only-event', 'A little cat jumping through the window')
 You will only get `ONLY A little cat jumping through the window` but the second callback never add to the event store.
 Although we develop this feature purposely for our other library to use, but it has a lot real world usage.
 
-#### $onlyOnce(eventName , callback, context)
+#### `$onlyOnce(eventName , callback, context)`
 
 Just like what it said on the tin; its `$only` + `$once`. You should able to figure out what it does.
 
-#### $off(eventName)
+#### `$off(eventName)`
 
 * eventName (string) event to remove from internal store  
 
@@ -137,13 +139,13 @@ It will return
 * true - event been clear
 * false - such event doesn't exist
 
-#### $replace(eventName, callback, context = null, type = 'on')
+#### `$replace(eventName, callback, context = null, type = 'on')`
 
 This is `$off` + event register function
 
 Type can be `on`, `only`, `once`, `onlyOnce` default value is `on`
 
-#### $trigger(eventName, params , context, type)
+#### `$trigger(eventName, params , context, type)`
 
 * eventName (string) this will trigger the callback that register with this `eventName` whether that actually exist or not
 * params (mixed) optional - data you want to pass to your callback method
@@ -155,7 +157,7 @@ This method will return:
 * false - if there is nothing to call
 * i - the total number of event been called
 
-#### $call(eventName, type, context) => (...params)
+#### `$call(eventName, type, context) => (...params)`
 
 It takes three parameter then return a function to accept the parameters
 
@@ -178,7 +180,7 @@ es.$on('some-event', function someEventCallback(num, more) {
 // it will throw Error that tells you it has been register with `only` type already
 ```
 
-#### $max(evt, max) => (...args)
+#### `$max(evt, max) => (...args)`
 
 This method let you execute a particular call back (`$on` or `$only` type, because they can get call repeatedly)
 up to `max` time.
@@ -214,19 +216,19 @@ Several things to remember:
 - After the count reach max, it will remove the event from the store, and you won't able to call it again
 - when it returns `-1` then you can not call it anymore, or an integer below your initial `max` value, because every time you call it, it reduces the count by 1 immediately
 
-#### $get(evt)
+#### `$get(evt)`
 
 It returns all the listeners for that particular event name from the internal store. Handy for debug.
 
 Or it will return `false` if there is nothing
 
-#### $suspend / $release
+#### `$suspend` / `$release`
 
 When you call `$suspend` , all the `$trigger` and `$call` action will have no effect and put into a temporary
 store, and wait until you call `$release`. This is an on / off switch no in between.
 
 ```js
-const evtSrv = new To1sourceEvent()
+const evtSrv = new To1SourceEvent()
 
 evtSrv.$on('some-event', value => {
   return value + 1
@@ -244,7 +246,7 @@ console.log(evtSrv.$done) // 101
 
 ```
 
-#### $suspendEvent(eventNamePattern)
+#### `$suspendEvent(eventNamePattern)`
 
 This is similar to `$suspend`, but it allows you to provide an event name pattern to those event name that matches.
 It allow you to add mutliple `eventNamePattern`. **Important to note that, if `$suspend` has been called,
@@ -252,7 +254,7 @@ this method has no effect.**
 
 ```js
 
-const evtSrv = new To1sourceEvent()
+const evtSrv = new To1SourceEvent()
 
 evtSrv.$on('some-event-ok', () => {
   console.log('ok')
@@ -285,14 +287,14 @@ evtSrv.$suspendEvent(`event-to-suspend-1`, `event-to-suspend-2`)
 
 ```
 
-#### $releaseEvent(eventNamePattern)
+#### `$releaseEvent(eventNamePattern)`
 
 This is the opposite of the `$suspendEvent`; it will release those suspend events if it matches the `eventNamePattern`.
 It will return the number of the released event from queue. And it's the same like `$suspendEvent`, if `$suspend` already
 been called; it has no effect.
 
 ```js
-const evtSrv = new To1sourceEvent()
+const evtSrv = new To1SourceEvent()
 
 evtSrv.$on('some-event-ok', () => {
   console.log('OK')
@@ -333,7 +335,7 @@ evtSrv.$releaseEvent(`event-to-release-1`, `event-to-release-2`)
 
 ```
 
-#### $debug(idx)
+#### `$debug(idx)`
 
 This method only logging output, so make sure you have passed a logger when you create the class instance.
 
@@ -346,8 +348,9 @@ If you don't pass anything, it will log all the stores to show what is inside.
 
 If you don't like the `$`, you can use the alias version.
 
-For browser you can include the `dist/to1source-event-alias.js`, for ES6 `import To1sourceEvent from '@to1source/event/alias'`
-for node you can `require('@tosource/event/dist/alias')`
+- browser you can include the `dist/to1source-event.alias.js` 
+- ES6 `import To1SourceEvent from '@to1source/event/alias'`
+- node you can `require('@tosource/event/dist/alias')`
 
 And that will gives you the following alias version:
 
@@ -364,9 +367,9 @@ If you want everything alias, then roll your own by extending this class
 
 ```js
 // node
-import To1sourceEvent from '@to1source/event/alias'
+import To1SourceEvent from '@to1source/event/alias'
 
-class MyEventClass extends To1sourceEvent {
+class MyEventClass extends To1SourceEvent {
   constructor(config) {
     super(config)
   }
@@ -390,7 +393,7 @@ class MyEventClass extends To1sourceEvent {
 
 ```
 
-## $done getter
+## `$done` getter
 
 This should return the last value that get exeucted
 
@@ -417,7 +420,8 @@ might be different from what you expected. So use this with caution.
 
 ## Types for typescript
 
-V.1.5.0 add type definition to the project `@types/index.d.ts` and its included in the package.json.
+V.2 completely rewritten with Typescript, and have `tsc` generate all the correct type files.
+~~V.1.5.0 add type definition to the project `@types/index.d.ts` and its included in the package.json.~~
 
 ## Test
 
@@ -429,7 +433,8 @@ $ npm test
 
 ## Build
 
-We use [rollup](https://rollupjs.org/guide/en/) for building process.
+~~We use [rollup](https://rollupjs.org/guide/en/) for building process.~~
+V.2 use `esbuild` to build the package directly. Might move back to rollup if require in the future.
 
 ```sh
 $ npm run build
@@ -439,4 +444,4 @@ $ npm run build
 
 UNLICENSED
 
-[Joel Chu](https://joelchu.com) [NEWBRAN LTD](https://newbran.ch) [TO1SOURCE](https://to1source.cn) (c) 2020
+[TO1SOURCE](https://to1source.cn) / [Joel Chu](https://joelchu.com) / [NEWBRAN LTD](https://newbran.co.uk)  (c) 2023
