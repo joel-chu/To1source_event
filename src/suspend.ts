@@ -12,6 +12,7 @@ Symbol.toString --> before pass to regex (better strip out the wrapper as well)
 
 **/
 import type { EvtName } from './lib/types'
+import type { EventClass } from './events'
 import { getRegex, isRegExp } from './lib/utils'
 // def
 export class SuspendClass {
@@ -22,22 +23,22 @@ export class SuspendClass {
   private __pattern__: Array<RegExp | string> = []
   // key value pair store to store the queued calls
   private queueStore = new Set()
-  // the StoreClass instance
-  // private $store: StoresClass
   // placeholder
-  private $trigger
+  private $eventCls: EventClass
   // for override
   private logger(..._: Array<unknown>) {}
 
   constructor(
-    // store: StoresClass,
-    trigger: unknown, // @TODO
-    logger: (...args: Array<unknown>) => void
+    eventCls: EventClass
   ) {
-    // init the store engine
-    // this.$store = store
-    this.$trigger = trigger
-    this.logger = logger
+    this.$eventCls = eventCls
+    this.logger = eventCls.logger
+  }
+
+  // just call the event.$trigger
+  // the different is we just take the param as a whole array
+  private $trigger(args: Array<unknown>) {
+    return Reflect.apply(this.$eventCls.$trigger, this.$eventCls, args)
   }
 
   /**
@@ -92,7 +93,8 @@ export class SuspendClass {
         return this.__getToReleaseQueue(regex as RegExp)
           .map((args, i) => {
             // @ts-ignore @TODO
-            Reflect.apply(self.$trigger, self, args)
+            // Reflect.apply(self.$trigger, self, args)
+            self.$trigger(args)
 
             return i
           }).reduce((_, b) => ++b, 0)
@@ -176,7 +178,6 @@ export class SuspendClass {
     args: Array<unknown>
   ) {
     this.logger(`($queue) ${evt} added to $queueStore`, args)
-
     // @TODO should we check if this already added?
     // what if that is a multiple call like $on
     this.queueStore.add([evt].concat(args as Array<string>))
@@ -230,13 +231,14 @@ export class SuspendClass {
     )
     if (size > 0) {
       const queue = Array.from(this.queueStore)
+      const self = this
       this.logger('(release queue)', queue)
 
       queue.forEach(args => {
         // @ts-ignore
-        this.logger(`[release] execute ${args[0]}`, args)
+        self.logger(`[release] execute ${args[0]}`, args)
         // @ts-ignore
-        Reflect.apply(this.$trigger, this, args)
+        self.$trigger(args)
       })
 
       this.queueStore.clear()
