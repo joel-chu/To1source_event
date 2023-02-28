@@ -2,7 +2,7 @@
 // inject into the html and run the server
 import { join, resolve } from 'node:path'
 import glob from 'glob'
-import serverIoCore from 'server-io-core'
+import { serverIoCore } from 'server-io-core'
 
 /**
  * @param {object} config configuration
