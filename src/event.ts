@@ -34,7 +34,8 @@ export class EventClass extends BaseClass {
     this.$storesCls = new StoresClass(config)
     // V.2 change to a standalone class init inside event constructor
     this.$suspendCls = new SuspendClass(
-      this
+      this,
+      this.logger
     )
   }
 
