@@ -351,6 +351,14 @@ export class EventClass extends BaseClass {
   }
 
   /**
+   * V.2 wrapper for StoreClass takeFromStore
+   */
+  $take (
+    evtName: EvtName
+  ) {
+    return this.$store.takeFromStore(evtName)
+  }
+  /**
    * Take a look inside the stores
    */
   $debug (idx: number | null = null): void {
