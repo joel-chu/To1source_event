@@ -11,8 +11,8 @@ isSymbol(i: unknown) => boolean
 Symbol.toString --> before pass to regex (better strip out the wrapper as well)
 
 **/
-import type { EvtName } from './lib/types'
-import type { EventClass } from './events'
+import type { EvtName, GenericFn } from './lib/types'
+import type { EventClass } from './event'
 import { getRegex, isRegExp } from './lib/utils'
 // def
 export class SuspendClass {
@@ -29,10 +29,11 @@ export class SuspendClass {
   private logger(..._: Array<unknown>) {}
 
   constructor(
-    eventCls: EventClass
+    eventCls: EventClass,
+    logger: GenericFn
   ) {
     this.$eventCls = eventCls
-    this.logger = eventCls.logger
+    this.logger = logger
   }
 
   // just call the event.$trigger
