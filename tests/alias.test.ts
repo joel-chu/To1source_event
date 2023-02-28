@@ -1,8 +1,10 @@
 import test from 'ava'
 import To1SourceEvent from '../src/alias'
 
-const logger = console.info
-const debug = (...args: Array<string>) => Reflect.apply(console.info, console, ['alias-debug'].concat(args))
+import debug from 'debug'
+
+const logger = debug('to1source-event')
+const _debug = (...args: Array<string>) => Reflect.apply(console.info, console, ['alias-debug'].concat(args))
 
 let value = 1000
 const evtSrv = new To1SourceEvent({ logger })
@@ -52,7 +54,7 @@ test('It should able to add more than one listerner to the same event', async (t
 test('It should not allow to add the same function again', t => {
   const evtName = 'add-once'
   const callback = (x: unknown) => {
-    debug(x as string)
+    _debug(x as string)
   }
 
   evtSrv.on(evtName, callback)
@@ -69,12 +71,12 @@ test('It should only call once if we use the $once option', t => {
 
   const callback = () => {
     ++ctn;
-    debug(ctn as unknown as string)
+    _debug(ctn as unknown as string)
   }
 
   const callback2 = () => {
     ++ctn;
-    debug(ctn as unknown as string)
+    _debug(ctn as unknown as string)
   }
 
   evtSrv.once(evtName, callback)
@@ -93,7 +95,7 @@ test('Using the $call alias to $trigger should do the same thing', t => {
 
   const callback = () => {
     ++ctn;
-    debug(ctn as unknown as string)
+    _debug(ctn as unknown as string)
   }
   evtSrv.once(evtName, callback)
   evtSrv.emit(evtName)
@@ -108,7 +110,7 @@ test('Using $trigger and $call should make the callback run again', t => {
 
   const callback = () => {
     ++ctn;
-    debug(ctn as unknown as string)
+    _debug(ctn as unknown as string)
   }
 
   evtSrv.emit(evtName)
@@ -125,7 +127,7 @@ test('Should not able to call the method once the $off is called', t => {
   const evtName = 'off-event'
 
   const callback = (l: string) => {
-    debug(`${l}`)
+    _debug(`${l}`)
   }
 
   evtSrv.on(evtName, callback)
