@@ -415,9 +415,12 @@ You will get a 1001. This might be useful in some situation. Please note, it wil
 whenever an event gets trigger; if at the same time some other event trigger, then your value
 might be different from what you expected. So use this with caution.
 
+--- 
+
 ## Types for typescript
 
-V.1.5.0 add type definition to the project `@types/index.d.ts` and its included in the package.json.
+~~V.1.5.0 add type definition to the project `@types/index.d.ts` and its included in the package.json.~~
+V.2 complete rewritten from ground up with Typescript
 
 ## Test
 

@@ -59,6 +59,7 @@ export class StoresClass extends BaseClass {
         if (value > 0) {
           --value
         }
+        // after deduct from the count if it's still more than zero 
         if (value > 0) {
           this.maxCountStore.set(evtName, value) // just update the value
         } else {
