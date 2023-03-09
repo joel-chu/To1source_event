@@ -25,7 +25,7 @@
     "test:ava": "ava",
     "test:coverage": "nyc ava",
     "build": "npm run clean:dist && npm run build:browser && npm run build:esm && npm run build:alias && npm run build:cjs && npm run build:cjs:alias && npm run typings",
-    "test": "npm run build && npm run test:ava",
+    "test": "npm run build && npm run test:coverage",
     "build:rollup": "rollup -c",
     "clean:dist": "rimraf ./dist",
     "build:browser": "esbuild ./src/index.ts --bundle --minify --sourcemap --outfile=./dist/to1source-event.browser.js",
